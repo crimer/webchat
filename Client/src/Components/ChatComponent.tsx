@@ -1,13 +1,15 @@
-import React, { useRef, useCallback, useContext, useMemo } from 'react'
+import React, {
+    useRef,
+    useCallback,
+    useContext,
+    useMemo,
+    useEffect,
+} from 'react'
 import '../styles/Chat.css'
 import { ChatContext, ChatContextProvider } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { formatDate } from '../libs/DateFormat'
-import {
-    makeStyles,
-    TextareaAutosize,
-    TextField,
-} from '@material-ui/core'
+import { makeStyles } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     appBarSpacer: theme.mixins.toolbar,
@@ -24,7 +26,6 @@ const useStyles = makeStyles((theme) => ({
         height: '100%',
         display: 'flex',
         flexFlow: 'column nowrap',
-
     },
 }))
 
@@ -42,13 +43,25 @@ type MessageBlock = {
 const ChatMessageListComponent: React.FC = () => {
     const { messages } = useContext(ChatContext)
     const { currentUserName } = useContext(AccountContext)
+    const bottomRef = useRef<HTMLDivElement>(null)
 
+    const scrollToBottom = () => {
+        if (!bottomRef.current) return
+        bottomRef.current.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start',
+        })
+    }
+    useEffect(() => {
+        scrollToBottom()
+    }, [messages])
     return (
         <div className='message-list'>
             {currentUserName !== '' &&
                 messages.map((m) => (
                     <ChatMessagesBlockComponent key={m.time} message={m} />
                 ))}
+            <div ref={bottomRef}></div>
         </div>
     )
 }
