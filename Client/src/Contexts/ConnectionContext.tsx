@@ -2,21 +2,15 @@ import React, { createContext, useState, useEffect, useContext } from 'react'
 import SignalRManager from '../SignalR/SignalRManager'
 
 interface IConnectionContext {
-    isConnected: boolean
     startConnection(): void
     stopConnection(): void
-    reconnectConnection(): void
 }
 
 export const ConnectionContext = createContext<IConnectionContext>({
-    isConnected: false,
     startConnection: () => {
         throw new Error('Контекст подключения не проинициализирован')
     },
     stopConnection: () => {
-        throw new Error('Контекст подключения не проинициализирован')
-    },
-    reconnectConnection: () => {
         throw new Error('Контекст подключения не проинициализирован')
     },
 })
@@ -42,21 +36,8 @@ export const ConnectionContextProvider: React.FC = ({ children }) => {
             .finally(() => setIsConnected(false))
     }
 
-    const reconnectConnection = () => {
-        SignalRManager.instance
-            .reconnect()
-            .then(() => {
-                setIsConnected(true)
-            })
-            .catch((error) => {
-                console.log('SignalRManager reconnection error', error)
-                setIsConnected(false)
-            })
-    }
-
     return (
-        <ConnectionContext.Provider
-            value={{ isConnected, startConnection, stopConnection, reconnectConnection }}>
+        <ConnectionContext.Provider value={{ startConnection, stopConnection }}>
             {children}
         </ConnectionContext.Provider>
     )

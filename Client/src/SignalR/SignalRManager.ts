@@ -22,7 +22,8 @@ class SignalRManager {
     }
 
     public stop(): Promise<void> {
-        this.connection.stop()
+        if(this.connection.state === SignalR.HubConnectionState.Connected)
+            this.connection.stop()
         return Promise.resolve()
     }
 

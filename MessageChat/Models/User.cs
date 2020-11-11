@@ -4,7 +4,7 @@ namespace MessageChat.Models
 {
     public class User
     {
-        public string Name { get; set; }
+        public string Name { get; private set; }
         public List<string> Connections { get; set; }
         public User(string name)
         {

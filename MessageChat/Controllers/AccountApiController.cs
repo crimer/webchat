@@ -15,23 +15,19 @@ namespace MessageChat.Controllers
         [HttpPost("login")]
         public async Task<object> Login([FromBody] LoginInDto loginData)
         {
-            // объявляем роли
             var claims = new []
             {
                 new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Name, loginData.Name), 
             };
-            // создаем идентификацию
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
-            // сохраняем в куки пользователя
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), new AuthenticationProperties
             {
                 IsPersistent = true,
                 AllowRefresh = true,
                 ExpiresUtc = DateTime.UtcNow.Add(TimeSpan.FromMinutes(1))
             });
-            // возврящвем имя авторизированного пользоватеял
             return new
             {
                 name = loginData.Name

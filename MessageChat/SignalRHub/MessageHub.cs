@@ -22,11 +22,8 @@ namespace MessageChat.SignalR
                 UserName = currentUserName,
             };
             
-            if (Context.User.Identity.IsAuthenticated)
-            {
-                var allAuthUsers = _authUserManager.GetAllAuthUsers();
-                await Clients.Users(allAuthUsers).SendAsync("NewMessage", userChatMessage);
-            }
+            var allAuthUsers = _authUserManager.GetAllAuthUsers();
+            await Clients.Users(allAuthUsers).SendAsync("NewMessage", userChatMessage);
         }
        
         public override Task OnConnectedAsync()

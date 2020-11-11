@@ -4,6 +4,7 @@ import React, {
     useContext,
     useMemo,
     useEffect,
+    useState,
 } from 'react'
 import '../styles/Chat.css'
 import { ChatContext, ChatContextProvider } from '../Contexts/ChatContext'
@@ -70,8 +71,7 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
     message,
 }: IMessageBlockProps) => {
     const { userName, isMy, text, time } = message
-
-    const [firstName, secondName] = userName.split(' ')
+    const names = userName.split(' ')
 
     const messageRowClasses = `message-row ${
         isMy ? 'message-row-my' : 'message-row-another'
@@ -85,10 +85,12 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
 
     const userInitials = useMemo(
         () =>
-            `${firstName[0]
-                ?.toUpperCase()
-                .toString()}${secondName[0]?.toString().toUpperCase()}`,
-        [firstName, secondName]
+            names.reduce(
+                (result, currentName) =>
+                    (result += currentName[0].toUpperCase()),
+                ''
+            ),
+        [userName]
     )
 
     const stringToColour = useCallback((): string => {
@@ -124,27 +126,22 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
 const ChatInputBlockComponent: React.FC = () => {
     const { sendMessage } = useContext(ChatContext)
     const { currentUserName } = useContext(AccountContext)
-
+    const [message, setMessage] = useState('')
     const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
-    const onEnter = useCallback(
-        async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
-            if (event.keyCode === 13 && textAreaRef.current) {
-                event.preventDefault()
-
-                if (textAreaRef.current.value !== '') {
-                    await sendMessage(textAreaRef.current.value)
-                    textAreaRef.current.value = ''
-                }
-            }
-        },
-        [textAreaRef]
-    )
+    const onEnter = async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+        if (event.key === 'Enter') {
+            event.preventDefault()
+            await sendMessage(message)
+            setMessage('')
+        }
+    }
 
     return (
         <div className='input-block'>
             <textarea
-                ref={textAreaRef}
+                onChange={(event) => setMessage(event.target.value)}
+                value={message}
                 className='text-input'
                 placeholder={'Введите сообщение'}
                 rows={1}

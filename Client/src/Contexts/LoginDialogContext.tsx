@@ -1,9 +1,4 @@
-import React, {
-    useContext,
-    useRef,
-    createContext,
-    useState,
-} from 'react'
+import React, { useContext, useRef, createContext, useState } from 'react'
 import { TextField, Button } from '@material-ui/core'
 import '../styles/LoginDialog.css'
 import { AccountContext } from './AccountContext'
@@ -27,10 +22,9 @@ export const LogingDialogContextProvder: React.FC = ({ children }) => {
     const { openModal } = useContext(ModalContext)
 
     const dialogRef = useRef<HTMLDialogElement>(null)
-    const inputRef = useRef<HTMLInputElement>(null)
 
     const setIsDialogOpen = (isDialogOpen: boolean) => {
-        if (!inputRef.current || !dialogRef.current) return
+        if (!dialogRef.current) return
 
         if (isDialogOpen) {
             dialogRef.current.showModal()
@@ -44,6 +38,7 @@ export const LogingDialogContextProvder: React.FC = ({ children }) => {
 
         dialogRef.current.close()
         if (userLogin.trim().length === 0) {
+            setUserLogin('')
             openModal('Внимание!', 'Логин не должен быть пустым')
             return
         }
@@ -52,7 +47,9 @@ export const LogingDialogContextProvder: React.FC = ({ children }) => {
         setUserLogin('')
     }
 
-    const enterPressHandler = async (event: React.KeyboardEvent<HTMLDivElement>) => event.key === 'Enter' && await loginInternal()
+    const enterPressHandler = async (
+        event: React.KeyboardEvent<HTMLDivElement>
+    ) => event.key === 'Enter' && (await loginInternal())
 
     return (
         <LoginDialogContext.Provider value={{ setIsDialogOpen }}>
@@ -66,10 +63,13 @@ export const LogingDialogContextProvder: React.FC = ({ children }) => {
                     <TextField
                         value={userLogin}
                         onChange={(e) => setUserLogin(e.target.value)}
-                        inputRef={inputRef}
                         onKeyPress={(event) => enterPressHandler(event)}
                         label='Имя пользователя'
-                        fullWidth
+                        fullWidth helperText='(не более 25 символов)'
+
+                        inputProps={{
+                            maxLength: 25,
+                        }}
                     />
                 </div>
                 <div className='login-dialog-footer'>

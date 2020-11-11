@@ -27,7 +27,8 @@ export const ModalContextProvider: React.FC = ({ children }) => {
         setDescription(description)
 
         if (title !== '' && description !== '') {
-            dialogRef.current.showModal()
+            if(!dialogRef.current.open)
+                dialogRef.current.showModal()
         } else {
             dialogRef.current.close()
         }

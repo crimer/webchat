@@ -1,6 +1,7 @@
 ﻿using MessageChat.Models;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MessageChat.Services.AuthUserManager
 {
@@ -59,13 +60,6 @@ namespace MessageChat.Services.AuthUserManager
                 user.RemoveConnection(userConnectionId);
             }
         }
-
-        public List<string> GetAllAuthUsers()
-        {
-            List<string> allAuthUsers = new List<string>();
-
-            allAuthUsers.AddRange(_authUsers.Keys);
-            return allAuthUsers;
-        }
+        public List<string> GetAllAuthUsers() => _authUsers.Keys.Select(user => user).ToList();
     }
 }

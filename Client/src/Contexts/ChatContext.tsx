@@ -11,16 +11,12 @@ type UserMessage = {
 }
 
 interface IChatContext {
-    messages: UserMessage[],
-    clearMessages: () => void,
+    messages: UserMessage[]
     sendMessage: (message: string) => Promise<void>
 }
 
 export const ChatContext = createContext<IChatContext>({
     messages: [],
-    clearMessages: () => {
-        throw new Error('Контекст чата не проинициализирован')
-    },
     sendMessage: (message: string) => {
         throw new Error('Контекст чата не проинициализирован')
     },
@@ -47,11 +43,10 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         return () => SignalRManager.instance.connection.off('NewMessage')
     }, [currentUserName])
 
-    useEffect(()=>{
-        if(currentUserName === '')
-        setMessages([])
-    },[currentUserName])
-    
+    useEffect(() => {
+        if (currentUserName === '') setMessages([])
+    }, [currentUserName])
+
     const sendMessage = (message: string) => {
         return SignalRManager.instance
             .sendMessage('NewMessage', message)
@@ -62,10 +57,9 @@ export const ChatContextProvider: React.FC = ({ children }) => {
                 )
             )
     }
-    const clearMessages = () => setMessages([])
 
     return (
-        <ChatContext.Provider value={{ messages, sendMessage, clearMessages }}>
+        <ChatContext.Provider value={{ messages, sendMessage }}>
             {children}
         </ChatContext.Provider>
     )
