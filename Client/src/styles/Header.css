@@ -1,0 +1,38 @@
+
+.navbar-item {
+    cursor: pointer;
+}
+
+.selected {
+    background-color: rgb(199, 198, 198);
+}
+
+.navbar-item:hover {
+    color: darkgray;
+}
+
+.selected.navbar-item:hover {
+    color: black;
+}
+
+.navbar-brand {
+    margin-left: 5px;
+    grid-column: 1;
+}
+
+.login-button {
+    grid-column: 2;
+    text-align: end;
+    margin-right: 5px;
+}
+
+.authorized-user {
+    display: grid;
+    grid-template-columns: auto min-content;
+    justify-items: end;
+    margin-right: 5px;
+}
+
+.user-name {
+    padding-right: 1em;
+}
