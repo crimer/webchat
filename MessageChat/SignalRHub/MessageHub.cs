@@ -11,7 +11,11 @@ namespace MessageChat.SignalR
     [Authorize]
     public class MessageHub : Hub
     {
-        private AuthUserManagerInMemory _authUserManager = AuthUserManagerInMemory.GetInstance();
+        private readonly IAuthUserManager _authUserManager;
+        public MessageHub(IAuthUserManager authUserManager) : base()
+        {
+            _authUserManager = authUserManager;
+        }
         public async Task NewMessage(string text)
         {
             var currentUserName = Context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Неизвестный чувак";
@@ -35,7 +39,7 @@ namespace MessageChat.SignalR
             if (userName == null || !Context.User.Identity.IsAuthenticated)
                 return base.OnConnectedAsync();
 
-            _authUserManager.AddUser(userName, userIdentifier, userConnectionId);
+            _authUserManager.ConnectedConnection(userName, userIdentifier, userConnectionId);
 
             return base.OnConnectedAsync();
         }
@@ -49,7 +53,7 @@ namespace MessageChat.SignalR
             if (userName == null || !Context.User.Identity.IsAuthenticated)
                 return base.OnDisconnectedAsync(exception);
 
-            _authUserManager.RemoveUser(userIdentifier, userConnectionId);
+            _authUserManager.DisconnectedConnection(userIdentifier, userConnectionId);
 
             return base.OnDisconnectedAsync(exception);
         }

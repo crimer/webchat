@@ -5,27 +5,15 @@ using System.Linq;
 
 namespace MessageChat.Services.AuthUserManager
 {
-    /// <summary>
-    /// Сингелтон для работы с авторизированными пользователями
-    /// </summary>
     public class AuthUserManagerInMemory : IAuthUserManager
     {
-        private static AuthUserManagerInMemory Manager;
-
         public ConcurrentDictionary<string, User> _authUsers { get; set; }
         public AuthUserManagerInMemory()
         {
             _authUsers = new ConcurrentDictionary<string, User>();
         }
 
-        public static AuthUserManagerInMemory GetInstance()
-        {
-            if (Manager == null)
-                Manager = new AuthUserManagerInMemory();
-            return Manager;
-        }
-
-        public void AddUser(string name, string userIdentifier, string connectionId)
+        public void ConnectedConnection(string name, string userIdentifier, string connectionId)
         {
             if (!_authUsers.ContainsKey(userIdentifier))
             {
@@ -42,7 +30,7 @@ namespace MessageChat.Services.AuthUserManager
             }
         }
 
-        public void RemoveUser(string userIdentifier, string userConnectionId)
+        public void DisconnectedConnection(string userIdentifier, string userConnectionId)
         {
             User deletedUser;
             User user;
@@ -60,6 +48,6 @@ namespace MessageChat.Services.AuthUserManager
                 user.RemoveConnection(userConnectionId);
             }
         }
-        public List<string> GetAllAuthUsers() => _authUsers.Keys.Select(user => user).ToList();
+        public IReadOnlyList<string> GetAllAuthUsers() => _authUsers.Keys.ToList();
     }
 }

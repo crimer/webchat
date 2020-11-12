@@ -15,6 +15,12 @@ namespace MessageChat.Controllers
         [HttpPost("login")]
         public async Task<object> Login([FromBody] LoginInDto loginData)
         {
+            if (string.IsNullOrWhiteSpace(loginData.Name) || loginData.Name.Length > 25)
+                return BadRequest(new
+                {
+                    name = "Имя не валидно"
+                });
+
             var claims = new []
             {
                 new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
@@ -28,6 +34,7 @@ namespace MessageChat.Controllers
                 AllowRefresh = true,
                 ExpiresUtc = DateTime.UtcNow.Add(TimeSpan.FromMinutes(1))
             });
+            //throw new Exception("my errror");
             return new
             {
                 name = loginData.Name

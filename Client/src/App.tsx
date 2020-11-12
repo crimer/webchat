@@ -11,7 +11,6 @@ import { CssBaseline, makeStyles } from '@material-ui/core'
 const useStyles = makeStyles((theme) => ({
     root: {
         display: 'grid',
-        // flexFlow: 'row nowrap',
         gridTemplateColumns: '320px 1fr',
         gridTemplateRows: '64px 1fr',
         height: '100vh',

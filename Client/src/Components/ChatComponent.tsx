@@ -10,7 +10,7 @@ import '../styles/Chat.css'
 import { ChatContext, ChatContextProvider } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { formatDate } from '../libs/DateFormat'
-import { makeStyles } from '@material-ui/core'
+import { makeStyles, TextField } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     appBarSpacer: theme.mixins.toolbar,
@@ -127,26 +127,25 @@ const ChatInputBlockComponent: React.FC = () => {
     const { sendMessage } = useContext(ChatContext)
     const { currentUserName } = useContext(AccountContext)
     const [message, setMessage] = useState('')
-    const textAreaRef = useRef<HTMLTextAreaElement>(null)
 
-    const onEnter = async (event: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    const onEnter = async (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault()
-            await sendMessage(message)
+            if (message.trim().length > 0) await sendMessage(message)
             setMessage('')
         }
     }
 
     return (
-        <div className='input-block'>
-            <textarea
-                onChange={(event) => setMessage(event.target.value)}
-                value={message}
-                className='text-input'
+        <div>
+            <TextField
                 placeholder={'Введите сообщение'}
-                rows={1}
+                value={message}
                 onKeyDown={(event) => onEnter(event)}
+                onChange={(event) => setMessage(event.target.value)}
                 disabled={currentUserName === ''}
+                rows={1}
+                fullWidth
             />
         </div>
     )

@@ -1,4 +1,5 @@
 using System;
+using MessageChat.Services.AuthUserManager;
 using MessageChat.SignalR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -21,7 +22,9 @@ namespace MessageChat
                 options.KeepAliveInterval = TimeSpan.FromMinutes(5);
                 options.ClientTimeoutInterval = TimeSpan.FromMinutes(5);
             });
-            
+
+            services.AddSingleton<IAuthUserManager, AuthUserManagerInMemory>();
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {

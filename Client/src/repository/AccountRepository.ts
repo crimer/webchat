@@ -7,7 +7,7 @@ class AccountRepository {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ name }),
-        });
+        })
     }
 
     public logout(): Promise<Response> {
@@ -17,10 +17,10 @@ class AccountRepository {
             headers: {
                 'Content-Type': 'application/json',
             },
-        });
+        })
     }
 }
 
-const accountRepository = new AccountRepository();
+const accountRepository = new AccountRepository()
 
-export default accountRepository;
+export default accountRepository

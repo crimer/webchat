@@ -40,7 +40,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             setUserName(json.name)
             return true
         } else if (response) {
-            alert(`При авторизации произошла ошибка. ${response.statusText}`)
+            openModal('Ошибка авторизации', `При авторизации произошла ошибка. ${response.statusText}`)
         }
         return false
     }
@@ -58,7 +58,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             setUserName('')
             await stopConnection()
         } else if (response) {
-            alert(`При выходе произошла ошибка. ${response.statusText}`)
+            openModal('Ошибка выхода', `При выходе произошла ошибка. ${response.statusText}`)
         }
     }
 
