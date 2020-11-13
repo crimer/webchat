@@ -18,11 +18,12 @@ class SignalRManager {
     public start(): Promise<void> {
         if (this.connection.state === SignalR.HubConnectionState.Disconnected)
             return this.connection.start()
+
         return Promise.resolve()
     }
 
     public stop(): Promise<void> {
-        if(this.connection.state === SignalR.HubConnectionState.Connected)
+        if (this.connection.state === SignalR.HubConnectionState.Connected)
             this.connection.stop()
         return Promise.resolve()
     }

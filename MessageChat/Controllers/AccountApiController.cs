@@ -32,7 +32,7 @@ namespace MessageChat.Controllers
             {
                 IsPersistent = true,
                 AllowRefresh = true,
-                ExpiresUtc = DateTime.UtcNow.Add(TimeSpan.FromMinutes(1))
+                ExpiresUtc = DateTime.UtcNow.AddMinutes(3)
             });
             //throw new Exception("my errror");
             return new

@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react'
+import Cookies from 'js-cookie'
+import React, { createContext, useState } from 'react'
 import SignalRManager from '../SignalR/SignalRManager'
 
 interface IConnectionContext {
@@ -23,6 +24,7 @@ export const ConnectionContextProvider: React.FC = ({ children }) => {
             .start()
             .then(() => {
                 setIsConnected(true)
+                console.log('Connected')
             })
             .catch((error) => setIsConnected(false))
     }
