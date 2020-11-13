@@ -18,6 +18,8 @@ namespace MessageChat.SignalR
         }
         public async Task NewMessage(string text)
         {
+            if (string.IsNullOrWhiteSpace(text)) return;
+
             var currentUserName = Context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Неизвестный чувак";
             var userChatMessage = new UserChatMessageDto
             {
