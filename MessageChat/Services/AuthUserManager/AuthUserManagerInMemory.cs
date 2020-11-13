@@ -26,7 +26,8 @@ namespace MessageChat.Services.AuthUserManager
             {
                 User user;
                 _authUsers.TryGetValue(userIdentifier, out user);
-                user.AddNewConnection(connectionId);
+                if(user != null)
+                    user.AddNewConnection(connectionId);
             }
         }
 
@@ -38,6 +39,8 @@ namespace MessageChat.Services.AuthUserManager
             if (!_authUsers.ContainsKey(userIdentifier)) return;
 
             _authUsers.TryGetValue(userIdentifier, out user);
+
+            if (user == null) return;
 
             if (user.Connections.Count == 1)
             {

@@ -128,6 +128,10 @@ const ChatInputBlockComponent: React.FC = () => {
     const { currentUserName } = useContext(AccountContext)
     const [message, setMessage] = useState('')
 
+    useEffect(() => {
+        setMessage('')
+    }, [currentUserName])
+
     const onEnter = async (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault()
