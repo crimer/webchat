@@ -1,4 +1,5 @@
 using System;
+using MessageChat.Middlewares;
 using MessageChat.Services.AuthUserManager;
 using MessageChat.SignalR;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -43,6 +44,8 @@ namespace MessageChat
                 app.UseExceptionHandler("/Error");
                 app.UseHsts();
             }
+
+            app.UseMiddleware<ErrorsMiddleware>();
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();

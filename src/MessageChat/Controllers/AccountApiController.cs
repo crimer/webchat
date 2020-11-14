@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using MessageChat.ApiHelpers;
+using System.Net;
 
 namespace MessageChat.Controllers
 {
@@ -34,11 +36,8 @@ namespace MessageChat.Controllers
                 AllowRefresh = true,
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(3)
             });
-            //throw new Exception("my errror");
-            return new
-            {
-                name = loginData.Name
-            };
+
+            return new ApiResponse<object>(new { name = loginData.Name }, (int)HttpStatusCode.OK);
         }
 
         [HttpPost("logout")]
