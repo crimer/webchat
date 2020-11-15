@@ -7,6 +7,7 @@ import { LogingDialogContextProvder } from './Contexts/LoginDialogContext'
 import { ConnectionContextProvider } from './Contexts/ConnectionContext'
 import { ModalContextProvider } from './Contexts/ModalContext'
 import { CssBaseline, makeStyles } from '@material-ui/core'
+import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -16,7 +17,6 @@ const useStyles = makeStyles((theme) => ({
         height: '100vh',
         width: '100%',
     },
-
 }))
 
 const App = () => {
@@ -26,14 +26,14 @@ const App = () => {
         <ModalContextProvider>
             <ConnectionContextProvider>
                 <AccountContextProvider>
-                    <CssBaseline />
-                    <div className={classes.root}>
-                        <LogingDialogContextProvder>
+                    <LogingDialogContextProvder>
+                        <CssBaseline />
+                        <div className={classes.root}>
                             <Header />
-                        </LogingDialogContextProvder>
-                        <ChannelsBar />
-                        <ChatComponent />
-                    </div>
+                            <ChannelsBar />
+                            <ChatComponent />
+                        </div>
+                    </LogingDialogContextProvder>
                 </AccountContextProvider>
             </ConnectionContextProvider>
         </ModalContextProvider>
