@@ -1,5 +1,4 @@
 ﻿using MessageChat.ApiHelpers;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Net;
@@ -22,15 +21,15 @@ namespace MessageChat.Middlewares
             }
             catch (Exception ex)
             {
-                await HandleExeptionAsync(context);
+                await HandleExeptionAsync(ex, context);
             }
         }
 
-        private Task HandleExeptionAsync(HttpContext context)
+        private Task HandleExeptionAsync(Exception error, HttpContext context)
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            return context.Response.WriteAsync(new ApiResponse(context.Response.StatusCode, "Internal Server Error").ToJson());
+            return context.Response.WriteAsync(new ApiResponse(context.Response.StatusCode, error.Message).ToJson());
         }
     }
 }
