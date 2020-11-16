@@ -1,23 +1,26 @@
-﻿using Infrastructure.Interfaces;
+﻿using ApplicationCore.Options;
+using Infrastructure.Interfaces;
+using Microsoft.Extensions.Options;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Threading.Tasks;
 
 namespace Infrastructure.Data
 {
     public class AdoDataAccess : IDataAccess
     {
         private string _connectionString { get; set; }
-        public AdoDataAccess(string connection)
+        public AdoDataAccess(IOptions<DatabaseSettings> options)
         {
-            _connectionString = connection;
+            _connectionString = options.Value.ConnectionString;
         }
 
-        public SqlConnection GetConnection()
+        public async Task<SqlConnection> GetConnectionAsync()
         {
             SqlConnection connection = new SqlConnection(this._connectionString);
             if (connection.State != ConnectionState.Open)
-                connection.Open();
+                await connection.OpenAsync();
             return connection;
         }
 
@@ -28,47 +31,50 @@ namespace Infrastructure.Data
             return command;
         }
 
-        public int ExecuteQuery(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+        public async Task<int> ExecuteNonQueryAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
         {
             int returnValue = -1;
-            using (SqlConnection connection = this.GetConnection())
+            var dbConnection = await this.GetConnectionAsync();
+            using (SqlConnection connection = dbConnection)
             {
                 SqlCommand command = this.GetCommand(connection, procedureName, commandType);
                 if (parameters != null && parameters.Count > 0)
                 {
                     command.Parameters.AddRange(parameters.ToArray());
                 }
-                returnValue = command.ExecuteNonQuery();
+                returnValue = await command.ExecuteNonQueryAsync();
             }
             return returnValue;
         }
 
-        public object ExecuteScalar(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+        public async Task<object> ExecuteScalarAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
         {
             object returnValue = null;
-            using (SqlConnection connection = this.GetConnection())
+            var dbConnection = await this.GetConnectionAsync();
+            using (SqlConnection connection = dbConnection)
             {
                 SqlCommand command = this.GetCommand(connection, procedureName, commandType);
                 if (parameters != null && parameters.Count > 0)
                 {
                     command.Parameters.AddRange(parameters.ToArray());
                 }
-                returnValue = command.ExecuteScalar();
+                returnValue = await command.ExecuteScalarAsync();
             }
             return returnValue;
         }
 
-        public SqlDataReader GetDataReader(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+        public async Task<SqlDataReader> GetDataReaderAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
         {
             SqlDataReader dataReader;
-            using (SqlConnection connection = this.GetConnection())
+            var dbConnection = await this.GetConnectionAsync();
+            using (SqlConnection connection = dbConnection)
             {
                 SqlCommand command = this.GetCommand(connection, procedureName, commandType);
                 if (parameters != null && parameters.Count > 0)
                 {
                     command.Parameters.AddRange(parameters.ToArray());
                 }
-                dataReader = command.ExecuteReader();
+                dataReader = await command.ExecuteReaderAsync();
             }
             return dataReader;
         }
