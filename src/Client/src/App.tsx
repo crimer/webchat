@@ -1,38 +1,19 @@
 import React from 'react'
-import Header from './Components/Header'
-import ChannelsBar from './Components/ChannelsBar'
-import { ChatComponent } from './Components/ChatComponent'
+import { CssBaseline } from '@material-ui/core'
 import { AccountContextProvider } from './Contexts/AccountContext'
 import { LogingDialogContextProvder } from './Contexts/LoginDialogContext'
 import { ConnectionContextProvider } from './Contexts/ConnectionContext'
 import { ModalContextProvider } from './Contexts/ModalContext'
-import { CssBaseline, makeStyles } from '@material-ui/core'
-import { BrowserRouter, Switch, Route, Link } from 'react-router-dom'
-
-const useStyles = makeStyles((theme) => ({
-    root: {
-        display: 'grid',
-        gridTemplateColumns: '320px 1fr',
-        gridTemplateRows: '64px 1fr',
-        height: '100vh',
-        width: '100%',
-    },
-}))
+import AppTemplate from './pages/AppTemplate'
 
 const App = () => {
-    const classes = useStyles()
-
     return (
         <ModalContextProvider>
             <ConnectionContextProvider>
                 <AccountContextProvider>
                     <LogingDialogContextProvder>
                         <CssBaseline />
-                        <div className={classes.root}>
-                            <Header />
-                            <ChannelsBar />
-                            <ChatComponent />
-                        </div>
+                        <AppTemplate />
                     </LogingDialogContextProvder>
                 </AccountContextProvider>
             </ConnectionContextProvider>
