@@ -1,4 +1,4 @@
-.login-dialog {
+.modal {
     width: 400px;
     padding: 0;
     border: 1px solid gray;
@@ -8,44 +8,44 @@
         0px 9px 46px 8px rgba(0, 0, 0, 0.12);
 }
 
-.login-dialog::backdrop {
+.modal::backdrop {
     background: rgba(0, 0, 0, 0.6);
 }
 
-.login-dialog-header {
+.modal-header {
     padding: 16px 24px;
     display: flex;
     flex-flow: column nowrap;
 }
 
-.login-dialog-header-text {
+.modal-header-text {
     justify-self: left;
     font-weight: 500;
     line-height: 1.6;
     font-size: 1.25em;
 }
 
-.login-dialog-header-close-button:hover {
+.modal-header-close-button:hover {
     background-color: lightgray;
     border-top-right-radius: 8px;
 }
 
-.login-dialog-body {
+.modal-body {
     padding: 0px 28px 8px 28px;
 }
 
-.login-dialog-footer {
+.modal-footer {
     padding: 8px 28px;
     display: flex;
     justify-content: space-between;
 }
 
-.login-dialog-close-button {
+.modal-close-button {
     grid-column: 3;
     font-weight: 600 !important;
 }
 
-.login-dialog-send-button {
+.modal-send-button {
     grid-column: 2;
     font-weight: 600 !important;
 }

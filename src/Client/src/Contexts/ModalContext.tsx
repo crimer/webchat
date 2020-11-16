@@ -38,17 +38,17 @@ export const ModalContextProvider: React.FC = ({ children }) => {
 
     return (
         <ModalContext.Provider value={{ openModal, closeModal }}>
-            <dialog ref={dialogRef} className='login-dialog'>
-                <div className='login-dialog-header'>
-                    <h2 className='login-dialog-header-title'>{title}</h2>
-                    <span className='login-dialog-header-text'>
+            <dialog ref={dialogRef} className='modal'>
+                <div className='modal-header'>
+                    <h2 className='modal-header-title'>{title}</h2>
+                    <span className='modal-header-text'>
                         {description}
                     </span>
                 </div>
-                <div className='login-dialog-footer'>
+                <div className='modal-footer'>
                     <Button
                         onClick={closeModal}
-                        className='login-dialog-close-button'
+                        className='modal-close-button'
                         color='primary'>
                         Закрыть
                     </Button>

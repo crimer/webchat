@@ -85,7 +85,7 @@ const RegisterPage = () => {
                         variant='contained'
                         color='primary'
                         className={classes.submit}>
-                        СОздать аккаунт
+                        Создать аккаунт
                     </Button>
                     <Grid container justify='flex-end'>
                         <Grid item>

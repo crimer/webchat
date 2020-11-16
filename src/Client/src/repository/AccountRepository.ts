@@ -1,3 +1,5 @@
+import { ApiResponse } from '../common/ApiHelpers/ApiResponse'
+
 class AccountRepository {
     public login(name: string): Promise<Response> {
         return fetch('https://localhost:5001/account/login', {

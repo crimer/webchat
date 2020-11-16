@@ -3,6 +3,7 @@ import accountRepository from '../repository/AccountRepository'
 import { ConnectionContext } from './ConnectionContext'
 import { ModalContext } from './ModalContext'
 import Cookies from 'js-cookie'
+import { useHistory } from 'react-router-dom'
 
 interface IAccountContext {
     currentUserName: string
@@ -24,13 +25,15 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const [currentUserName, setUserName] = useState('')
     const { openModal } = useContext(ModalContext)
     const { startConnection, stopConnection } = useContext(ConnectionContext)
-
+    const history = useHistory()
     useEffect(() => {
         const autoStartConnection = async () => {
             const cookieUserName = Cookies.get('userName')
             if (cookieUserName !== undefined) {
                 await startConnection()
                 setUserName(cookieUserName)
+            } else {
+                history.push('/login')
             }
         }
         autoStartConnection()
@@ -39,17 +42,24 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const login = async (userName: string) => {
         const response = await accountRepository
             .login(userName)
-            .catch((e) => openModal('Ошибка подключения','Извините, не удалось подключиться к серверу, повторите попытку позже'))
+            .catch((e) =>
+                openModal(
+                    'Ошибка подключения',
+                    'Извините, не удалось подключиться к серверу, повторите попытку позже'
+                )
+            )
 
         if (response && response.status === 200) {
             await startConnection()
-
             const json = await response.json()
-            setUserName(json.name)
-            Cookies.set('userName', json.name,{ expires: 1, path: '/' })
+            setUserName(json.data.name)
+            Cookies.set('userName', json.data.name, { expires: 1, path: '/' })
             return true
         } else if (response) {
-            openModal('Ошибка авторизации', `При авторизации произошла ошибка. ${response.statusText}`)
+            openModal(
+                'Ошибка авторизации',
+                `При авторизации произошла ошибка. ${response.statusText}`
+            )
         }
         return false
     }
@@ -68,7 +78,10 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             await stopConnection()
             Cookies.remove('userName')
         } else if (response) {
-            openModal('Ошибка выхода', `При выходе произошла ошибка. ${response.statusText}`)
+            openModal(
+                'Ошибка выхода',
+                `При выходе произошла ошибка. ${response.statusText}`
+            )
         }
     }
 
