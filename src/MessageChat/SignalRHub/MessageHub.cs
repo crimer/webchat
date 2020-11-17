@@ -12,6 +12,7 @@ namespace MessageChat.SignalR
     public class MessageHub : Hub
     {
         private readonly IAuthUserManager _authUserManager;
+        // репо сюда
         public MessageHub(IAuthUserManager authUserManager) : base()
         {
             _authUserManager = authUserManager;

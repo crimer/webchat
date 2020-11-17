@@ -26,6 +26,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const { openModal } = useContext(ModalContext)
     const { startConnection, stopConnection } = useContext(ConnectionContext)
     const history = useHistory()
+
     useEffect(() => {
         const autoStartConnection = async () => {
             const cookieUserName = Cookies.get('userName')

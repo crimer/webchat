@@ -1,5 +1,7 @@
 using System;
 using ApplicationCore.Options;
+using Infrastructure.Data;
+using Infrastructure.Interfaces;
 using MessageChat.Middlewares;
 using MessageChat.Services.AuthUserManager;
 using MessageChat.SignalR;
@@ -32,7 +34,9 @@ namespace MessageChat
             });
 
             services.AddSingleton<IAuthUserManager, AuthUserManagerInMemory>();
+            services.AddSingleton<IDataAccess, AdoDataAccess>();
             services.Configure<DatabaseSettings>(options => _configuration.GetSection("DatabaseSettings").Bind(options));
+
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {

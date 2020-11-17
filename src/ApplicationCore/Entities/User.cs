@@ -1,23 +1,9 @@
-﻿using System.Collections.Generic;
-
-namespace MessageChat.Models
+﻿namespace ApplicationCore.Entities
 {
-    public class User
+    public class User : BaseEntity
     {
-        public string Name { get; private set; }
-        public List<string> Connections { get; set; }
-        public User(string name)
-        {
-            Name = name;
-            Connections = new List<string>();
-        }
-        public void AddNewConnection(string connectionId)
-        {
-            Connections.Add(connectionId);
-        }
-        public void RemoveConnection(string connectionId)
-        {
-            Connections.Remove(connectionId);
-        }
+        public string Login { get; set; }
+        public string Password { get; set; }
+        public int MediaId { get; set; }
     }
 }
