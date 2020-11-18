@@ -1,4 +1,5 @@
 using System;
+using ApplicationCore.Interfaces;
 using ApplicationCore.Options;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
@@ -35,6 +36,10 @@ namespace MessageChat
 
             services.AddSingleton<IAuthUserManager, AuthUserManagerInMemory>();
             services.AddSingleton<IDataAccess, AdoDataAccess>();
+            services.AddSingleton<IUserRepository, UserRepository>();
+            services.AddSingleton<IMessageRepository, MessageRepository>();
+            services.AddSingleton<IChatRepository, ChatRepository>();
+
             services.Configure<DatabaseSettings>(options => _configuration.GetSection("DatabaseSettings").Bind(options));
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

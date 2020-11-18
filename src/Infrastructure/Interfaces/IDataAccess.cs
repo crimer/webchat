@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Data;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Threading.Tasks;
 
@@ -7,10 +7,12 @@ namespace Infrastructure.Interfaces
 {
     public interface IDataAccess
     {
-        public Task<SqlConnection> GetConnectionAsync();
-        public SqlCommand GetCommand(SqlConnection connection, string query, CommandType commandType);
-        public Task<int> ExecuteNonQueryAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure);
-        public Task<object> ExecuteScalarAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure);
-        public Task<SqlDataReader> GetDataReaderAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure);
+        public Task<int> ExecuteProcedureAsync(string procedureName, List<SqlParameter> parameters);
+        public Task<object> ExecuteScalarAsync(string procedureName, List<SqlParameter> parameters);
+        public Task<IEnumerable<T>> GetProcedureDataAsync<T>(
+            string procedureName, 
+            List<SqlParameter> parameters, 
+            Func<SqlDataReader, T> generator);
+        public T GetValue<T>(SqlDataReader reader, string collumnName);
     }
 }

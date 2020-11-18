@@ -6,11 +6,8 @@ namespace MessageChat.Dto
     /// Данные для авторизации
     /// </summary>
     [DataContract]
-    public class LoginInDto
+    public class UserLoginDto
     {
-        /// <summary>
-        /// Имя пользователя
-        /// </summary>
         [DataMember(Name = "name")]
         public string Name { get; set; }
     }

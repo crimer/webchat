@@ -1,9 +1,11 @@
 ﻿using ApplicationCore.Options;
 using Infrastructure.Interfaces;
 using Microsoft.Extensions.Options;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Data
@@ -16,7 +18,7 @@ namespace Infrastructure.Data
             _connectionString = options.Value.ConnectionString;
         }
 
-        public async Task<SqlConnection> GetConnectionAsync()
+        private async Task<SqlConnection> GetConnectionAsync()
         {
             SqlConnection connection = new SqlConnection(this._connectionString);
             if (connection.State != ConnectionState.Open)
@@ -24,20 +26,20 @@ namespace Infrastructure.Data
             return connection;
         }
 
-        public SqlCommand GetCommand(SqlConnection connection, string query, CommandType commandType)
+        private SqlCommand GetCommand(SqlConnection connection, string query, CommandType commandType)
         {
             SqlCommand command = new SqlCommand(query, connection);
             command.CommandType = commandType;
             return command;
         }
 
-        public async Task<int> ExecuteNonQueryAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+        public async Task<int> ExecuteProcedureAsync(string procedureName, List<SqlParameter> parameters)
         {
             int returnValue = -1;
             var dbConnection = await this.GetConnectionAsync();
             using (SqlConnection connection = dbConnection)
             {
-                SqlCommand command = this.GetCommand(connection, procedureName, commandType);
+                SqlCommand command = this.GetCommand(connection, procedureName, CommandType.StoredProcedure);
                 if (parameters != null && parameters.Count > 0)
                 {
                     command.Parameters.AddRange(parameters.ToArray());
@@ -47,13 +49,13 @@ namespace Infrastructure.Data
             return returnValue;
         }
 
-        public async Task<object> ExecuteScalarAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+        public async Task<object> ExecuteScalarAsync(string procedureName, List<SqlParameter> parameters)
         {
             object returnValue = null;
             var dbConnection = await this.GetConnectionAsync();
             using (SqlConnection connection = dbConnection)
             {
-                SqlCommand command = this.GetCommand(connection, procedureName, commandType);
+                SqlCommand command = this.GetCommand(connection, procedureName, CommandType.StoredProcedure);
                 if (parameters != null && parameters.Count > 0)
                 {
                     command.Parameters.AddRange(parameters.ToArray());
@@ -63,20 +65,38 @@ namespace Infrastructure.Data
             return returnValue;
         }
 
-        public async Task<SqlDataReader> GetDataReaderAsync(string procedureName, List<SqlParameter> parameters, CommandType commandType = CommandType.StoredProcedure)
+        public async Task<IEnumerable<T>> GetProcedureDataAsync<T>(string procedureName, List<SqlParameter> parameters,
+            Func<SqlDataReader, T> generator)
         {
             SqlDataReader dataReader;
+
+            List<T> datas = new List<T>();
+
             var dbConnection = await this.GetConnectionAsync();
             using (SqlConnection connection = dbConnection)
             {
-                SqlCommand command = this.GetCommand(connection, procedureName, commandType);
+                SqlCommand command = this.GetCommand(connection, procedureName, CommandType.StoredProcedure);
                 if (parameters != null && parameters.Count > 0)
                 {
                     command.Parameters.AddRange(parameters.ToArray());
                 }
                 dataReader = await command.ExecuteReaderAsync();
+                if (dataReader != null && dataReader.HasRows)
+                {
+                    while (await dataReader.ReadAsync())
+                        datas.Add(generator(dataReader));
+                }
+                else
+                {
+                    return Enumerable.Empty<T>();
+                }
             }
-            return dataReader;
+            return datas;
+        }
+
+        public T GetValue<T>(SqlDataReader reader, string collumnName)
+        {
+            return reader[collumnName] == System.DBNull.Value ? default(T) : (T)reader[collumnName];
         }
     }
 }

@@ -5,14 +5,25 @@ import { ModalContext } from './ModalContext'
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
 
+type AuthUser = {
+    id: number | null
+    login: string
+}
+
 interface IAccountContext {
-    currentUserName: string
+    // currentUserName: string
+    user: AuthUser
     login: (name: string) => Promise<boolean>
     logout: () => void
 }
+const initUserValue = {
+    id: null,
+    login: '',
+}
 
 export const AccountContext = React.createContext<IAccountContext>({
-    currentUserName: '',
+    // currentUserName: '',
+    user: initUserValue,
     login: (name: string) => {
         throw Error('Не проинициализирован контекст авторизации')
     },
@@ -22,7 +33,9 @@ export const AccountContext = React.createContext<IAccountContext>({
 })
 
 export const AccountContextProvider: React.FC = ({ children }) => {
-    const [currentUserName, setUserName] = useState('')
+    // const [currentUserName, setUserName] = useState('')
+    const [authUser, setAuthUser] = useState(initUserValue)
+
     const { openModal } = useContext(ModalContext)
     const { startConnection, stopConnection } = useContext(ConnectionContext)
     const history = useHistory()

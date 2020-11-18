@@ -3,6 +3,7 @@ using ApplicationCore.Interfaces;
 using Infrastructure.Interfaces;
 using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Data
@@ -22,7 +23,7 @@ namespace Infrastructure.Data
                 new SqlParameter("@password", password),
                 new SqlParameter("@avatarId", avatarId)
             };
-            var addedRows = await _dataAccess.ExecuteNonQueryAsync("CreateNewUser", parameters);
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewUser", parameters);
 
             return addedRows > 0;
         }
@@ -35,7 +36,7 @@ namespace Infrastructure.Data
                 new SqlParameter("@chatId", chatId),
                 new SqlParameter("@userRoleId", userRoleId)
             };
-            var addedRows = await _dataAccess.ExecuteNonQueryAsync("SubscribeUserToChat", parameters);
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("SubscribeUserToChat", parameters);
 
             return addedRows > 0;
         }
@@ -46,29 +47,16 @@ namespace Infrastructure.Data
             {
                 new SqlParameter("@userLogin", login),
             };
-            var dataReader = await _dataAccess.GetDataReaderAsync("GetUserByLogin", parameters);
-
-            User user = null;
-
-            if (dataReader != null && dataReader.HasRows)
-            {
-                while (dataReader.Read())
+            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetUserByLogin", parameters,
+                reader => new User()
                 {
-                    int id = dataReader.GetInt32(0);
-                    string userLogin = dataReader.GetString(1);
-                    string userPassword = dataReader.GetString(2);
-                    int mediaId = dataReader.GetInt32(3);
-                    user = new User()
-                    {
-                        Id = id,
-                        Login = userLogin,
-                        Password = userPassword,
-                        MediaId = mediaId
-                    };
-                }
-            }
+                    Id = _dataAccess.GetValue<int>(reader, "Id"),
+                    Login = _dataAccess.GetValue<string>(reader, "Login"),
+                    Password = _dataAccess.GetValue<string>(reader, "Password"),
+                    MediaId = _dataAccess.GetValue<int>(reader, "MediaId")
+                });
 
-            return user;
+            return dataReader.FirstOrDefault();
         }
     }
 }

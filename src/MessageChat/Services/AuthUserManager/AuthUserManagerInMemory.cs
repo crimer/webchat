@@ -7,24 +7,24 @@ namespace MessageChat.Services.AuthUserManager
 {
     public class AuthUserManagerInMemory : IAuthUserManager
     {
-        public ConcurrentDictionary<string, User> _authUsers { get; set; }
+        public ConcurrentDictionary<string, AuthUser> _authUsers { get; set; }
         public AuthUserManagerInMemory()
         {
-            _authUsers = new ConcurrentDictionary<string, User>();
+            _authUsers = new ConcurrentDictionary<string, AuthUser>();
         }
 
         public void ConnectedConnection(string name, string userIdentifier, string connectionId)
         {
             if (!_authUsers.ContainsKey(userIdentifier))
             {
-                User newUser = new User(name);
+                AuthUser newUser = new AuthUser(name);
                 newUser.AddNewConnection(connectionId);
 
                 _authUsers.TryAdd(userIdentifier, newUser);
             }
             else
             {
-                User user;
+                AuthUser user;
                 _authUsers.TryGetValue(userIdentifier, out user);
                 if(user != null)
                     user.AddNewConnection(connectionId);
@@ -33,8 +33,8 @@ namespace MessageChat.Services.AuthUserManager
 
         public void DisconnectedConnection(string userIdentifier, string userConnectionId)
         {
-            User deletedUser;
-            User user;
+            AuthUser deletedUser;
+            AuthUser user;
 
             if (!_authUsers.ContainsKey(userIdentifier)) return;
 

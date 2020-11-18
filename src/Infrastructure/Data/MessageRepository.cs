@@ -23,7 +23,7 @@ namespace Infrastructure.Data
                 new SqlParameter("@mediaId", mediaId),
                 new SqlParameter("@replyId", replyId)
             };
-            var addedRows = await _dataAccess.ExecuteNonQueryAsync("CreateNewMessage", parameters);
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewMessage", parameters);
 
             return addedRows > 0;
         }
@@ -36,7 +36,7 @@ namespace Infrastructure.Data
                 new SqlParameter("@path", path),
                 new SqlParameter("@mimeType", mimeType)
             };
-            var addedRows = await _dataAccess.ExecuteNonQueryAsync("CreateNewMedia", parameters);
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewMedia", parameters);
 
             return addedRows > 0;
         }
