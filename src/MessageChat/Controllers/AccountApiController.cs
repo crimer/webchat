@@ -61,7 +61,7 @@ namespace MessageChat.Controllers
             if(dbUser != null)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Уже существует пользователь с логином {userRegisterDto.Login}");
 
-            var registerSuccess = await _userRepository.CreateNewUser(userRegisterDto.Login, userRegisterDto.Password, 0);
+            var registerSuccess = await _userRepository.CreateNewUser(userRegisterDto.Login, userRegisterDto.Password, null);
             return Ok();
         }
 

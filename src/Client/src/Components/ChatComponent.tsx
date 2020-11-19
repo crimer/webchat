@@ -38,7 +38,7 @@ type MessageBlock = {
     userName: string
     isMy: boolean
     text: string
-    time: number
+    createdAt: number
 }
 
 const ChatMessageListComponent: React.FC = () => {
@@ -60,7 +60,7 @@ const ChatMessageListComponent: React.FC = () => {
         <div className='message-list'>
             {authUser.login !== '' &&
                 messages.map((m) => (
-                    <ChatMessagesBlockComponent key={m.time} message={m} />
+                    <ChatMessagesBlockComponent key={m.id} message={m} />
                 ))}
             <div ref={bottomRef}></div>
         </div>
@@ -70,17 +70,18 @@ const ChatMessageListComponent: React.FC = () => {
 const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
     message,
 }: IMessageBlockProps) => {
-    const { userName, isMy, text, time } = message
+    const { authUser } = useContext(AccountContext)
+    const { userName, text, createdAt } = message
     const names = userName.split(' ')
 
     const messageRowClasses = `message-row ${
-        isMy ? 'message-row-my' : 'message-row-another'
+        authUser.login === userName ? 'message-row-my' : 'message-row-another'
     }`
     const userLogoClasses = `user-logo ${
-        isMy ? 'user-logo-my' : 'user-logo-another'
+        authUser.login === userName ? 'user-logo-my' : 'user-logo-another'
     }`
     const messageTextClasses = `message ${
-        isMy ? 'my-message' : 'another-message'
+        authUser.login === userName ? 'my-message' : 'another-message'
     }`
 
     const userInitials = useMemo(
@@ -117,7 +118,7 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
             </span>
             <div className={messageTextClasses}>
                 <span>{text}</span>
-                <span className='message-time'>{formatDate(time)}</span>
+                <span className='message-time'>{formatDate(createdAt)}</span>
             </div>
         </span>
     )
@@ -159,13 +160,12 @@ export const ChatComponent: React.FC = () => {
     const classes = useStyles()
 
     return (
-        <ChatContextProvider>
             <main className={classes.content}>
                 <div className={classes.container}>
                     <ChatMessageListComponent />
                     <ChatInputBlockComponent />
                 </div>
             </main>
-        </ChatContextProvider>
+
     )
 }

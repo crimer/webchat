@@ -7,12 +7,12 @@ import { useHistory } from 'react-router-dom'
 import { apiRequest, ApiResponse } from '../common/Api/ApiHelper'
 
 type AuthUser = {
-    id?: number | null
+    id: number
     login: string
 }
 
 const initUserValue: AuthUser = {
-    id: null,
+    id: -1,
     login: '',
 }
 

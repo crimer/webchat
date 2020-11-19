@@ -3,6 +3,8 @@ using MessageChat.ApiHelpers;
 using MessageChat.Dto;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
@@ -19,17 +21,19 @@ namespace MessageChat.Controllers
             _chatRepository = chatRepository;
         }
 
-        //[HttpGet("GetChatMessages")]
-        //public async Task<object> GetChatMessages(int chatId)
-        //{
-        //    var messages = await _chatRepository.GetChatMessagesById(chatId);
-        //    var data = messages.Select(message => new UserChatMessageDto() 
-        //    { 
-        //        Text = message.Text,
-        //        CreatedAt = message.CreatedAt,
-        //        UserName = message.
-        //    })
-        //    return new ApiResponse(, (int)HttpStatusCode.OK);
-        //}
+        [HttpGet("getChatMessagesById/{chatId}")]
+        public async Task<object> GetChatMessages(int chatId)
+        {
+            var messages = await _chatRepository.GetChatMessagesById(chatId);
+            var data = messages.Select(message => new SendMessageDto()
+            {
+                Id = message.Id,
+                Text = message.Text,
+                CreatedAt = message.CreatedAt,
+                UserName = message.AuthorLogin,
+                IsMy = false
+            });
+            return new ApiResponse<IEnumerable<SendMessageDto>>(data, (int)HttpStatusCode.OK);
+        }
     }
 }

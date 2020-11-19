@@ -15,7 +15,7 @@ namespace Infrastructure.Data
         {
             _dataAccess = dataAccess;
         }
-        public async Task<bool> CreateNewUser(string login, string password, int avatarId)
+        public async Task<bool> CreateNewUser(string login, string password, int? avatarId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {

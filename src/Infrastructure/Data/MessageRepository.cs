@@ -13,7 +13,7 @@ namespace Infrastructure.Data
         {
             _dataAccess = dataAccess;
         }
-        public async Task<bool> CreateNewMessage(string text, int userId, int chatId, int mediaId, int replyId)
+        public async Task<bool> CreateNewMessage(string text, int userId, int chatId, int? mediaId, int? replyId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {

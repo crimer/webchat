@@ -1,7 +1,10 @@
-﻿using MessageChat.Dto;
+﻿using ApplicationCore.Interfaces;
+using MessageChat.Dto;
+using MessageChat.Dto.Message;
 using MessageChat.Services.AuthUserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
+using System;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -12,25 +15,38 @@ namespace MessageChat.SignalR
     public class MessageHub : Hub
     {
         private readonly IAuthUserManager _authUserManager;
-        // репо сюда
-        public MessageHub(IAuthUserManager authUserManager) : base()
+        private readonly IMessageRepository _messageRepository;
+        public MessageHub(IAuthUserManager authUserManager, IMessageRepository messageRepository)
         {
             _authUserManager = authUserManager;
+            _messageRepository = messageRepository;
         }
-        public async Task NewMessage(string text)
+
+        public async Task NewMessage(ReciveMessageDto reciveMessage)
         {
-            if (string.IsNullOrWhiteSpace(text)) return;
+            if (string.IsNullOrWhiteSpace(reciveMessage.Text)) return;
 
             var currentUserName = Context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Неизвестный чувак";
-            var userChatMessage = new UserChatMessageDto
+            var sendMessage = new SendMessageDto
             {
-                Text = text,
+                Text = reciveMessage.Text,
                 IsMy = false,
                 UserName = currentUserName,
             };
+            try
+            {
+                var allAuthUsers = _authUserManager.GetAllAuthUsers();
+                var createMessageSuccess = await _messageRepository.CreateNewMessage(reciveMessage.Text, 
+                    reciveMessage.UserId, reciveMessage.ChatId, reciveMessage.MediaId, reciveMessage.ReplyId);
             
-            var allAuthUsers = _authUserManager.GetAllAuthUsers();
-            await Clients.Users(allAuthUsers).SendAsync("NewMessage", userChatMessage);
+                if(createMessageSuccess)
+                    await Clients.Users(allAuthUsers).SendAsync("NewMessage", sendMessage);
+            }
+            catch (System.Exception error)
+            {
+
+                Console.WriteLine($"NewMessage Hub error {error.Message}");
+            }
         }
        
         public override Task OnConnectedAsync()

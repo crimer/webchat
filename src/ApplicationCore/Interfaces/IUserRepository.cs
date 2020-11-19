@@ -7,6 +7,6 @@ namespace ApplicationCore.Interfaces
     {
         public Task<User> GetUserByLogin(string login);
         public Task<bool> SubscribeUserToChat(int userId, int chatId, int userRoleId);
-        public Task<bool> CreateNewUser(string login, string password, int avatarId);
+        public Task<bool> CreateNewUser(string login, string password, int? avatarId);
     }
 }

@@ -23,7 +23,6 @@ export const ConnectionContextProvider: React.FC = ({ children }) => {
             .start()
             .then(() => {
                 setIsConnected(true)
-                console.log('Connected')
             })
             .catch((error) => setIsConnected(false))
     }
