@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme: Theme) =>
 type HeaderProps = {}
 
 const Header: React.FC<HeaderProps> = () => {
-    const { currentUserName, logout } = useContext(AccountContext)
+    const { authUser, logout } = useContext(AccountContext)
     const history = useHistory()
     const classes = useStyles()
     const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
@@ -73,12 +73,12 @@ const Header: React.FC<HeaderProps> = () => {
                     MyChat
                 </Typography>
                 <Box className={classes.authBlock}>
-                    {currentUserName !== '' && (
+                    {authUser.login !== '' && (
                         <Typography
                             variant='h6'
                             className={classes.userAccaunt}>
                             <AccountCircle className={classes.userIcon} />
-                            {currentUserName}
+                            {authUser.login}
                         </Typography>
                     )}
 

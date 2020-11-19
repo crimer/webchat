@@ -49,7 +49,7 @@ const LoginPage: React.FC = () => {
             return
         }
         const isLogin = await login(auth.name.trim())
-        if (isLogin){
+        if (isLogin) {
             await SignalRManager.instance.reconnect()
             setAuth({ name: '', password: '' })
             history.push('/')

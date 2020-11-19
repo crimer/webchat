@@ -1,4 +1,3 @@
-import Cookies from 'js-cookie'
 import React, { createContext, useState } from 'react'
 import SignalRManager from '../SignalR/SignalRManager'
 

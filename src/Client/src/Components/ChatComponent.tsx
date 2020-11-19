@@ -43,7 +43,7 @@ type MessageBlock = {
 
 const ChatMessageListComponent: React.FC = () => {
     const { messages } = useContext(ChatContext)
-    const { currentUserName } = useContext(AccountContext)
+    const { authUser } = useContext(AccountContext)
     const bottomRef = useRef<HTMLDivElement>(null)
 
     const scrollToBottom = () => {
@@ -58,7 +58,7 @@ const ChatMessageListComponent: React.FC = () => {
     }, [messages])
     return (
         <div className='message-list'>
-            {currentUserName !== '' &&
+            {authUser.login !== '' &&
                 messages.map((m) => (
                     <ChatMessagesBlockComponent key={m.time} message={m} />
                 ))}
@@ -125,12 +125,12 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
 
 const ChatInputBlockComponent: React.FC = () => {
     const { sendMessage } = useContext(ChatContext)
-    const { currentUserName } = useContext(AccountContext)
+    const { authUser } = useContext(AccountContext)
     const [message, setMessage] = useState('')
 
     useEffect(() => {
         setMessage('')
-    }, [currentUserName])
+    }, [authUser])
 
     const onEnter = async (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
@@ -147,7 +147,7 @@ const ChatInputBlockComponent: React.FC = () => {
                 value={message}
                 onKeyDown={(event) => onEnter(event)}
                 onChange={(event) => setMessage(event.target.value)}
-                disabled={currentUserName === ''}
+                disabled={authUser.login === ''}
                 rows={1}
                 fullWidth
             />

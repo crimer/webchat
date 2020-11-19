@@ -24,14 +24,14 @@ export const ChatContext = createContext<IChatContext>({
 
 export const ChatContextProvider: React.FC = ({ children }) => {
     const [messages, setMessages] = useState<UserMessage[]>([])
-    const { currentUserName } = useContext(AccountContext)
+    const { authUser } = useContext(AccountContext)
     const { openModal } = useContext(ModalContext)
 
     useEffect(() => {
         SignalRManager.instance.connection.on(
             'NewMessage',
             (message: UserMessage) => {
-                message.isMy = currentUserName === message.userName
+                message.isMy = authUser.login === message.userName
                 message.time = new Date().getTime()
 
                 setMessages((existedMessages: UserMessage[]) => [
@@ -41,11 +41,11 @@ export const ChatContextProvider: React.FC = ({ children }) => {
             }
         )
         return () => SignalRManager.instance.connection.off('NewMessage')
-    }, [currentUserName])
+    }, [authUser])
 
     useEffect(() => {
-        if (currentUserName === '') setMessages([])
-    }, [currentUserName])
+        if (authUser.login === '') setMessages([])
+    }, [authUser])
 
     const sendMessage = (message: string) => {
         return SignalRManager.instance

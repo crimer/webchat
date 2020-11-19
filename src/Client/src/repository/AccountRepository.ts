@@ -1,4 +1,4 @@
-import { ApiResponse } from '../common/ApiHelpers/ApiResponse'
+import { ApiResponse, apiRequest } from '../common/Api/ApiHelper'
 
 class AccountRepository {
     public login(name: string): Promise<Response> {
@@ -11,6 +11,13 @@ class AccountRepository {
             body: JSON.stringify({ name }),
         })
     }
+    // public async login<T>(name: string): Promise<ApiResponse<T>> {
+    //     const response = await apiRequest<T>('POST', '/account/login', {
+    //         body: { name: name },
+    //         headers: { 'Content-Type': 'application/json' },
+    //     })
+    //     return response
+    // }
 
     public logout(): Promise<Response> {
         return fetch('https://localhost:5001/account/logout', {
