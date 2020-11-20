@@ -16,27 +16,27 @@ namespace MessageChat.Controllers
     [Route("account")]
     public class AccountApiController : ControllerBase
     {
-        private readonly IUserRepository _userRepository;
-        public AccountApiController(IUserRepository userRepository)
+        private readonly IAuthService _authService;
+        public AccountApiController(IAuthService authService)
         {
-            _userRepository = userRepository;
+            _authService = authService;
         }
 
         [HttpPost("login")]
         public async Task<object> Login([FromBody] UserLoginDto loginData)
         {
-            if (string.IsNullOrWhiteSpace(loginData.Name) || loginData.Name.Length > 25)
+            if (string.IsNullOrWhiteSpace(loginData.Login) || loginData.Login.Length > 25)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин не должен быть пустым");
 
-            User dbUser = await _userRepository.GetUserByLogin(loginData.Name);
+            User user = await _authService.Login(loginData.Login, loginData.Password);
 
-            if(dbUser == null)
-                return new ApiResponse((int)HttpStatusCode.NotFound, $"Не существует пользователя с логином: {loginData.Name}");
+            if(user == null)
+                return new ApiResponse((int)HttpStatusCode.NotFound, $"Не существует пользователя с таким логином и паролем");
 
             var claims = new []
             {
                 new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
-                new Claim(ClaimTypes.Name, dbUser.Login), 
+                new Claim(ClaimTypes.Name, user.Login),
             };
             var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -47,22 +47,21 @@ namespace MessageChat.Controllers
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(3)
             });
 
-            return new ApiResponse<object>(new { id = dbUser.Id, login = dbUser.Login }, (int)HttpStatusCode.OK);
+            return new ApiResponse<object>(new { id = user.Id, login = user.Login }, (int)HttpStatusCode.OK);
         }
 
         [HttpPost("register")]
         public async Task<object> Register([FromBody] UserRegisterDto userRegisterDto)
         {
             if (string.IsNullOrWhiteSpace(userRegisterDto.Login) || userRegisterDto.Login.Length > 25 || string.IsNullOrWhiteSpace(userRegisterDto.Password))
-                return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин не должен быть пустым");
+                return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин или пароль не должен быть пустым");
 
-            User dbUser = await _userRepository.GetUserByLogin(userRegisterDto.Login);
+            var isRegistred = await _authService.Register(userRegisterDto.Login, userRegisterDto.Password);
             
-            if(dbUser != null)
+            if(!isRegistred)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Уже существует пользователь с логином {userRegisterDto.Login}");
 
-            var registerSuccess = await _userRepository.CreateNewUser(userRegisterDto.Login, userRegisterDto.Password, null);
-            return Ok();
+            return new ApiResponse((int)HttpStatusCode.OK);
         }
 
         [HttpPost("logout")]

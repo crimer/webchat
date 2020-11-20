@@ -38,14 +38,14 @@ namespace Infrastructure.Data
             var dataReader = await _dataAccess.GetProcedureDataAsync<Message>("GetChatMessages", parameters,
                 reader => new Message()
                 {
-                    Id = _dataAccess.GetValue<int>(reader, "Id"),
-                    Text = _dataAccess.GetValue<string>(reader, "Text"),
-                    CreatedAt = _dataAccess.GetValue<DateTime>(reader, "CreatedAt"),
-                    ChatId = _dataAccess.GetValue<int>(reader, "ChatId"),
-                    AuthorLogin = _dataAccess.GetValue<string>(reader, "Login")
-                    //UserId = _dataAccess.GetValue<int>(reader, "UserId"),
-                    //MediaId = _dataAccess.GetValue<int>(reader, "MediaId"),
-                    //ReplyId = _dataAccess.GetValue<int>(reader, "ReplyId")
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Text = AdoDataAccess.GetValue<string>(reader, "Text"),
+                    CreatedAt = AdoDataAccess.GetValue<DateTime>(reader, "CreatedAt"),
+                    ChatId = AdoDataAccess.GetValue<int>(reader, "ChatId"),
+                    AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
+                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
+                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId")
                 });
 
             if (dataReader == null || dataReader.Count() == 0)

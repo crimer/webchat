@@ -41,19 +41,20 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
-        public async Task<User> GetUserByLogin(string login)
+        public async Task<User> GetUser(string login, string password)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
                 new SqlParameter("@userLogin", login),
+                new SqlParameter("@userPassword", password),
             };
-            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetUserByLogin", parameters,
+            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetUserByLoginAndPassword", parameters,
                 reader => new User()
                 {
-                    Id = _dataAccess.GetValue<int>(reader, "Id"),
-                    Login = _dataAccess.GetValue<string>(reader, "Login"),
-                    Password = _dataAccess.GetValue<string>(reader, "Password"),
-                    MediaId = _dataAccess.GetValue<int>(reader, "MediaId")
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    Password = AdoDataAccess.GetValue<string>(reader, "Password"),
+                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId")
                 });
 
             return dataReader.FirstOrDefault();

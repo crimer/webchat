@@ -7,7 +7,7 @@ import React, {
     useState,
 } from 'react'
 import '../styles/Chat.css'
-import { ChatContext, ChatContextProvider } from '../Contexts/ChatContext'
+import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { formatDate } from '../libs/DateFormat'
 import { makeStyles, TextField } from '@material-ui/core'
@@ -56,6 +56,8 @@ const ChatMessageListComponent: React.FC = () => {
     useEffect(() => {
         scrollToBottom()
     }, [messages])
+
+
     return (
         <div className='message-list'>
             {authUser.login !== '' &&

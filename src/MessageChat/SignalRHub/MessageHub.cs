@@ -42,9 +42,8 @@ namespace MessageChat.SignalR
                 if(createMessageSuccess)
                     await Clients.Users(allAuthUsers).SendAsync("NewMessage", sendMessage);
             }
-            catch (System.Exception error)
+            catch (Exception error)
             {
-
                 Console.WriteLine($"NewMessage Hub error {error.Message}");
             }
         }
@@ -63,7 +62,7 @@ namespace MessageChat.SignalR
             return base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(System.Exception exception)
+        public override Task OnDisconnectedAsync(Exception exception)
         {
             string userName = Context.User.Identity.Name;
             string userIdentifier = Context.UserIdentifier;

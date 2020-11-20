@@ -62,10 +62,9 @@ export const ChatContextProvider: React.FC = ({ children }) => {
     }, [authUser])
 
     const getChatMessagesById = async (chatId: number) => {
-        const response = await chatRepository.getMessagesByChatId(chatId)
-        if (response && response.status === 200) {
-            const data: ApiResponse<UserMessage[]> = await response.json()
-            setMessages(data.data)
+        const response = await chatRepository.getMessagesByChatId<UserMessage[]>(chatId)
+        if (response && response.responseCode === 200) {
+            setMessages(response.data)
         }
     }
 

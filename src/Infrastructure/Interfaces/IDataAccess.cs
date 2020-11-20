@@ -13,6 +13,5 @@ namespace Infrastructure.Interfaces
             string procedureName, 
             List<SqlParameter> parameters, 
             Func<SqlDataReader, T> generator);
-        public T GetValue<T>(SqlDataReader reader, string collumnName);
     }
 }

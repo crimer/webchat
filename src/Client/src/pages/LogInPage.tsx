@@ -37,23 +37,23 @@ const useStyles = makeStyles((theme) => ({
 const LoginPage: React.FC = () => {
     const classes = useStyles()
     const history = useHistory()
-    const [auth, setAuth] = useState({ name: '', password: '' })
+    const [auth, setAuth] = useState({ login: '', password: '' })
     const { login } = useContext(AccountContext)
     const { openModal } = useContext(ModalContext)
 
     const submitLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        if (auth.name.trim().length === 0 || auth.password.trim().length === 0) {
-            setAuth({ name: '', password: '' })
+        if (auth.login.trim().length === 0 || auth.password.trim().length === 0) {
+            setAuth({ login: '', password: '' })
             openModal('Внимание!', 'Логин или пароль не должны быть пустыми')
             return
         }
-        const isLogin = await login(auth.name.trim())
+        const isLogin = await login(auth.login, auth.password)
         if (isLogin) {
             await SignalRManager.instance.reconnect()
-            setAuth({ name: '', password: '' })
             history.push('/')
         }
+        setAuth({ login: '', password: '' })
     }
 
     return (
@@ -74,19 +74,20 @@ const LoginPage: React.FC = () => {
                         margin='normal'
                         required
                         fullWidth
-                        value={auth.name}
+                        value={auth.login}
                         onChange={(e) =>
-                            setAuth({ ...auth, name: e.target.value })
+                            setAuth({ ...auth, login: e.target.value })
                         }
-                        id='name'
-                        label='Имя'
-                        name='name'
+                        id='login'
+                        label='Логин'
+                        name='login'
                         autoFocus
                     />
                     <TextField
                         variant='outlined'
                         margin='normal'
                         required
+                        value={auth.password}
                         fullWidth
                         onChange={(e) =>
                             setAuth({ ...auth, password: e.target.value })

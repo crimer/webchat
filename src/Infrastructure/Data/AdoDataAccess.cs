@@ -94,9 +94,9 @@ namespace Infrastructure.Data
             return datas;
         }
 
-        public T GetValue<T>(SqlDataReader reader, string collumnName)
+        public static T GetValue<T>(SqlDataReader reader, string collumnName)
         {
-            return reader[collumnName] == System.DBNull.Value ? default(T) : (T)reader[collumnName];
+            return reader[collumnName] == DBNull.Value ? default(T) : (T)reader[collumnName];
         }
     }
 }

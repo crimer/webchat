@@ -20,7 +20,7 @@ const baseUri = 'https://localhost:5001'
  * @param Url - strig
  * @param Options - object
  */
-export async function apiRequest<T>(method: Method, url: string, options: Options = {}): Promise<ApiResponse<T>> {
+export function apiRequest<T>(method: Method, url: string, options: Options = {}): Promise<ApiResponse<T>> {
 
     const uri: string = `${options.baseUri || baseUri}${url}`
     const { body, ...restOptions } = options
@@ -36,16 +36,16 @@ export async function apiRequest<T>(method: Method, url: string, options: Option
         body: createBody(options, headers),
         headers,
         method,
+        credentials: 'include',
     })
 
-    const response: Response = await fetch(config)
-    if (response.status == 200) {
-        const data: ApiResponse<T> = await response.json()
-        return data
-    } else {
-        throw new Error(response.statusText)
-    }
-
+    return fetch(config).then((resp: Response) => {
+        return resp.json()
+    }).then((data: ApiResponse<T>) => {
+        return Promise.resolve<ApiResponse<T>>(data)
+    }).catch((error: Error) =>{
+        return Promise.reject(error)
+    })
 }
 
 const createBody = (options: Options, headers: Headers): FormData | string | null => {
@@ -80,14 +80,3 @@ const createContentType = (options: Options): object => {
     }
     return headerType ? { 'Content-Type': headerType } : {}
 }
-
-// async function Example() {
-//     const res = await apiRequest('POST','/api/comments',{
-//         body:{
-//             name:'nikita'
-//         }
-//     }).catch((e:Error) => {
-//         e.message
-//     })
-
-// }

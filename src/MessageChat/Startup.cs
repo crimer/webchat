@@ -1,6 +1,7 @@
 using System;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Options;
+using ApplicationCore.Services;
 using Infrastructure.Data;
 using Infrastructure.Interfaces;
 using MessageChat.Middlewares;
@@ -39,6 +40,7 @@ namespace MessageChat
             services.AddSingleton<IUserRepository, UserRepository>();
             services.AddSingleton<IMessageRepository, MessageRepository>();
             services.AddSingleton<IChatRepository, ChatRepository>();
+            services.AddSingleton<IAuthService, AuthService>();
 
             services.Configure<DatabaseSettings>(options => _configuration.GetSection("DatabaseSettings").Bind(options));
 
