@@ -1,5 +1,4 @@
 import React, { useState, createContext, useEffect, useContext } from 'react'
-import { ApiResponse } from '../common/Api/ApiHelper'
 import chatRepository from '../repository/ChatRepository'
 import SignalRManager from '../SignalR/SignalRManager'
 import { AccountContext } from './AccountContext'

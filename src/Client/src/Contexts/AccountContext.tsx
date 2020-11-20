@@ -1,10 +1,9 @@
 import React, { useState, useContext, useEffect } from 'react'
 import accountRepository from '../repository/AccountRepository'
 import { ConnectionContext } from './ConnectionContext'
-import { ModalContext } from './ModalContext'
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
-import { apiRequest, ApiResponse } from '../common/Api/ApiHelper'
+import { ToastContext } from './ToastContext'
 
 
 type AuthUser = {
@@ -39,7 +38,7 @@ export const AccountContext = React.createContext<IAccountContext>({
 
 export const AccountContextProvider: React.FC = ({ children }) => {
     const [authUser, setAuthUser] = useState<AuthUser>(initUserValue)
-    const { openModal } = useContext(ModalContext)
+    const { openToast } = useContext(ToastContext)
     const { startConnection, stopConnection } = useContext(ConnectionContext)
     const history = useHistory()
 
@@ -62,10 +61,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         const response = await accountRepository
             .login<AuthUser>(login, password)
             .catch((e: Error) =>
-                openModal(
-                    'Ошибка подключения',
-                    'Извините, не удалось подключиться к серверу, повторите попытку позже'
-                )
+                openToast({body:'Извините, не удалось подключиться к серверу, повторите попытку позже'})
             )
 
         if (response && response.isValid) {
@@ -75,11 +71,8 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                 path: '/',
             })
             return true
-        } else if (response ) {
-            openModal(
-                'Ошибка авторизации',
-                `При авторизации произошла ошибка. ${response.errorMessage}`
-            )
+        } else if (response) {
+            openToast({body:`При авторизации произошла ошибка. ${response.errorMessage}`})
         }
         return false
     }
@@ -88,21 +81,13 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         const response = await accountRepository
             .register(login, password)
             .catch((e: Error) =>
-                openModal(
-                    'Ошибка подключения',
-                    'Извините, не удалось подключиться к серверу, повторите попытку позже'
-                )
+                openToast({body:'Извините, не удалось подключиться к серверу, повторите попытку позже'})
             )
 
         if (response && response.responseCode === 200) {
             return true
         } else {
-            console.log(response);
-
-            openModal(
-                'Ошибка авторизации',
-                `При авторизации произошла ошибка.`
-            )
+            openToast({body:`При авторизации произошла ошибка.`})
             return false
         }
     }
@@ -111,10 +96,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         const response = await accountRepository
             .logout()
             .catch((e) =>
-                openModal(
-                    'Ошибка подключения',
-                    'Извините, не удалось подключиться к серверу, повторите попытку позже'
-                )
+                openToast({body:'Извините, не удалось подключиться к серверу, повторите попытку позже'})
             )
 
         if (response && response.status === 200) {
@@ -122,10 +104,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             await stopConnection()
             Cookies.remove('userData')
         } else if (response) {
-            openModal(
-                'Ошибка выхода',
-                `При выходе произошла ошибка. ${response.statusText}`
-            )
+            openToast({body:`При выходе произошла ошибка. ${response.statusText}`})
         }
     }
 

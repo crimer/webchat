@@ -5,18 +5,21 @@ import { ConnectionContextProvider } from './Contexts/ConnectionContext'
 import { ModalContextProvider } from './Contexts/ModalContext'
 import AppTemplate from './pages/AppTemplate'
 import { ChatContextProvider } from './Contexts/ChatContext'
+import { ToastContextProvider } from './Contexts/ToastContext'
 
 const App = () => {
     return (
         <ModalContextProvider>
-            <ConnectionContextProvider>
-                <AccountContextProvider>
-                    <ChatContextProvider>
-                        <CssBaseline />
-                        <AppTemplate />
-                    </ChatContextProvider>
-                </AccountContextProvider>
-            </ConnectionContextProvider>
+            <ToastContextProvider>
+                <ConnectionContextProvider>
+                    <AccountContextProvider>
+                        <ChatContextProvider>
+                            <CssBaseline />
+                            <AppTemplate />
+                        </ChatContextProvider>
+                    </AccountContextProvider>
+                </ConnectionContextProvider>
+            </ToastContextProvider>
         </ModalContextProvider>
     )
 }

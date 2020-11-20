@@ -9,8 +9,8 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { Link, useHistory } from 'react-router-dom'
 import { AccountContext } from '../Contexts/AccountContext'
-import { ModalContext } from '../Contexts/ModalContext'
 import SignalRManager from '../SignalR/SignalRManager'
+import { ToastContext } from '../Contexts/ToastContext'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -39,21 +39,22 @@ const LoginPage: React.FC = () => {
     const history = useHistory()
     const [auth, setAuth] = useState({ login: '', password: '' })
     const { login } = useContext(AccountContext)
-    const { openModal } = useContext(ModalContext)
+    const { openToast } = useContext(ToastContext)
 
     const submitLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0) {
             setAuth({ login: '', password: '' })
-            openModal('Внимание!', 'Логин или пароль не должны быть пустыми')
+            openToast({body: 'Логин или пароль не должны быть пустыми'})
             return
         }
         const isLogin = await login(auth.login, auth.password)
         if (isLogin) {
             await SignalRManager.instance.reconnect()
+            openToast({body:'Вы вошли'})
+            setAuth({ login: '', password: '' })
             history.push('/')
         }
-        setAuth({ login: '', password: '' })
     }
 
     return (
