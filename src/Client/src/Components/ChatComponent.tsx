@@ -6,7 +6,6 @@ import React, {
     useEffect,
     useState,
 } from 'react'
-import '../styles/Chat.css'
 import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { formatDate } from '../libs/DateFormat'
@@ -28,6 +27,118 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexFlow: 'column nowrap',
     },
+    messageList: {
+        display: 'flex',
+        flexFlow: 'column nowrap',
+        overflowY: 'scroll',
+        flex: '1 1 auto',
+        '&::-webkit-scrollbar': {
+            width: '5xp',
+        },
+        '&::-webkit-scrollbar-thumb': {
+            backgroundColor: 'rgb(193, 193, 193)',
+        },
+        '&::-webkit-scrollbar-track': {
+            webkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
+        },
+    },
+    message: {
+        backgroundColor: 'whitesmoke',
+        filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.36))',
+        padding: '1em 1.5em',
+        borderRadius: '3px',
+        maxWidth: '50%',
+        wordBreak: 'break-word',
+        minWidth: '200px',
+        display: 'flex',
+        flexFlow: 'column nowrap'
+    },
+    messageTime: {
+        color: '#a0a0a0',
+        marginTop: '5px',
+        alignSelf: 'flex-end'
+    },
+    messageRow: {
+        padding: '0.5em',
+        display: 'flex',
+        justifyContent: 'flex-end',
+        flexFlow: 'row nowrap',
+        animation: 'showing 1s'
+    },
+    messageRowMy: {
+        alignSelf: 'flex-end',
+        flexDirection: 'row-reverse'
+    },
+    messageRowAnother: {
+        alignSelf: 'flex-start',
+        flexDirection: 'row'
+    },
+    userLogo: {
+        padding: '20px',
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: '100%',
+        textAlign: 'center',
+        display: 'flex',
+        height: '25px',
+        width: '25px',
+        alignSelf: 'flex-end',
+        fontWeight: 'bold',
+        color: 'white',
+    },
+
+    userLogoMy: {
+        justifySelf: 'start'
+    },
+
+    userLogoAnother: {
+        justifySelf: 'end'
+    },
+
+    myMessage: {
+        justifySelf: 'start',
+        marginRight: '15px',
+        '&::before': {
+            content: '',
+            position: 'absolute',
+            visibility: 'visible',
+            bottom: '0px',
+            right: '-11px',
+            border: '10px solid transparent',
+            borderBottom: '10px solid #ccc',
+        },
+        '&::after': {
+            content: '',
+            position: 'absolute',
+            visibility: 'visible',
+            bottom: '0px',
+            right: '-11px',
+            border: '10px solid transparent',
+            borderBottom: '10px solid whitesmoke',
+        }
+    },
+    anotherMessage: {
+        justifySelf: 'end',
+        marginLeft: '15px',
+        '&::before': {
+            content: '',
+            position: 'absolute',
+            visibility: 'visible',
+            bottom: '0px',
+            left: '-11px',
+            border: '10px solid transparent',
+            borderBottom: '10px solid #ccc',
+        },
+        '&::after': {
+            content: '',
+            position: 'absolute',
+            visibility: 'visible',
+            bottom: '0px',
+            left: '-11px',
+            border: '10px solid transparent',
+            borderBottom: '10px solid whitesmoke',
+        }
+    }
 }))
 
 interface IMessageBlockProps {
@@ -45,6 +156,7 @@ const ChatMessageListComponent: React.FC = () => {
     const { messages } = useContext(ChatContext)
     const { authUser } = useContext(AccountContext)
     const bottomRef = useRef<HTMLDivElement>(null)
+    const classes = useStyles()
 
     const scrollToBottom = () => {
         if (!bottomRef.current) return
@@ -57,9 +169,8 @@ const ChatMessageListComponent: React.FC = () => {
         scrollToBottom()
     }, [messages])
 
-
     return (
-        <div className='message-list'>
+        <div className={classes.messageList}>
             {authUser.login !== '' &&
                 messages.map((m) => (
                     <ChatMessagesBlockComponent key={m.id} message={m} />
@@ -74,16 +185,17 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
 }: IMessageBlockProps) => {
     const { authUser } = useContext(AccountContext)
     const { userName, text, createdAt } = message
+    const classes = useStyles()
     const names = userName.split(' ')
 
-    const messageRowClasses = `message-row ${
-        authUser.login === userName ? 'message-row-my' : 'message-row-another'
+    const messageRowClasses = `${classes.messageRow} ${
+        authUser.login === userName ? classes.messageRowMy : classes.messageRowAnother
     }`
-    const userLogoClasses = `user-logo ${
-        authUser.login === userName ? 'user-logo-my' : 'user-logo-another'
+    const userLogoClasses = `${classes.userLogo} ${
+        authUser.login === userName ? classes.userLogoMy : classes.userLogoAnother
     }`
-    const messageTextClasses = `message ${
-        authUser.login === userName ? 'my-message' : 'another-message'
+    const messageTextClasses = `${classes.message} ${
+        authUser.login === userName ? classes.myMessage : classes.anotherMessage
     }`
 
     const userInitials = useMemo(
@@ -120,7 +232,7 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
             </span>
             <div className={messageTextClasses}>
                 <span>{text}</span>
-                <span className='message-time'>{formatDate(createdAt)}</span>
+                <span className={classes.messageTime}>{formatDate(createdAt)}</span>
             </div>
         </span>
     )
@@ -162,12 +274,11 @@ export const ChatComponent: React.FC = () => {
     const classes = useStyles()
 
     return (
-            <main className={classes.content}>
-                <div className={classes.container}>
-                    <ChatMessageListComponent />
-                    <ChatInputBlockComponent />
-                </div>
-            </main>
-
+        <main className={classes.content}>
+            <div className={classes.container}>
+                <ChatMessageListComponent />
+                <ChatInputBlockComponent />
+            </div>
+        </main>
     )
 }
