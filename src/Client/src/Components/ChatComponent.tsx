@@ -8,7 +8,7 @@ import React, {
 } from 'react'
 import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
-import { formatDate } from '../libs/DateFormat'
+import { DateType, formatDate } from '../libs/DateFormat'
 import { makeStyles, TextField } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
@@ -43,10 +43,10 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     message: {
-        backgroundColor: 'whitesmoke',
+        backgroundColor: 'white',
         filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.36))',
         padding: '1em 1.5em',
-        borderRadius: '3px',
+        borderRadius: '7px',
         maxWidth: '50%',
         wordBreak: 'break-word',
         minWidth: '200px',
@@ -232,7 +232,7 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
             </span>
             <div className={messageTextClasses}>
                 <span>{text}</span>
-                <span className={classes.messageTime}>{formatDate(createdAt)}</span>
+                <span className={classes.messageTime}>{formatDate(createdAt,DateType.DateTime)}</span>
             </div>
         </span>
     )

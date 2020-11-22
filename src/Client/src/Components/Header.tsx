@@ -65,12 +65,16 @@ const Header: React.FC<HeaderProps> = () => {
         logout()
         history.push('/login')
     }
+    const navigateToProfile = () => {
+        setAnchorEl(null)
+        history.push(`/profile/${authUser.id}`)
+    }
 
     return (
         <AppBar position='static' className={classes.root}>
             <Toolbar className={classes.toolbar}>
                 <Typography variant='h6' className={classes.title} noWrap>
-                    MyChat
+                    Mega Chat
                 </Typography>
                 <Box className={classes.authBlock}>
                     {authUser.login !== '' && (
@@ -94,6 +98,7 @@ const Header: React.FC<HeaderProps> = () => {
                         keepMounted
                         open={Boolean(anchorEl)}
                         onClose={handleClose}>
+                        <MenuItem onClick={navigateToProfile}>Профиль</MenuItem>
                         <MenuItem onClick={handleLogout}>Выйти</MenuItem>
                     </Menu>
                 </Box>

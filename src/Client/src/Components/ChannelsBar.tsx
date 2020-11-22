@@ -1,5 +1,4 @@
 import {
-    createStyles,
     Divider,
     List,
     ListItem,
@@ -38,8 +37,12 @@ type ChannelsBarProps = {}
 
 const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const classes = useStyles()
-    const theme = useTheme()
-
+    const channels = [
+        'DotNetChatRu',
+        'VueJs',
+        'React RU',
+        'Xamarin Developers',
+    ]
     return (
         <Drawer
             variant='permanent'
@@ -53,12 +56,7 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
             </div>
             <Divider />
             <List>
-                {[
-                    'DotNetChatRu',
-                    'VueJs',
-                    'React RU',
-                    'Xamarin Developers',
-                ].map((text, index) => (
+                {channels.map((text, index) => (
                     <ListItem button key={text}>
                         <ListItemIcon>
                             {/* {index % 2 === 0 ? <InboxIcon /> : <MailIcon />} */}
