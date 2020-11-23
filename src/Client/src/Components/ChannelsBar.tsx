@@ -1,9 +1,7 @@
 import {
     Divider,
     IconButton,
-    List,
     ListItem,
-    ListItemIcon,
     ListItemText,
     makeStyles,
     Menu,
@@ -13,13 +11,15 @@ import {
 } from '@material-ui/core'
 import CreateIcon from '@material-ui/icons/Create'
 import Drawer from '@material-ui/core/Drawer/Drawer'
-import React, { useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import GroupIcon from '@material-ui/icons/Group'
 import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
-import CreateChatModal, {ChatTypes,CreateChatType} from '../Components/CreateChatModal'
-
-
+import CreateChatModal, {
+    CreateChatType,
+} from '../Components/CreateChatModal'
+import { ChatContext, ChatType, UserChat } from '../Contexts/ChatContext'
+import { AccountContext } from '../Contexts/AccountContext'
 
 const drawerWidth = 320
 
@@ -66,33 +66,37 @@ type ChannelsBarProps = {}
 
 const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const classes = useStyles()
+    const { getChatsByUserId, chats } = useContext(ChatContext)
+    const { authUser } = useContext(AccountContext)
+
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [isCreateChatOpen, setCreateChatOpen] = useState<boolean>(false)
-    const [selectedChatType, setSelectedChatType] = useState<CreateChatType | undefined>()
-
-    const channels = ['DotNetChatRu', 'VueJs', 'React RU', 'Xamarin Developers']
+    const [selectedChatType, setSelectedChatType] = useState<
+        CreateChatType | undefined
+    >()
 
     const channelTypes: CreateChatType[] = [
         {
             id: 1,
-            type: ChatTypes.Group,
+            type: ChatType.Group,
             text: 'Группа',
             icon: <GroupIcon className={classes.chatIcon} />,
         },
         {
             id: 2,
-            type: ChatTypes.Channel,
+            type: ChatType.Channel,
             text: 'Канал',
             icon: <RadioIcon className={classes.chatIcon} />,
         },
         {
             id: 3,
-            type: ChatTypes.Direct,
+            type: ChatType.Direct,
             text: 'Личная переписка',
             icon: <ChatIcon className={classes.chatIcon} />,
         },
     ]
-    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAnchorEl(event.currentTarget)
+    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) =>
+        setAnchorEl(event.currentTarget)
     const handleClose = () => setAnchorEl(null)
 
     const selectChatType = (chatType: CreateChatType) => {
@@ -105,9 +109,17 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
         setSelectedChatType(undefined)
     }
 
+    useEffect(() => {
+        if (authUser.id !== -1) getChatsByUserId(authUser.id)
+    }, [authUser.id])
+
     return (
         <>
-            <CreateChatModal open={isCreateChatOpen} createChatType={selectedChatType} onModalClose={modalClose}/>
+            <CreateChatModal
+                open={isCreateChatOpen}
+                createChatType={selectedChatType}
+                onModalClose={modalClose}
+            />
             <Drawer
                 variant='permanent'
                 className={classes.drawer}
@@ -140,21 +152,66 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                         ))}
                     </Menu>
                 </div>
-                <div className={classes.drawerHeader}>
-                    <Typography>Чаты:</Typography>
-                </div>
-                <Divider />
-                <List>
-                    {channels.map((text) => (
-                        <ListItem button key={text}>
-                            <ListItemIcon>
-                            </ListItemIcon>
-                            <ListItemText primary={text} />
-                        </ListItem>
-                    ))}
-                </List>
+                <ChannelList allChats={chats} />
             </Drawer>
         </>
     )
 }
 export default ChannelsBar
+
+const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
+    const classes = useStyles()
+    const groups = allChats.filter((chat) => chat.chatType === ChatType.Group)
+    const channels = allChats.filter((chat) => chat.chatType === ChatType.Channel)
+    const directs = allChats.filter((chat) => chat.chatType === ChatType.Direct)
+
+    return (
+        <>
+            <Divider />
+            <div className={classes.drawerHeader}>
+                <Typography>
+                    Каналы: {channels.length === 0 && 'нет'}
+                </Typography>
+            </div>
+            {channels.map((chat: UserChat) => (
+                <ChannelItem chatItem={chat} key={chat.id} />
+            ))}
+
+            <Divider />
+            <div className={classes.drawerHeader}>
+                <Typography>Группы: {groups.length === 0 && 'нет'}</Typography>
+            </div>
+            {groups.map((chat: UserChat) => (
+                <ChannelItem chatItem={chat} key={chat.id} />
+            ))}
+
+            <Divider />
+            <div className={classes.drawerHeader}>
+                <Typography>
+                    Directs: {directs.length === 0 && 'нет'}
+                </Typography>
+            </div>
+            {directs.map((chat: UserChat) => (
+                <ChannelItem chatItem={chat} key={chat.id} />
+            ))}
+        </>
+    )
+}
+
+const ChannelItem: React.FC<{ chatItem: UserChat }> = ({ chatItem }) => {
+    const classes = useStyles()
+    return (
+        <ListItem button>
+            {chatItem.chatType === ChatType.Direct && (
+                <ChatIcon className={classes.chatIcon} />
+            )}
+            {chatItem.chatType === ChatType.Channel && (
+                <RadioIcon className={classes.chatIcon} />
+            )}
+            {chatItem.chatType === ChatType.Group && (
+                <GroupIcon className={classes.chatIcon} />
+            )}
+            <ListItemText primary={chatItem.name}/>
+        </ListItem>
+    )
+}

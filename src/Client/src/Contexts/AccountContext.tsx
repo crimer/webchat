@@ -5,15 +5,16 @@ import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
 import { ToastContext } from './ToastContext'
 
-
-type AuthUser = {
+export type AuthUser = {
     id: number
     login: string
+    role: string
 }
 
 const initUserValue: AuthUser = {
     id: -1,
     login: '',
+    role: '',
 }
 
 interface IAccountContext {
@@ -48,8 +49,8 @@ export const AccountContextProvider: React.FC = ({ children }) => {
 
             if (cookieUserDataJson !== undefined) {
                 const userData: AuthUser = JSON.parse(cookieUserDataJson)
-                await startConnection()
                 setAuthUser(userData)
+                await startConnection()
             } else {
                 history.push('/login')
             }
@@ -61,7 +62,10 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         const response = await accountRepository
             .login<AuthUser>(login, password)
             .catch((e: Error) =>
-                openToast({body:'Извините, не удалось подключиться к серверу, повторите попытку позже'})
+                openToast({
+                    body:
+                        'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                })
             )
 
         if (response && response.isValid) {
@@ -72,7 +76,9 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             })
             return true
         } else if (response) {
-            openToast({body:`При авторизации произошла ошибка. ${response.errorMessage}`})
+            openToast({
+                body: `При авторизации произошла ошибка. ${response.errorMessage}`,
+            })
         }
         return false
     }
@@ -81,13 +87,16 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         const response = await accountRepository
             .register(login, password)
             .catch((e: Error) =>
-                openToast({body:'Извините, не удалось подключиться к серверу, повторите попытку позже'})
+                openToast({
+                    body:
+                        'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                })
             )
 
         if (response && response.responseCode === 200) {
             return true
         } else {
-            openToast({body:`При авторизации произошла ошибка.`})
+            openToast({ body: `При авторизации произошла ошибка.` })
             return false
         }
     }
@@ -96,7 +105,10 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         const response = await accountRepository
             .logout()
             .catch((e) =>
-                openToast({body:'Извините, не удалось подключиться к серверу, повторите попытку позже'})
+                openToast({
+                    body:
+                        'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                })
             )
 
         if (response && response.status === 200) {
@@ -104,7 +116,9 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             await stopConnection()
             Cookies.remove('userData')
         } else if (response) {
-            openToast({body:`При выходе произошла ошибка. ${response.statusText}`})
+            openToast({
+                body: `При выходе произошла ошибка. ${response.statusText}`,
+            })
         }
     }
 

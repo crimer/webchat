@@ -20,6 +20,7 @@ import {
 } from '@material-ui/core'
 import React, { useMemo, useState } from 'react'
 import Chip from '@material-ui/core/Chip'
+import { ChatType } from '../Contexts/ChatContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -80,14 +81,9 @@ const MenuProps = {
     },
 }
 
-export enum ChatTypes {
-    Direct,
-    Group,
-    Channel,
-}
 export type CreateChatType = {
     id: number
-    type: ChatTypes
+    type: ChatType
     text: string
     icon: any
 }
@@ -131,15 +127,15 @@ const CreateChatModal: React.FC<CreateChatModalType> = ({
     ]
 
     const chatNames = chatSettings.chatTitle.split('')
+
     const chatShortName = useMemo(() => {
         const name = chatNames.reduce(
             (result, currentName) => (result += currentName[0].toUpperCase()),
             ''
         )
-        console.log('s')
-
         return name.trim().slice(0, 1)
     }, [chatSettings.chatTitle])
+
     const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
         const users = event.target.value as string[]
         setChatSetting({ ...chatSettings, users })

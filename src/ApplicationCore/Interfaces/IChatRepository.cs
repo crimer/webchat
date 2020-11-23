@@ -8,5 +8,6 @@ namespace ApplicationCore.Interfaces
     {
         public Task<IEnumerable<Message>> GetChatMessagesById(int id);
         public Task<bool> CreateNewChat(string chatName, int chatTypeId, int mediaId);
+        public Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId);
     }
 }

@@ -67,7 +67,7 @@ const UserFrofilePage = () => {
 
     const submitChangeProfile = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        console.log('form')
+        console.log('submitChangeProfile form')
     }
 
     return (

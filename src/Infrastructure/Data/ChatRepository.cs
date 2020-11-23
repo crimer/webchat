@@ -29,6 +29,28 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
+        public async Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<Chat>("GetAllChatsByUserId", parameters,
+                reader => new Chat()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Name = AdoDataAccess.GetValue<string>(reader, "Name"),
+                    ChatType = (ChatType)AdoDataAccess.GetValue<int>(reader, "ChatType"),
+                    //MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
+                    //MediaPath = AdoDataAccess.GetValue<string>(reader, "Path"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<Chat>();
+            else
+                return dataReader;
+        }
+
         public async Task<IEnumerable<Message>> GetChatMessagesById(int id)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()

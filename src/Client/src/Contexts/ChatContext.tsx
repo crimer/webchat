@@ -1,7 +1,7 @@
 import React, { useState, createContext, useEffect, useContext } from 'react'
 import chatRepository from '../repository/ChatRepository'
 import SignalRManager from '../SignalR/SignalRManager'
-import { AccountContext } from './AccountContext'
+import { AccountContext, AuthUser } from './AccountContext'
 import { ModalContext } from './ModalContext'
 
 type UserMessage = {
@@ -19,24 +19,46 @@ type SendMessageDto = {
     mediaId: number | null
     replyId: number | null
 }
+
+export enum ChatType {
+    Group = 1,
+    Channel = 2,
+    Direct = 3,
+}
+
+export type UserChat = {
+    id: number,
+    name: string,
+    chatType: ChatType,
+    // mediaPath: string,
+    // mediaId: number,
+}
+
 interface IChatContext {
-    messages: UserMessage[]
+    messages: UserMessage[],
+    chats: UserChat[],
     sendMessage: (message: string) => Promise<void>
     getChatMessagesById: (chatId: number) => Promise<void>
+    getChatsByUserId: (userId: number) => Promise<void>
 }
 
 export const ChatContext = createContext<IChatContext>({
     messages: [],
+    chats: [],
     sendMessage: (message: string) => {
         throw new Error('Контекст чата не проинициализирован')
     },
     getChatMessagesById: (chatId: number) => {
         throw new Error('Контекст чата не проинициализирован')
     },
+    getChatsByUserId: (userId: number) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
 })
 
 export const ChatContextProvider: React.FC = ({ children }) => {
     const [messages, setMessages] = useState<UserMessage[]>([])
+    const [chats, setChats] = useState<UserChat[]>([])
     const { authUser } = useContext(AccountContext)
     const { openModal } = useContext(ModalContext)
 
@@ -67,6 +89,13 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         }
     }
 
+    const getChatsByUserId = async (userId: number) => {
+        const response = await chatRepository.getChatsByUserId<UserChat[]>(userId)
+        if (response && response.responseCode === 200) {
+            setChats(response.data)
+        }
+    }
+
     const sendMessage = (message: string) => {
         const sendMessageDto: SendMessageDto = {
             chatId: 1,
@@ -86,7 +115,7 @@ export const ChatContextProvider: React.FC = ({ children }) => {
     }
 
     return (
-        <ChatContext.Provider value={{ messages, sendMessage, getChatMessagesById }}>
+        <ChatContext.Provider value={{ messages, chats, sendMessage, getChatMessagesById, getChatsByUserId }}>
             {children}
         </ChatContext.Provider>
     )

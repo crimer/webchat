@@ -1,13 +1,10 @@
-﻿namespace ApplicationCore.Entities
+﻿using ApplicationCore.Entities;
+
+namespace MessageChat.Dto.Chat
 {
-    public enum ChatType
+    public class UserChatDto
     {
-        Group = 1,
-        Channel = 2,
-        Direct = 3,
-    }
-    public class Chat : BaseEntity
-    {
+        public int Id { get; set; }
         public string Name { get; set; }
         public ChatType ChatType { get; set; }
         public int MediaId { get; set; }
