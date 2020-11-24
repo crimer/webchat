@@ -4,6 +4,7 @@ import ChannelsBar from '../Components/ChannelsBar'
 import { ChatComponent } from '../Components/ChatComponent'
 import { makeStyles } from '@material-ui/core'
 import { ChatContext } from '../Contexts/ChatContext'
+import { Route, Switch, useParams } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -18,6 +19,8 @@ const useStyles = makeStyles((theme) => ({
 const ChatPage = () => {
     const classes = useStyles()
     const { getChatMessagesById } = useContext(ChatContext)
+    const { chatId } = useParams()
+    console.log(chatId)
 
     useEffect(() => {
         getChatMessagesById(1)
@@ -27,7 +30,15 @@ const ChatPage = () => {
         <div className={classes.root}>
             <Header />
             <ChannelsBar />
-            <ChatComponent />
+            <div>
+
+            <Switch>
+                <Route exact path='/channel:chatId' component={ChatComponent} />
+                <Route exact path='/group:chatId' component={ChatComponent} />
+                <Route exact path='/direct:chatId' component={ChatComponent} />
+            </Switch>
+            </div>
+            {/* <ChatComponent /> */}
         </div>
     )
 }

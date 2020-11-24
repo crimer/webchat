@@ -3,6 +3,7 @@ using ApplicationCore.Interfaces;
 using Infrastructure.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading.Tasks;
@@ -16,7 +17,7 @@ namespace Infrastructure.Data
         {
             _dataAccess = dataAccess;
         }
-        public async Task<bool> CreateNewChat(string chatName, int chatTypeId, int mediaId)
+        public async Task<int> CreateNewChat(string chatName, int chatTypeId, int? mediaId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -24,9 +25,13 @@ namespace Infrastructure.Data
                 new SqlParameter("@chatType", chatTypeId),
                 new SqlParameter("@mediaId", mediaId),
             };
-            var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewChat", parameters);
 
-            return addedRows > 0;
+            SqlParameter createdChatIdParam = new SqlParameter("@createdChatId", SqlDbType.Int);
+            createdChatIdParam.Direction = ParameterDirection.Output;
+            parameters.Add(createdChatIdParam);
+
+            await _dataAccess.ExecuteProcedureAsync("CreateNewChat", parameters);
+            return (int)createdChatIdParam.Value;
         }
 
         public async Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId)

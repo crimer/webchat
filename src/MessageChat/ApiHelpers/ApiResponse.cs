@@ -23,11 +23,13 @@ namespace MessageChat.ApiHelpers
     {
         public int ResponseCode { get; set; }
         public string ErrorMessage { get; set; }
+        public string SuccessMessage { get; set; }
         public bool IsValid => ResponseCode == 200;
-        public ApiResponse(int responseCode, string errorMessage = null)
+        public ApiResponse(int responseCode, string errorMessage = null, string successMessage = null)
         {
             ResponseCode = responseCode;
             ErrorMessage = errorMessage;
+            SuccessMessage = successMessage;
         }
         public string ToJson()
         {

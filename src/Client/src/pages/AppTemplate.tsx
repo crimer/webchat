@@ -12,6 +12,9 @@ const AppTemplate = () => {
             <Route exact path='/register' component={RegisterPage} />
             <Route exact path='/profile/:id' component={UserFrofilePage} />
             <Route exact path='/' component={ChatPage} />
+            {/* <Route exact path='/channel:chatId' component={ChatPage} />
+                <Route exact path='/group:chatId' component={ChatPage} />
+                <Route exact path='/direct:chatId' component={ChatPage} /> */}
             {/* <Route exact path='*' component={AccountPage} /> */}
         </Switch>
     )

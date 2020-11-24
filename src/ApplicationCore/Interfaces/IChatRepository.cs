@@ -6,8 +6,8 @@ namespace ApplicationCore.Interfaces
 {
     public interface IChatRepository
     {
-        public Task<IEnumerable<Message>> GetChatMessagesById(int id);
-        public Task<bool> CreateNewChat(string chatName, int chatTypeId, int mediaId);
-        public Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId);
+        Task<IEnumerable<Message>> GetChatMessagesById(int id);
+        Task<int> CreateNewChat(string chatName, int chatTypeId, int? mediaId);
+        Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId);
     }
 }

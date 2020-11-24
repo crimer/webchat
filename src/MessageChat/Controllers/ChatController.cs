@@ -15,9 +15,11 @@ namespace MessageChat.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IChatRepository _chatRepository;
-        public ChatController(IChatRepository chatRepository)
+        private readonly IChatService _chatService;
+        public ChatController(IChatRepository chatRepository, IChatService chatService)
         {
             _chatRepository = chatRepository;
+            _chatService = chatService;
         }
 
         [HttpGet("getChatsByUserId/{userId}")]
@@ -35,6 +37,19 @@ namespace MessageChat.Controllers
                 //MediaPath = chat.MediaPath,
             });
             return new ApiResponse<IEnumerable<UserChatDto>>(data, (int)HttpStatusCode.OK);
+        }
+        [HttpPost("createNewChat")]
+        public async Task<object> CreateNewChat([FromBody] CreateChatDto createChatDto)
+        {
+            if (createChatDto == null) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно создать чат");
+
+            bool creationSuccess = await _chatService.CreateNewChat(createChatDto.ChatName, createChatDto.ChatTypeId, 
+                createChatDto.UserCreatorId, createChatDto.MediaId);
+
+            if (creationSuccess)
+                return new ApiResponse((int)HttpStatusCode.OK, null, $"Чат {createChatDto.ChatName} успешно создан");
+            else
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Не удалось создать чат");
         }
     }
 }

@@ -47,8 +47,8 @@ const useStyles = makeStyles((theme) => ({
         filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.36))',
         padding: '1em 1.5em',
         borderRadius: '7px',
-        maxWidth: '50%',
         wordBreak: 'break-word',
+        maxWidth: '35vw',
         minWidth: '200px',
         display: 'flex',
         flexFlow: 'column nowrap'

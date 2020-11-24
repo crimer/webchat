@@ -41,6 +41,7 @@ namespace MessageChat
             services.AddSingleton<IMessageRepository, MessageRepository>();
             services.AddSingleton<IChatRepository, ChatRepository>();
             services.AddSingleton<IAuthService, AuthService>();
+            services.AddSingleton<IChatService, ChatService>();
 
             services.Configure<DatabaseSettings>(options => _configuration.GetSection("DatabaseSettings").Bind(options));
 

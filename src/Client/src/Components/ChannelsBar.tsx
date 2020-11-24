@@ -15,11 +15,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import GroupIcon from '@material-ui/icons/Group'
 import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
-import CreateChatModal, {
-    CreateChatType,
-} from '../Components/CreateChatModal'
+import CreateChatModal, { CreateChatType } from '../Components/CreateChatModal'
 import { ChatContext, ChatType, UserChat } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
+import { NavLink, useRouteMatch } from 'react-router-dom'
 
 const drawerWidth = 320
 
@@ -60,6 +59,9 @@ const useStyles = makeStyles((theme: Theme) => ({
     paper: {
         padding: theme.spacing(3, 2),
     },
+    activeChat:{
+        backgroundColor: '#9ea2a8'
+    }
 }))
 
 type ChannelsBarProps = {}
@@ -72,7 +74,11 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
     const [isCreateChatOpen, setCreateChatOpen] = useState<boolean>(false)
     const [selectedChatType, setSelectedChatType] = useState<
-        CreateChatType | undefined
+        | {
+              type: ChatType
+              text: string
+          }
+        | undefined
     >()
 
     const channelTypes: CreateChatType[] = [
@@ -99,10 +105,11 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
         setAnchorEl(event.currentTarget)
     const handleClose = () => setAnchorEl(null)
 
-    const selectChatType = (chatType: CreateChatType) => {
+    const selectChatType = (chatType: { type: ChatType; text: string }) => {
         setAnchorEl(null)
         setCreateChatOpen(true)
         setSelectedChatType(chatType)
+        console.log(chatType)
     }
     const modalClose = () => {
         setCreateChatOpen(false)
@@ -144,7 +151,7 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                         onClose={handleClose}>
                         {channelTypes.map((type) => (
                             <MenuItem
-                                onClick={() => selectChatType(type)}
+                                onClick={() => selectChatType({text: type.text, type: type.type})}
                                 key={type.type}>
                                 {type.icon}
                                 {type.text}
@@ -161,6 +168,8 @@ export default ChannelsBar
 
 const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
     const classes = useStyles()
+    const { path } = useRouteMatch()
+
     const groups = allChats.filter((chat) => chat.chatType === ChatType.Group)
     const channels = allChats.filter((chat) => chat.chatType === ChatType.Channel)
     const directs = allChats.filter((chat) => chat.chatType === ChatType.Direct)
@@ -174,7 +183,9 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
                 </Typography>
             </div>
             {channels.map((chat: UserChat) => (
-                <ChannelItem chatItem={chat} key={chat.id} />
+                <NavLink to={`/channel/${chat.id}`} activeClassName={classes.activeChat}>
+                    <ChannelItem chatItem={chat} key={chat.id} />
+                </NavLink>
             ))}
 
             <Divider />
@@ -182,7 +193,9 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
                 <Typography>Группы: {groups.length === 0 && 'нет'}</Typography>
             </div>
             {groups.map((chat: UserChat) => (
-                <ChannelItem chatItem={chat} key={chat.id} />
+                <NavLink to={`/group/${chat.id}`} activeClassName={classes.activeChat}>
+                    <ChannelItem chatItem={chat} key={chat.id} />
+                </NavLink>
             ))}
 
             <Divider />
@@ -192,7 +205,9 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
                 </Typography>
             </div>
             {directs.map((chat: UserChat) => (
-                <ChannelItem chatItem={chat} key={chat.id} />
+                <NavLink to={`/direct/${chat.id}`} activeClassName={classes.activeChat}>
+                    <ChannelItem chatItem={chat} key={chat.id} />
+                </NavLink>
             ))}
         </>
     )
@@ -211,7 +226,7 @@ const ChannelItem: React.FC<{ chatItem: UserChat }> = ({ chatItem }) => {
             {chatItem.chatType === ChatType.Group && (
                 <GroupIcon className={classes.chatIcon} />
             )}
-            <ListItemText primary={chatItem.name}/>
+            <ListItemText primary={chatItem.name} />
         </ListItem>
     )
 }

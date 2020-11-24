@@ -2,6 +2,7 @@ export interface ApiResponse<T>{
     data: T,
     responseCode: number,
     errorMessage: string,
+    successMessage?: string,
     isValid: boolean
 }
 

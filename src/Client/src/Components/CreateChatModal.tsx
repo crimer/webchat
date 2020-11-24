@@ -18,9 +18,13 @@ import {
     Theme,
     useTheme,
 } from '@material-ui/core'
-import React, { useMemo, useState } from 'react'
+import React, { FormEvent, useContext, useMemo, useState } from 'react'
 import Chip from '@material-ui/core/Chip'
 import { ChatType } from '../Contexts/ChatContext'
+import { AccountContext } from '../Contexts/AccountContext'
+import { CreateChatDto } from '../common/Dtos/Chat/ChatDtos'
+import chatRepository from '../repository/ChatRepository'
+import { ToastContext } from '../Contexts/ToastContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -51,35 +55,34 @@ const useStyles = makeStyles((theme: Theme) =>
             padding: theme.spacing(3, 2),
         },
         chatType: {
-            marginTop: '20px',
-            display: 'flex',
-            alignItems: 'center',
             '& p': {
+                marginTop: '0px',
+                marginBottom: '10px',
                 marginRight: '10px',
             },
         },
     })
 )
 
-function getStyles(name: string, personName: string[], theme: Theme) {
-    return {
-        fontWeight:
-            personName.indexOf(name) === -1
-                ? theme.typography.fontWeightRegular
-                : theme.typography.fontWeightMedium,
-    }
-}
+// function getStyles(name: string, personName: string[], theme: Theme) {
+//     return {
+//         fontWeight:
+//             personName.indexOf(name) === -1
+//                 ? theme.typography.fontWeightRegular
+//                 : theme.typography.fontWeightMedium,
+//     }
+// }
 
-const ITEM_HEIGHT = 48
-const ITEM_PADDING_TOP = 8
-const MenuProps = {
-    PaperProps: {
-        style: {
-            maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-            width: 250,
-        },
-    },
-}
+// const ITEM_HEIGHT = 48
+// const ITEM_PADDING_TOP = 8
+// const MenuProps = {
+//     PaperProps: {
+//         style: {
+//             maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+//             width: 250,
+//         },
+//     },
+// }
 
 export type CreateChatType = {
     id: number
@@ -88,31 +91,24 @@ export type CreateChatType = {
     icon: any
 }
 
-type CreateChatModalType = {
+type CreateChatModalProps = {
     open: boolean
-    createChatType: CreateChatType | undefined
+    createChatType: { type: ChatType; text: string } | undefined
     onModalClose: () => void
 }
 
-const CreateChatModal: React.FC<CreateChatModalType> = ({
+const CreateChatModal: React.FC<CreateChatModalProps> = ({
     open,
     createChatType,
     onModalClose,
 }) => {
     const theme = useTheme()
     const classes = useStyles()
+    const { authUser } = useContext(AccountContext)
+    const { openToast } = useContext(ToastContext)
 
-    const [chatSettings, setChatSetting] = useState<{
-        chatTitle: string
-        chatType: string
-        users: string[]
-        creator: string
-    }>({
-        chatTitle: '',
-        chatType: '',
-        users: [],
-        creator: '',
-    })
+    const [chatTitle, setChatTitle] = useState('')
+
     const names = [
         'Oliver Hansen',
         'Van Henry',
@@ -126,7 +122,7 @@ const CreateChatModal: React.FC<CreateChatModalType> = ({
         'Kelly Snyder',
     ]
 
-    const chatNames = chatSettings.chatTitle.split('')
+    const chatNames = chatTitle.split('')
 
     const chatShortName = useMemo(() => {
         const name = chatNames.reduce(
@@ -134,60 +130,83 @@ const CreateChatModal: React.FC<CreateChatModalType> = ({
             ''
         )
         return name.trim().slice(0, 1)
-    }, [chatSettings.chatTitle])
+    }, [chatTitle])
 
-    const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-        const users = event.target.value as string[]
-        setChatSetting({ ...chatSettings, users })
-    }
+    // const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    //     const users = event.target.value as string[]
+    //     setChatSetting({ ...chatSettings, users })
+    // }
+
     const closeModal = () => {
-        setChatSetting({
-            chatTitle: '',
-            chatType: '',
-            users: [],
-            creator: '',
-        })
+        setChatTitle('')
         onModalClose()
     }
 
+    const submitChatCreation = async (event: FormEvent<HTMLFormElement>) => {
+        event.preventDefault()
+
+        if (chatTitle.trim().length === 0 || authUser.id <= 0 || createChatType === undefined)
+            return
+
+        const chatDto: CreateChatDto = {
+            chatName: chatTitle,
+            chatTypeId: createChatType?.type as number,
+            userCreatorId: authUser.id
+        }
+        const response = await chatRepository.createNewChat<undefined>(chatDto)
+        if (response && response.isValid && response.successMessage) {
+            openToast({ body: response.successMessage })
+        }else if(response){
+            openToast({ body: response.errorMessage })
+        }
+
+
+        closeModal()
+    }
     return (
         <Dialog open={open} onClose={closeModal}>
             <DialogTitle>Создаем новый чат</DialogTitle>
             <DialogContent>
-                <Grid container spacing={2} justify='center'>
+                <Grid container spacing={2} justify='center' direction='column'>
                     <Grid item className={classes.gridItem}>
                         <Paper className={classes.paper}>
-                            <Avatar
-                                alt={chatSettings.chatTitle}
-                                className={classes.avatarSize}>
-                                {chatShortName}
-                            </Avatar>
-                            <div className={classes.chatType}>
-                                <p>Тип:</p>
-                                {createChatType && createChatType.icon}
-                                {createChatType && createChatType.text}
-                            </div>
+                            <Grid container spacing={2} justify='flex-start' alignItems="flex-start" direction='row'>
+                                <Grid item>
+                                    <Avatar
+                                        alt={chatTitle}
+                                        className={classes.avatarSize}>
+                                        {chatShortName}
+                                    </Avatar>
+
+                                </Grid>
+                                <Grid item>
+
+                                    <div className={classes.chatType}>
+                                        <p>Тип: {createChatType && createChatType.text}</p>
+                                    </div>
+                                    <div className={classes.chatType}>
+                                        <p>Создатель: {authUser.login}</p>
+                                    </div>
+                                </Grid>
+                            </Grid>
                         </Paper>
                     </Grid>
                     <Grid item className={classes.gridItem}>
-                        <form>
+                        <form onSubmit={submitChatCreation}>
                             <TextField
                                 variant='outlined'
+                                autoFocus
                                 margin='normal'
                                 required
                                 fullWidth
-                                value={chatSettings.chatTitle}
+                                value={chatTitle}
                                 onChange={(e) =>
-                                    setChatSetting({
-                                        ...chatSettings,
-                                        chatTitle: e.target.value,
-                                    })
+                                    setChatTitle(e.target.value)
                                 }
                                 label='Название чата'
                                 name='chatTitle'
-                                autoFocus
                             />
-                            <FormControl fullWidth>
+                            {/* <FormControl fullWidth>
                                 <InputLabel>Участники</InputLabel>
                                 <Select
                                     multiple
@@ -221,19 +240,17 @@ const CreateChatModal: React.FC<CreateChatModalType> = ({
                                         </MenuItem>
                                     ))}
                                 </Select>
-                            </FormControl>
+                            </FormControl> */}
+                            <Button type='submit' color='primary'>
+                                Создать
+                            </Button>
+                            <Button onClick={closeModal} color='primary'>
+                                Отмена
+                            </Button>
                         </form>
                     </Grid>
                 </Grid>
             </DialogContent>
-            <DialogActions>
-                <Button onClick={closeModal} color='primary' autoFocus>
-                    Создать
-                </Button>
-                <Button onClick={closeModal} color='primary'>
-                    Отмена
-                </Button>
-            </DialogActions>
         </Dialog>
     )
 }

@@ -7,6 +7,8 @@ node_modules/
 .yarn/
 .vscode/
 .env
+yarn.lock
+package-lock.json
 
 # User-specific files
 *.suo
