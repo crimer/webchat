@@ -4,21 +4,16 @@ import { ConnectionContext } from './ConnectionContext'
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
 import { ToastContext } from './ToastContext'
+import { AuthUserDto } from '../common/Dtos/User/UserDtos'
 
-export type AuthUser = {
-    id: number
-    login: string
-    role: string
-}
-
-const initUserValue: AuthUser = {
+const initUserValue: AuthUserDto = {
     id: -1,
     login: '',
     role: '',
 }
 
 interface IAccountContext {
-    authUser: AuthUser
+    authUser: AuthUserDto
     login: (name: string, password: string) => Promise<boolean>
     register: (login: string, password: string) => Promise<boolean>
     logout: () => void
@@ -38,7 +33,7 @@ export const AccountContext = React.createContext<IAccountContext>({
 })
 
 export const AccountContextProvider: React.FC = ({ children }) => {
-    const [authUser, setAuthUser] = useState<AuthUser>(initUserValue)
+    const [authUser, setAuthUser] = useState<AuthUserDto>(initUserValue)
     const { openToast } = useContext(ToastContext)
     const { startConnection, stopConnection } = useContext(ConnectionContext)
     const history = useHistory()
@@ -48,7 +43,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             const cookieUserDataJson = Cookies.get('userData')
 
             if (cookieUserDataJson !== undefined) {
-                const userData: AuthUser = JSON.parse(cookieUserDataJson)
+                const userData: AuthUserDto = JSON.parse(cookieUserDataJson)
                 setAuthUser(userData)
                 await startConnection()
             } else {
@@ -60,7 +55,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
 
     const login = async (login: string, password: string) => {
         const response = await accountRepository
-            .login<AuthUser>(login, password)
+            .login<AuthUserDto>(login, password)
             .catch((e: Error) =>
                 openToast({
                     body:

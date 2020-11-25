@@ -1,54 +1,41 @@
 import React, { useState, createContext, useEffect, useContext } from 'react'
+import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
+import {
+    ReciveMessageDto,
+    SendMessageDto,
+} from '../common/Dtos/Chat/MessageDtos'
 import chatRepository from '../repository/ChatRepository'
 import SignalRManager from '../SignalR/SignalRManager'
-import { AccountContext, AuthUser } from './AccountContext'
+import { AccountContext } from './AccountContext'
 import { ModalContext } from './ModalContext'
 
-type UserMessage = {
-    id: number,
-    userName: string
-    text: string
-    isMy: boolean
-    createdAt: number
-}
-
-type SendMessageDto = {
-    text: string
-    userId: number
-    chatId: number
-    mediaId: number | null
-    replyId: number | null
-}
-
-export enum ChatType {
-    Group = 1,
-    Channel = 2,
-    Direct = 3,
-}
-
-export type UserChat = {
-    id: number,
-    name: string,
-    chatType: ChatType,
-    // mediaPath: string,
-    // mediaId: number,
-}
-
 interface IChatContext {
-    messages: UserMessage[],
-    chats: UserChat[],
-    sendMessage: (message: string) => Promise<void>
+    chats: UserChatDto[]
+    isPinned: boolean
+    getMessages: (isPinned: boolean) => ReciveMessageDto[]
+    setPinned: (isPinned: boolean) => void
+    sendMessage: (message: string, chatId: number) => Promise<void>
     getChatMessagesById: (chatId: number) => Promise<void>
+    getPinnedMessagesByChatId: (chatId: number) => Promise<void>
     getChatsByUserId: (userId: number) => Promise<void>
 }
 
 export const ChatContext = createContext<IChatContext>({
-    messages: [],
     chats: [],
+    isPinned: false,
+    getMessages: (sPinned: boolean) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
+    setPinned: (isPinned: boolean) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
     sendMessage: (message: string) => {
         throw new Error('Контекст чата не проинициализирован')
     },
     getChatMessagesById: (chatId: number) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
+    getPinnedMessagesByChatId: (chatId: number) => {
         throw new Error('Контекст чата не проинициализирован')
     },
     getChatsByUserId: (userId: number) => {
@@ -57,19 +44,20 @@ export const ChatContext = createContext<IChatContext>({
 })
 
 export const ChatContextProvider: React.FC = ({ children }) => {
-    const [messages, setMessages] = useState<UserMessage[]>([])
-    const [chats, setChats] = useState<UserChat[]>([])
+    const [messages, setMessages] = useState<ReciveMessageDto[]>([])
+    const [chats, setChats] = useState<UserChatDto[]>([])
+    const [isPinned, setIsPinned] = useState<boolean>(false)
     const { authUser } = useContext(AccountContext)
     const { openModal } = useContext(ModalContext)
 
     useEffect(() => {
         SignalRManager.instance.connection.on(
             'NewMessage',
-            (message: UserMessage) => {
+            (message: ReciveMessageDto) => {
                 message.isMy = authUser.login === message.userName
                 message.createdAt = new Date().getTime()
 
-                setMessages((existedMessages: UserMessage[]) => [
+                setMessages((existedMessages: ReciveMessageDto[]) => [
                     ...existedMessages,
                     message,
                 ])
@@ -82,40 +70,73 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         if (authUser.login === '') setMessages([])
     }, [authUser])
 
+    const setPinned = (pinned: boolean) => setIsPinned(pinned)
+
+    const getMessages = (pinned: boolean = false) => {
+        if (pinned) {
+            return messages.filter((message) => message.isPinned === pinned)
+        } else {
+            return messages
+        }
+    }
+
     const getChatMessagesById = async (chatId: number) => {
-        const response = await chatRepository.getMessagesByChatId<UserMessage[]>(chatId)
+        const response = await chatRepository.getMessagesByChatId<
+            ReciveMessageDto[]
+        >(chatId)
+        if (response && response.responseCode === 200) {
+            setMessages(response.data)
+        }
+    }
+
+    const getPinnedMessagesByChatId = async (chatId: number) => {
+        const response = await chatRepository.getMessagesByChatId<
+            ReciveMessageDto[]
+        >(chatId)
         if (response && response.responseCode === 200) {
             setMessages(response.data)
         }
     }
 
     const getChatsByUserId = async (userId: number) => {
-        const response = await chatRepository.getChatsByUserId<UserChat[]>(userId)
+        const response = await chatRepository.getChatsByUserId<UserChatDto[]>(
+            userId
+        )
         if (response && response.responseCode === 200) {
             setChats(response.data)
         }
     }
 
-    const sendMessage = (message: string) => {
+    const sendMessage = (text: string, chatId: number) => {
         const sendMessageDto: SendMessageDto = {
-            chatId: 1,
+            text,
             userId: authUser.id,
-            text: message,
+            chatId,
+            replyId: null,
             mediaId: null,
-            replyId: null
         }
         return SignalRManager.instance
             .sendMessage<SendMessageDto>('NewMessage', sendMessageDto)
-            .catch(() =>
+            .catch((e) => {
                 openModal(
                     'Внимание!',
                     'Не удалось отправить сообщение, потеряно соединение с сервером'
                 )
-            )
+            })
     }
 
     return (
-        <ChatContext.Provider value={{ messages, chats, sendMessage, getChatMessagesById, getChatsByUserId }}>
+        <ChatContext.Provider
+            value={{
+                chats,
+                sendMessage,
+                setPinned,
+                getMessages,
+                isPinned,
+                getChatMessagesById,
+                getPinnedMessagesByChatId,
+                getChatsByUserId,
+            }}>
             {children}
         </ChatContext.Provider>
     )

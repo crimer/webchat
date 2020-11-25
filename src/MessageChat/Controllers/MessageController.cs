@@ -31,7 +31,24 @@ namespace MessageChat.Controllers
                 Text = message.Text,
                 CreatedAt = message.CreatedAt,
                 UserName = message.AuthorLogin,
-                IsMy = false
+                IsMy = false,
+                IsPinned = message.IsPinned
+            });
+            return new ApiResponse<IEnumerable<SendMessageDto>>(data, (int)HttpStatusCode.OK);
+        }
+
+        [HttpGet("getPinnedMessagesByChatId/{chatId}")]
+        public async Task<object> GetPinnedMessagesByChatId(int chatId)
+        {
+            var messages = await _chatRepository.GetPinnedMessagesByChatId(chatId);
+            var data = messages.Select(message => new SendMessageDto()
+            {
+                Id = message.Id,
+                Text = message.Text,
+                CreatedAt = message.CreatedAt,
+                UserName = message.AuthorLogin,
+                IsMy = false,
+                IsPinned = message.IsPinned
             });
             return new ApiResponse<IEnumerable<SendMessageDto>>(data, (int)HttpStatusCode.OK);
         }

@@ -33,8 +33,8 @@ class SignalRManager {
         await this.start()
         return Promise.resolve()
     }
-    public sendMessage<T>(messageName: string, messageData: T): Promise<void> {
-        return this.connection.send(messageName, messageData)
+    public sendMessage<T>(messageName: string, reciveMessage: T): Promise<void> {
+        return this.connection.send(messageName, reciveMessage)
     }
 }
 

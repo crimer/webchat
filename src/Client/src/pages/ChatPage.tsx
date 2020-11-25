@@ -3,6 +3,7 @@ import ChannelsBar from '../Components/ChannelsBar'
 import { ChatComponent } from '../Components/ChatComponent'
 import { Container, makeStyles } from '@material-ui/core'
 import { Route } from 'react-router-dom'
+import ChatDetailPage from '../pages/ChatDetailPage'
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -20,6 +21,7 @@ const ChatPage = () => {
         <div className={classes.root}>
             <ChannelsBar />
             <Route exact path='/chat/:chatId' component={ChatComponent} />
+            <Route exact path='/chat/:chatId/detail' component={ChatDetailPage} />
             <Route exact path='/chat'>
                 <Container>
                     <h1>Главная</h1>

@@ -12,6 +12,8 @@ import { DateType, formatDate } from '../libs/DateFormat'
 import { makeStyles, TextField } from '@material-ui/core'
 import Header from './Header'
 import { useParams } from 'react-router-dom'
+import AttachmentOutlinedIcon from '@material-ui/icons/AttachmentOutlined'
+import { ReciveMessageDto } from '../common/Dtos/Chat/MessageDtos'
 
 const useStyles = makeStyles((theme) => ({
     appBarSpacer: theme.mixins.toolbar,
@@ -43,6 +45,13 @@ const useStyles = makeStyles((theme) => ({
             webkitBoxShadow: 'inset 0 0 6px rgba(0, 0, 0, 0.3)',
         },
     },
+    messageFooter: {
+        marginTop: '5px',
+        display: 'flex',
+        flexFlow: 'row-reverse',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     message: {
         backgroundColor: 'white',
         filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.36))',
@@ -56,8 +65,6 @@ const useStyles = makeStyles((theme) => ({
     },
     messageTime: {
         color: '#a0a0a0',
-        marginTop: '5px',
-        alignSelf: 'flex-end',
     },
     messageRow: {
         padding: '0.5em',
@@ -152,18 +159,11 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 interface IMessageBlockProps {
-    message: MessageBlock
-}
-
-type MessageBlock = {
-    userName: string
-    isMy: boolean
-    text: string
-    createdAt: number
+    message: ReciveMessageDto
 }
 
 const ChatMessageListComponent: React.FC = () => {
-    const { messages } = useContext(ChatContext)
+    const { getMessages, isPinned } = useContext(ChatContext)
     const { authUser } = useContext(AccountContext)
     const bottomRef = useRef<HTMLDivElement>(null)
     const classes = useStyles()
@@ -175,6 +175,8 @@ const ChatMessageListComponent: React.FC = () => {
             block: 'start',
         })
     }
+
+    const messages = getMessages(isPinned)
     useEffect(() => {
         scrollToBottom()
     }, [messages])
@@ -197,7 +199,7 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
     message,
 }: IMessageBlockProps) => {
     const { authUser } = useContext(AccountContext)
-    const { userName, text, createdAt } = message
+    const { userName, text, createdAt, isPinned } = message
     const classes = useStyles()
     const names = userName.split(' ')
 
@@ -249,9 +251,12 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
             </span>
             <div className={messageTextClasses}>
                 <span>{text}</span>
-                <span className={classes.messageTime}>
-                    {formatDate(createdAt, DateType.DateTime)}
-                </span>
+                <div className={classes.messageFooter}>
+                    <span className={classes.messageTime}>
+                        {formatDate(createdAt, DateType.DateTime)}
+                    </span>
+                    {isPinned && <AttachmentOutlinedIcon fontSize='small' />}
+                </div>
             </div>
         </span>
     )
@@ -262,6 +267,7 @@ const ChatInputBlockComponent: React.FC = () => {
     const { authUser } = useContext(AccountContext)
     const [message, setMessage] = useState('')
     const classes = useStyles()
+    const { chatId } = useParams()
 
     useEffect(() => {
         setMessage('')
@@ -270,7 +276,9 @@ const ChatInputBlockComponent: React.FC = () => {
     const onEnter = async (event: React.KeyboardEvent<HTMLDivElement>) => {
         if (event.key === 'Enter') {
             event.preventDefault()
-            if (message.trim().length > 0) await sendMessage(message)
+            if (message.trim().length > 0 && +chatId > 0) {
+                await sendMessage(message, +chatId)
+            }
             setMessage('')
         }
     }
@@ -296,8 +304,7 @@ export const ChatComponent: React.FC = () => {
     const { getChatMessagesById } = useContext(ChatContext)
 
     useEffect(() => {
-        if(chatId)
-            getChatMessagesById(chatId)
+        if (chatId) getChatMessagesById(chatId)
     }, [chatId])
 
     return (

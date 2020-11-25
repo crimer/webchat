@@ -11,5 +11,6 @@ namespace ApplicationCore.Entities
         public int ChatId { get; set; }
         public int MediaId { get; set; }
         public int ReplyId { get; set; }
+        public bool IsPinned { get; set; }
     }
 }

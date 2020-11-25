@@ -72,7 +72,34 @@ namespace Infrastructure.Data
                     AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
                     UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
                     MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
-                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId")
+                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId"),
+                    IsPinned = AdoDataAccess.GetValue<bool>(reader, "IsPinned"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<Message>();
+            else
+                return dataReader;
+        }
+
+        public async Task<IEnumerable<Message>> GetPinnedMessagesByChatId(int id)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", id),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<Message>("GetPinnedMessagesByChatId", parameters,
+                reader => new Message()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Text = AdoDataAccess.GetValue<string>(reader, "Text"),
+                    CreatedAt = AdoDataAccess.GetValue<DateTime>(reader, "CreatedAt"),
+                    ChatId = AdoDataAccess.GetValue<int>(reader, "ChatId"),
+                    AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
+                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
+                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId"),
+                    IsPinned = AdoDataAccess.GetValue<bool>(reader, "IsPinned"),
                 });
 
             if (dataReader == null || dataReader.Count() == 0)

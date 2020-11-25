@@ -20,9 +20,8 @@ import {
 } from '@material-ui/core'
 import React, { FormEvent, useContext, useMemo, useState } from 'react'
 import Chip from '@material-ui/core/Chip'
-import { ChatType } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
-import { CreateChatDto } from '../common/Dtos/Chat/ChatDtos'
+import { ChatType, CreateChatDto } from '../common/Dtos/Chat/ChatDtos'
 import chatRepository from '../repository/ChatRepository'
 import { ToastContext } from '../Contexts/ToastContext'
 

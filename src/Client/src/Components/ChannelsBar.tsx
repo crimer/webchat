@@ -17,9 +17,10 @@ import GroupIcon from '@material-ui/icons/Group'
 import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
 import CreateChatModal, { CreateChatType } from '../Components/CreateChatModal'
-import { ChatContext, ChatType, UserChat } from '../Contexts/ChatContext'
+import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { NavLink, useHistory } from 'react-router-dom'
+import { ChatType, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 
 const drawerWidth = 320
 
@@ -226,13 +227,11 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
 }
 export default ChannelsBar
 
-const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
+const ChannelList: React.FC<{ allChats: UserChatDto[] }> = ({ allChats }) => {
     const classes = useStyles()
 
     const groups = allChats.filter((chat) => chat.chatType === ChatType.Group)
-    const channels = allChats.filter(
-        (chat) => chat.chatType === ChatType.Channel
-    )
+    const channels = allChats.filter((chat) => chat.chatType === ChatType.Channel)
     const directs = allChats.filter((chat) => chat.chatType === ChatType.Direct)
 
     return (
@@ -243,7 +242,7 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
                     Каналы: {channels.length === 0 && 'нет'}
                 </Typography>
             </div>
-            {channels.map((chat: UserChat) => (
+            {channels.map((chat: UserChatDto) => (
                 <NavLink
                     to={`/chat/${chat.id}`}
                     className={classes.chatLink}
@@ -257,7 +256,7 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
             <div className={classes.drawerHeader}>
                 <Typography>Группы: {groups.length === 0 && 'нет'}</Typography>
             </div>
-            {groups.map((chat: UserChat) => (
+            {groups.map((chat: UserChatDto) => (
                 <NavLink
                     to={`/chat/${chat.id}`}
                     className={classes.chatLink}
@@ -273,7 +272,7 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
                     Directs: {directs.length === 0 && 'нет'}
                 </Typography>
             </div>
-            {directs.map((chat: UserChat) => (
+            {directs.map((chat: UserChatDto) => (
                 <NavLink
                     to={`/chat/${chat.id}`}
                     className={classes.chatLink}
@@ -286,7 +285,7 @@ const ChannelList: React.FC<{ allChats: UserChat[] }> = ({ allChats }) => {
     )
 }
 
-const ChannelItem: React.FC<{ chatItem: UserChat }> = ({ chatItem }) => {
+const ChannelItem: React.FC<{ chatItem: UserChatDto }> = ({ chatItem }) => {
     const classes = useStyles()
     return (
         <ListItem button>
