@@ -10,20 +10,21 @@ import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { DateType, formatDate } from '../libs/DateFormat'
 import { makeStyles, TextField } from '@material-ui/core'
+import Header from './Header'
+import { useParams } from 'react-router-dom'
 
 const useStyles = makeStyles((theme) => ({
     appBarSpacer: theme.mixins.toolbar,
     content: {
         gridRow: 2,
         gridColumn: 2,
-        padding: theme.spacing(4),
-        overflow: 'auto',
+        overflow: 'hidden',
         width: '100%',
         height: '100%',
     },
     container: {
         width: '100%',
-        height: '100%',
+        height: 'calc(100% - 64px)',
         display: 'flex',
         flexFlow: 'column nowrap',
     },
@@ -51,27 +52,27 @@ const useStyles = makeStyles((theme) => ({
         maxWidth: '35vw',
         minWidth: '200px',
         display: 'flex',
-        flexFlow: 'column nowrap'
+        flexFlow: 'column nowrap',
     },
     messageTime: {
         color: '#a0a0a0',
         marginTop: '5px',
-        alignSelf: 'flex-end'
+        alignSelf: 'flex-end',
     },
     messageRow: {
         padding: '0.5em',
         display: 'flex',
         justifyContent: 'flex-end',
         flexFlow: 'row nowrap',
-        animation: 'showing 1s'
+        animation: 'showing 1s',
     },
     messageRowMy: {
         alignSelf: 'flex-end',
-        flexDirection: 'row-reverse'
+        flexDirection: 'row-reverse',
     },
     messageRowAnother: {
         alignSelf: 'flex-start',
-        flexDirection: 'row'
+        flexDirection: 'row',
     },
     userLogo: {
         padding: '20px',
@@ -88,11 +89,11 @@ const useStyles = makeStyles((theme) => ({
     },
 
     userLogoMy: {
-        justifySelf: 'start'
+        justifySelf: 'start',
     },
 
     userLogoAnother: {
-        justifySelf: 'end'
+        justifySelf: 'end',
     },
 
     myMessage: {
@@ -115,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
             right: '-11px',
             border: '10px solid transparent',
             borderBottom: '10px solid whitesmoke',
-        }
+        },
     },
     anotherMessage: {
         justifySelf: 'end',
@@ -137,8 +138,17 @@ const useStyles = makeStyles((theme) => ({
             left: '-11px',
             border: '10px solid transparent',
             borderBottom: '10px solid whitesmoke',
-        }
-    }
+        },
+    },
+    inputWrapper: {
+        padding: '20px',
+    },
+    emptyChatList: {
+        display: 'block',
+        margin: '20px 0',
+        textAlign: 'center',
+        fontSize: '20px',
+    },
 }))
 
 interface IMessageBlockProps {
@@ -171,6 +181,9 @@ const ChatMessageListComponent: React.FC = () => {
 
     return (
         <div className={classes.messageList}>
+            {messages.length === 0 && (
+                <p className={classes.emptyChatList}>Сообщений нет</p>
+            )}
             {authUser.login !== '' &&
                 messages.map((m) => (
                     <ChatMessagesBlockComponent key={m.id} message={m} />
@@ -189,10 +202,14 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
     const names = userName.split(' ')
 
     const messageRowClasses = `${classes.messageRow} ${
-        authUser.login === userName ? classes.messageRowMy : classes.messageRowAnother
+        authUser.login === userName
+            ? classes.messageRowMy
+            : classes.messageRowAnother
     }`
     const userLogoClasses = `${classes.userLogo} ${
-        authUser.login === userName ? classes.userLogoMy : classes.userLogoAnother
+        authUser.login === userName
+            ? classes.userLogoMy
+            : classes.userLogoAnother
     }`
     const messageTextClasses = `${classes.message} ${
         authUser.login === userName ? classes.myMessage : classes.anotherMessage
@@ -232,7 +249,9 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
             </span>
             <div className={messageTextClasses}>
                 <span>{text}</span>
-                <span className={classes.messageTime}>{formatDate(createdAt,DateType.DateTime)}</span>
+                <span className={classes.messageTime}>
+                    {formatDate(createdAt, DateType.DateTime)}
+                </span>
             </div>
         </span>
     )
@@ -242,6 +261,7 @@ const ChatInputBlockComponent: React.FC = () => {
     const { sendMessage } = useContext(ChatContext)
     const { authUser } = useContext(AccountContext)
     const [message, setMessage] = useState('')
+    const classes = useStyles()
 
     useEffect(() => {
         setMessage('')
@@ -256,7 +276,7 @@ const ChatInputBlockComponent: React.FC = () => {
     }
 
     return (
-        <div>
+        <div className={classes.inputWrapper}>
             <TextField
                 placeholder={'Введите сообщение'}
                 value={message}
@@ -272,9 +292,18 @@ const ChatInputBlockComponent: React.FC = () => {
 
 export const ChatComponent: React.FC = () => {
     const classes = useStyles()
+    const { chatId } = useParams()
+    const { getChatMessagesById } = useContext(ChatContext)
+
+    useEffect(() => {
+        if(chatId)
+            getChatMessagesById(chatId)
+    }, [chatId])
 
     return (
         <main className={classes.content}>
+            <Header />
+
             <div className={classes.container}>
                 <ChatMessageListComponent />
                 <ChatInputBlockComponent />

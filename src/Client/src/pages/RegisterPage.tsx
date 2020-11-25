@@ -10,6 +10,7 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { AccountContext } from '../Contexts/AccountContext'
 import { ModalContext } from '../Contexts/ModalContext'
+import { ToastContext } from '../Contexts/ToastContext'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -37,6 +38,7 @@ const RegisterPage = () => {
     const [auth, setAuth] = useState({ login: '', password: '', repeatPassword: '' })
     const { register } = useContext(AccountContext)
     const { openModal } = useContext(ModalContext)
+    const { openToast } = useContext(ToastContext)
 
     const submitRegister = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
@@ -52,6 +54,7 @@ const RegisterPage = () => {
         const isRegister = await register(auth.login, auth.password)
         if (isRegister) {
             setAuth({ login: '', password: '', repeatPassword: '' })
+            openToast({ body:'Вы успешно создали аккаунт' })
             history.push('/login')
         }
     }

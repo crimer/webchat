@@ -4,14 +4,10 @@ import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
-import Button from '@material-ui/core/Button'
 import { AccountCircle } from '@material-ui/icons'
 import Box from '@material-ui/core/Box'
-import { MenuItem } from '@material-ui/core'
-import Menu from '@material-ui/core/Menu'
-import { useHistory } from 'react-router-dom'
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
     createStyles({
         root: {
             gridRow: 1,
@@ -48,27 +44,8 @@ const useStyles = makeStyles((theme: Theme) =>
 type HeaderProps = {}
 
 const Header: React.FC<HeaderProps> = () => {
-    const { authUser, logout } = useContext(AccountContext)
-    const history = useHistory()
+    const { authUser } = useContext(AccountContext)
     const classes = useStyles()
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null)
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAnchorEl(event.currentTarget)
-    }
-
-    const handleClose = () => {
-        setAnchorEl(null)
-    }
-    const handleLogout = () => {
-        setAnchorEl(null)
-        logout()
-        history.push('/login')
-    }
-    const navigateToProfile = () => {
-        setAnchorEl(null)
-        history.push(`/profile/${authUser.id}`)
-    }
 
     return (
         <AppBar position='static' className={classes.root}>
@@ -85,22 +62,6 @@ const Header: React.FC<HeaderProps> = () => {
                             {authUser.login}
                         </Typography>
                     )}
-
-                    <Button
-                        aria-controls='simple-menu'
-                        aria-haspopup='true'
-                        onClick={handleClick}>
-                        Аккаунт
-                    </Button>
-                    <Menu
-                        id='simple-menu'
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}>
-                        <MenuItem onClick={navigateToProfile}>Профиль</MenuItem>
-                        <MenuItem onClick={handleLogout}>Выйти</MenuItem>
-                    </Menu>
                 </Box>
             </Toolbar>
         </AppBar>
