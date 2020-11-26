@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Interfaces;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
 using MessageChat.ApiHelpers;
 using MessageChat.Dto.Chat;
 using Microsoft.AspNetCore.Authorization;
@@ -25,7 +26,7 @@ namespace MessageChat.Controllers
         [HttpGet("getChatsByUserId/{userId}")]
         public async Task<object> GetChatsByUserId(int userId)
         {
-            if(userId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невохможно получить чаты такого пользователя");
+            if(userId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить чаты такого пользователя");
 
             var userChats = await _chatRepository.GetAllChatsByUserId(userId);
             IEnumerable<UserChatDto> data = userChats.Select(chat => new UserChatDto()
@@ -38,6 +39,29 @@ namespace MessageChat.Controllers
             });
             return new ApiResponse<IEnumerable<UserChatDto>>(data, (int)HttpStatusCode.OK);
         }
+        [HttpGet("detailChatInfo/{chatId}")]
+        public async Task<object> GetDetailChatInfo(int chatId)
+        {
+            if (chatId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить информацию о чате");
+            
+            Chat chatDetail = await _chatRepository.GetChat(chatId);
+            IEnumerable<User> members = await _chatRepository.GetChatMembers(chatId);
+            var chatMembers = members.Select(member => new UserChatDto()
+            {
+                Id = member.Id,
+                Name = member.Login,
+                UserRoleId = member.UserRoleId
+            });
+
+            ChatDetailDto detailDto = new ChatDetailDto()
+            {
+                Id = chatDetail.Id,
+                Name = chatDetail.Name,
+                Members = chatMembers
+            };
+            return new ApiResponse<ChatDetailDto>(detailDto, (int)HttpStatusCode.OK);
+        }
+
         [HttpPost("createNewChat")]
         public async Task<object> CreateNewChat([FromBody] CreateChatDto createChatDto)
         {

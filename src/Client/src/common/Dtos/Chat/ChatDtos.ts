@@ -1,3 +1,5 @@
+import { UserRole } from "../User/UserDtos"
+
 export enum ChatType {
     Group = 1,
     Channel = 2,
@@ -17,10 +19,11 @@ export type UserChatDto = {
     chatType: ChatType
     mediaPath: string,
     mediaId: number,
+    userRoleId: UserRole
 }
 
-export type DetailChatDto = {
+export type ChatDetailDto = {
     id: number,
     name: string,
-    // members: a
+    members: UserChatDto[]
 }

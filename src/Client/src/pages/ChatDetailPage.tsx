@@ -9,9 +9,14 @@ import {
     TextField,
     IconButton,
 } from '@material-ui/core'
-import React, { FormEvent, useState } from 'react'
+import React, { FormEvent, useContext, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import ChatMembers from '../Components/ChatMembers'
+import InviteMemberAutocomplete from '../Components/InviteMemberAutocomplete'
+import chatRepository from '../repository/ChatRepository'
+import { ChatDetailDto } from '../common/Dtos/Chat/ChatDtos'
+import { ToastContext } from '../Contexts/ToastContext'
 
 const useStyles = makeStyles((theme) => ({
     heroContent: {
@@ -44,24 +49,30 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const ChatDetailPage = () => {
-    const data = {
-        login: 'Nikita@mail.ru',
-        name: 'nikita',
-        password: '',
-        newPassword: '',
-        repeatNewPassword: '',
-        avatarPath: '',
-        shortName: 'N',
-    }
-    const { id } = useParams()
+
+    const [detailInfo, setDetailInfo] = useState<ChatDetailDto>()
+    const { chatId } = useParams()
     const classes = useStyles()
     const history = useHistory()
-    const [userData, setUserData] = useState(data)
+    const { openToast } = useContext(ToastContext)
 
     const submitChangeProfile = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
         console.log('submitChangeProfile form')
     }
+    useEffect(() => {
+        const fetchDetailInfo = async () => {
+            const response = await chatRepository.getDetailChatInfo<ChatDetailDto>(
+                chatId
+            )
+            if (response && response.isValid) {
+                setDetailInfo(response.data)
+            } else if (response) {
+                openToast({ body: response.errorMessage })
+            }
+        }
+        fetchDetailInfo()
+    }, [])
 
     return (
         <div className={classes.heroContent}>
@@ -78,57 +89,85 @@ const ChatDetailPage = () => {
                         variant='h4'
                         align='left'
                         color='textPrimary'>
-                        Чат: Такой-то
+                        Чат: {detailInfo ? detailInfo.name : ':('}
                     </Typography>
                 </Grid>
-                <Grid container spacing={2} className={classes.mainContent}>
-                    <Paper className={classes.paper}>
-                        <Grid item className={classes.gridItem}>
-                            {userData.avatarPath === '' ? (
-                                <Avatar
-                                    alt={userData.name}
-                                    className={classes.avatarSize}>
-                                    {userData.shortName}
-                                </Avatar>
-                            ) : (
-                                <Avatar
-                                    className={classes.avatarSize}
-                                    alt={userData.name}
-                                    src={userData.avatarPath}
-                                />
-                            )}
+                <Paper className={classes.paper}>
+                    {!detailInfo ? (
+                        <Typography
+                            component='h1'
+                            variant='h4'
+                            align='left'
+                            color='textPrimary'>
+                            Не удалось загрузить детальную информацию
+                        </Typography>
+                    ) : (
+                        <Grid
+                            container
+                            direction='row'
+                            spacing={2}
+                            className={classes.mainContent}>
+                            <Grid item className={classes.gridItem}>
+                                <Grid
+                                    container
+                                    alignItems='center'
+                                    direction='column'>
+                                        <Avatar
+                                            alt={detailInfo.name}
+                                            className={classes.avatarSize}>
+                                            {detailInfo.name[0].toUpperCase()}
+                                        </Avatar>
+                                    {/* {detailInfo.avatarPath === '' ? (
+                                    ) : (
+                                        <Avatar
+                                            className={classes.avatarSize}
+                                            alt={userData.name}
+                                            src={userData.avatarPath}
+                                        />
+                                        )} */}
+                                    <p className={classes.userName}>
+                                        {detailInfo.name}
+                                    </p>
+                                </Grid>
+                                {/* <div>
+                                    <form
+                                        noValidate
+                                        onSubmit={submitChangeProfile}>
+                                        <TextField
+                                            variant='outlined'
+                                            margin='normal'
+                                            required
+                                            fullWidth
+                                            id='name'
+                                            label='Имя'
+                                            name='name'
+                                            value={detailInfo.name}
+                                            // onChange={(e) =>
+                                            //     setUserData({
+                                            //         ...userData,
+                                            //         name: e.target.value,
+                                            //     })
+                                            // }
+                                        />
 
-                            <p className={classes.userName}>{userData.name}</p>
+                                        <Button
+                                            type='submit'
+                                            variant='contained'
+                                            color='primary'>
+                                            Сохранить
+                                        </Button>
+                                    </form>
+                                </div> */}
+                            </Grid>
+                            <Grid item className={classes.gridItem}>
+                                <ChatMembers members={detailInfo.members}/>
+                            </Grid>
+                            <Grid item className={classes.gridItem}>
+                                <InviteMemberAutocomplete />
+                            </Grid>
                         </Grid>
-                        <Grid item className={classes.gridItem}>
-                            <form noValidate onSubmit={submitChangeProfile}>
-                                <TextField
-                                    variant='outlined'
-                                    margin='normal'
-                                    required
-                                    fullWidth
-                                    id='name'
-                                    label='Имя'
-                                    name='name'
-                                    value={userData.name}
-                                    onChange={(e) =>
-                                        setUserData({
-                                            ...userData,
-                                            name: e.target.value,
-                                        })
-                                    }
-                                />
-
-                                <Button
-                                    type='submit'
-                                    variant='contained'
-                                    color='primary'>
-                                    Сохранить
-                                </Button>
-                            </form>
-                        </Grid>
-                    </Paper>
-                </Grid>
+                    )}
+                </Paper>
             </Container>
         </div>
     )

@@ -4,12 +4,12 @@ import { ConnectionContext } from './ConnectionContext'
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
 import { ToastContext } from './ToastContext'
-import { AuthUserDto } from '../common/Dtos/User/UserDtos'
+import { AuthUserDto, UserRole } from '../common/Dtos/User/UserDtos'
 
 const initUserValue: AuthUserDto = {
     id: -1,
     login: '',
-    role: '',
+    role: UserRole.Member,
 }
 
 interface IAccountContext {

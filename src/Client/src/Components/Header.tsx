@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { AccountContext } from '../Contexts/AccountContext'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
@@ -6,15 +6,8 @@ import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import { AccountCircle } from '@material-ui/icons'
 import Box from '@material-ui/core/Box'
-import {
-    IconButton,
-    MenuItem,
-    Menu,
-    FormControl,
-    InputLabel,
-    Select,
-} from '@material-ui/core'
-import { useHistory } from 'react-router-dom'
+import { IconButton, MenuItem, Menu } from '@material-ui/core'
+import { useHistory, useParams } from 'react-router-dom'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { ChatContext } from '../Contexts/ChatContext'
 import ToggleButton from '@material-ui/lab/ToggleButton'
@@ -66,7 +59,7 @@ const useStyles = makeStyles((theme: Theme) =>
         moreIconMenu: {
             color: '#000',
         },
-        togglePinnedBtn:{
+        togglePinnedBtn: {
             marginRight: '20px',
         },
     })
@@ -76,10 +69,12 @@ type HeaderProps = {}
 
 const Header: React.FC<HeaderProps> = () => {
     const { authUser } = useContext(AccountContext)
-    const { isPinned, setPinned } = useContext(ChatContext)
+    const { isPinned, setPinned, getChatById } = useContext(ChatContext)
     const classes = useStyles()
+    const { chatId } = useParams()
     const history = useHistory()
     const [channelMenu, setChannelMenu] = useState<null | HTMLElement>(null)
+
     const handleClose = () => setChannelMenu(null)
     const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) =>
         setChannelMenu(event.currentTarget)
@@ -132,7 +127,7 @@ const Header: React.FC<HeaderProps> = () => {
                     keepMounted
                     open={Boolean(channelMenu)}
                     onClose={handleClose}>
-                    <MenuItem onClick={() => toDetailPage(1)}>
+                    <MenuItem onClick={() => toDetailPage(chatId)}>
                         Детально
                     </MenuItem>
                 </Menu>

@@ -12,6 +12,11 @@ class ChatRepository {
         return response
     }
 
+    public async getDetailChatInfo<T>(chatId: number): Promise<ApiResponse<T>> {
+        const response = await apiRequest<T>('GET', `/chat/detailChatInfo/${chatId}`)
+        return response
+    }
+
     public async createNewChat<T>(createChatDto: CreateChatDto): Promise<ApiResponse<T>> {
         const response = await apiRequest<T>('POST', `/chat/createNewChat`, {
             body:{ ...createChatDto },

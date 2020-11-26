@@ -56,6 +56,44 @@ namespace Infrastructure.Data
                 return dataReader;
         }
 
+        public async Task<Chat> GetChat(int chatId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", chatId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<Chat>("GetChat", parameters,
+                reader => new Chat()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    ChatType = AdoDataAccess.GetValue<ChatType>(reader, "ChatType"),
+                    Name = AdoDataAccess.GetValue<string>(reader, "Name"),
+                });
+
+            
+            return dataReader.FirstOrDefault();
+        }
+
+        public async Task<IEnumerable<User>> GetChatMembers(int chatId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", chatId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetChatMembers", parameters,
+                reader => new User()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<User>();
+            else
+                return dataReader;
+        }
+
         public async Task<IEnumerable<Message>> GetChatMessagesById(int id)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()

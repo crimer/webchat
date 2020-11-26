@@ -119,6 +119,28 @@ GO
 -- END;
 -- GO
 
+ CREATE PROC GetChat
+ 	@chatId INT
+ AS
+ BEGIN
+	SELECT [Chats].Id, [Chats].Name, [Chats].ChatType
+	FROM [Chats] JOIN ChatTypes ON [Chats].ChatType = ChatTypes.Id
+	WHERE [Chats].Id = @chatId;
+ END;
+ GO
+
+ CREATE PROC GetChatMembers
+ 	@chatId INT
+ AS
+ BEGIN
+	SELECT [Users].Id, [Users].Login, ChatToUser.UserRoleId
+	FROM [Chats] 
+	JOIN ChatToUser ON  ChatToUser.ChatId = [Chats].Id
+	JOIN [Users] ON  ChatToUser.UserId = [Users].Id
+	WHERE [Chats].Id = @chatId;
+ END;
+ GO
+
 --EXEC CreateNewChat 'C# (Ru)', 1
 --EXEC CreateNewUser 'nikita', 'nikita'
 --EXEC CreateNewMessage 'Hello everyone', 1, 1

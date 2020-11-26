@@ -15,6 +15,7 @@ interface IChatContext {
     getMessages: (isPinned: boolean) => ReciveMessageDto[]
     setPinned: (isPinned: boolean) => void
     sendMessage: (message: string, chatId: number) => Promise<void>
+    getChatById: (chatId: number) => UserChatDto
     getChatMessagesById: (chatId: number) => Promise<void>
     getPinnedMessagesByChatId: (chatId: number) => Promise<void>
     getChatsByUserId: (userId: number) => Promise<void>
@@ -24,6 +25,9 @@ export const ChatContext = createContext<IChatContext>({
     chats: [],
     isPinned: false,
     getMessages: (sPinned: boolean) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
+    getChatById: (chatId: number): UserChatDto => {
         throw new Error('Контекст чата не проинициализирован')
     },
     setPinned: (isPinned: boolean) => {
@@ -107,6 +111,8 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         }
     }
 
+    const getChatById = (chatId: number): UserChatDto => chats.filter(chat => chat.id === chatId)[0]
+
     const sendMessage = (text: string, chatId: number) => {
         const sendMessageDto: SendMessageDto = {
             text,
@@ -132,6 +138,7 @@ export const ChatContextProvider: React.FC = ({ children }) => {
                 sendMessage,
                 setPinned,
                 getMessages,
+                getChatById,
                 isPinned,
                 getChatMessagesById,
                 getPinnedMessagesByChatId,
