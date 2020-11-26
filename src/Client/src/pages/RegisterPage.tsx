@@ -36,19 +36,23 @@ const RegisterPage = () => {
     const classes = useStyles()
     const history = useHistory()
     const [auth, setAuth] = useState({ login: '', password: '', repeatPassword: '' })
+    const [disable, setDisable] = useState(false)
     const { register } = useContext(AccountContext)
     const { openModal } = useContext(ModalContext)
     const { openToast } = useContext(ToastContext)
 
     const submitRegister = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setDisable(true)
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0 || auth.repeatPassword.trim().length === 0) {
             setAuth({ login: '', password: '', repeatPassword: '' })
             openModal('Внимание!', 'Логин или пароль не должны быть пустыми')
+            setDisable(false)
             return
         }
         if(auth.password !== auth.repeatPassword) {
             openModal('Внимание!', 'Пароли должны совпадать')
+            setDisable(false)
             return
         }
         const isRegister = await register(auth.login, auth.password)
@@ -57,6 +61,7 @@ const RegisterPage = () => {
             openToast({ body:'Вы успешно создали аккаунт' })
             history.push('/login')
         }
+        setDisable(false)
     }
 
     return (
@@ -77,6 +82,7 @@ const RegisterPage = () => {
                                 variant='outlined'
                                 required
                                 fullWidth
+                                disabled={disable}
                                 id='login'
                                 label='Логин'
                                 name='login'
@@ -91,6 +97,7 @@ const RegisterPage = () => {
                                 variant='outlined'
                                 required
                                 fullWidth
+                                disabled={disable}
                                 label='Пароль'
                                 name='password'
                                 type='password'
@@ -103,6 +110,7 @@ const RegisterPage = () => {
                                 onChange={(e)=> setAuth({...auth, repeatPassword: e.target.value})}
                                 variant='outlined'
                                 required
+                                disabled={disable}
                                 fullWidth
                                 label='Повторите пароль'
                                 name='repeatPassword'
@@ -116,6 +124,7 @@ const RegisterPage = () => {
                         fullWidth
                         variant='contained'
                         color='primary'
+                        disabled={disable}
                         className={classes.submit}>
                         Создать аккаунт
                     </Button>

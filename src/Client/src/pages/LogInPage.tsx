@@ -40,12 +40,15 @@ const LoginPage: React.FC = () => {
     const [auth, setAuth] = useState({ login: '', password: '' })
     const { login } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
+    const [disable, setDisable] = useState(false)
 
     const submitLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
+        setDisable(true)
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0) {
             setAuth({ login: '', password: '' })
             openToast({body: 'Логин или пароль не должны быть пустыми'})
+            setDisable(false)
             return
         }
         const isLogin = await login(auth.login, auth.password)
@@ -55,6 +58,7 @@ const LoginPage: React.FC = () => {
             setAuth({ login: '', password: '' })
             history.push('/chat/1')
         }
+        setDisable(false)
     }
 
     return (
@@ -74,6 +78,7 @@ const LoginPage: React.FC = () => {
                         variant='outlined'
                         margin='normal'
                         required
+                        disabled={disable}
                         fullWidth
                         value={auth.login}
                         onChange={(e) =>
@@ -88,6 +93,7 @@ const LoginPage: React.FC = () => {
                         variant='outlined'
                         margin='normal'
                         required
+                        disabled={disable}
                         value={auth.password}
                         fullWidth
                         onChange={(e) =>
@@ -103,6 +109,7 @@ const LoginPage: React.FC = () => {
                         fullWidth
                         variant='contained'
                         color='primary'
+                        disabled={disable}
                         className={classes.submit}>
                         Войти
                     </Button>
