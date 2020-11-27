@@ -28,8 +28,11 @@ const useStyles = makeStyles((theme) => ({
         height: theme.spacing(15),
         fontSize: '45px',
     },
-    gridItem: {
-        maxWidth: '500px',
+    gridRow: {
+        width: '100%',
+        display: 'flex',
+        marginBottom: '20px',
+        flexFlow: 'row nowrap',
     },
     iconBack: {},
     paper: {
@@ -41,8 +44,9 @@ const useStyles = makeStyles((theme) => ({
         textAlign: 'center',
     },
 
-    mainContent: {
-        marginTop: '20px',
+    chatLogo: {
+        marginRight: '20px',
+
     },
 }))
 
@@ -99,16 +103,9 @@ const ChatDetailPage = () => {
                             Не удалось загрузить детальную информацию
                         </Typography>
                     ) : (
-                        <Grid
-                            container
-                            direction='row'
-                            spacing={2}
-                            className={classes.mainContent}>
-                            <Grid item className={classes.gridItem}>
-                                <Grid
-                                    container
-                                    alignItems='center'
-                                    direction='column'>
+                        <section>
+                            <div className={classes.gridRow}>
+                                <div className={classes.chatLogo}>
                                     <Avatar
                                         alt={detailInfo.name}
                                         className={classes.avatarSize}>
@@ -117,15 +114,13 @@ const ChatDetailPage = () => {
                                     <p className={classes.userName}>
                                         {detailInfo.name}
                                     </p>
-                                </Grid>
-                            </Grid>
-                            <Grid item className={classes.gridItem}>
+                                </div>
                                 <ChatMembers members={detailInfo.members} />
-                            </Grid>
-                            <Grid item className={classes.gridItem}>
+                            </div>
+                            <div className={classes.gridRow}>
                                 <InviteMemberAutocomplete chatId={chatId}/>
-                            </Grid>
-                        </Grid>
+                            </div>
+                        </section>
                     )}
                 </Paper>
             </Container>

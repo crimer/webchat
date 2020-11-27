@@ -53,7 +53,6 @@ const createBody = (options: Options, headers: Headers): FormData | string | nul
     const contentType = headers.get('Content-Type')
     if (options.body && contentType && contentType.includes('application/json')) {
         const json =  JSON.stringify(options.body)
-        debugger
         return json
     }
     if (options.body instanceof FormData) {
