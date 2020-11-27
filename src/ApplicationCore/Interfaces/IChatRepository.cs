@@ -12,5 +12,6 @@ namespace ApplicationCore.Interfaces
         Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId);
         Task<IEnumerable<User>> GetChatMembers(int chatId);
         Task<Chat> GetChat(int chatId);
+        Task<bool> SubscribeUserToChat(int chatId, int userId, int? userRole = 3);
     }
 }

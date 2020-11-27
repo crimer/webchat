@@ -50,9 +50,11 @@ export function apiRequest<T>(method: Method, url: string, options: Options = {}
 }
 
 const createBody = (options: Options, headers: Headers): FormData | string | null => {
-    const contentType = headers .get('Content-Type')
+    const contentType = headers.get('Content-Type')
     if (options.body && contentType && contentType.includes('application/json')) {
-        return JSON.stringify(options.body)
+        const json =  JSON.stringify(options.body)
+        debugger
+        return json
     }
     if (options.body instanceof FormData) {
         return options.body

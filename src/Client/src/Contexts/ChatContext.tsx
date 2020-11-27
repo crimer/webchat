@@ -94,9 +94,7 @@ export const ChatContextProvider: React.FC = ({ children }) => {
     }
 
     const getPinnedMessagesByChatId = async (chatId: number) => {
-        const response = await chatRepository.getMessagesByChatId<
-            ReciveMessageDto[]
-        >(chatId)
+        const response = await chatRepository.getMessagesByChatId<ReciveMessageDto[]>(chatId)
         if (response && response.responseCode === 200) {
             setMessages(response.data)
         }

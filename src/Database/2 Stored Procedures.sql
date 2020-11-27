@@ -151,5 +151,6 @@ GO
  END;
  GO
 
+ 
 
 --EXEC CreateNewMessage 'Hello everyone', 1, 1

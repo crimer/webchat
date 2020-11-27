@@ -28,18 +28,6 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
-        public async Task<bool> SubscribeUserToChat(int userId, int chatId, int userRoleId)
-        {
-            List<SqlParameter> parameters = new List<SqlParameter>()
-            {
-                new SqlParameter("@userId", userId),
-                new SqlParameter("@chatId", chatId),
-                new SqlParameter("@userRoleId", userRoleId)
-            };
-            var addedRows = await _dataAccess.ExecuteProcedureAsync("SubscribeUserToChat", parameters);
-
-            return addedRows > 0;
-        }
 
         public async Task<User> GetUser(string login, string password)
         {

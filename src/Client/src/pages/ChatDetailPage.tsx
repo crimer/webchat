@@ -2,11 +2,9 @@ import {
     Container,
     Typography,
     Grid,
-    Button,
     makeStyles,
     Paper,
     Avatar,
-    TextField,
     IconButton,
 } from '@material-ui/core'
 import React, { FormEvent, useContext, useEffect, useState } from 'react'
@@ -49,7 +47,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const ChatDetailPage = () => {
-
     const [detailInfo, setDetailInfo] = useState<ChatDetailDto>()
     const { chatId } = useParams()
     const classes = useStyles()
@@ -112,58 +109,21 @@ const ChatDetailPage = () => {
                                     container
                                     alignItems='center'
                                     direction='column'>
-                                        <Avatar
-                                            alt={detailInfo.name}
-                                            className={classes.avatarSize}>
-                                            {detailInfo.name[0].toUpperCase()}
-                                        </Avatar>
-                                    {/* {detailInfo.avatarPath === '' ? (
-                                    ) : (
-                                        <Avatar
-                                            className={classes.avatarSize}
-                                            alt={userData.name}
-                                            src={userData.avatarPath}
-                                        />
-                                        )} */}
+                                    <Avatar
+                                        alt={detailInfo.name}
+                                        className={classes.avatarSize}>
+                                        {detailInfo.name[0].toUpperCase()}
+                                    </Avatar>
                                     <p className={classes.userName}>
                                         {detailInfo.name}
                                     </p>
                                 </Grid>
-                                {/* <div>
-                                    <form
-                                        noValidate
-                                        onSubmit={submitChangeProfile}>
-                                        <TextField
-                                            variant='outlined'
-                                            margin='normal'
-                                            required
-                                            fullWidth
-                                            id='name'
-                                            label='Имя'
-                                            name='name'
-                                            value={detailInfo.name}
-                                            // onChange={(e) =>
-                                            //     setUserData({
-                                            //         ...userData,
-                                            //         name: e.target.value,
-                                            //     })
-                                            // }
-                                        />
-
-                                        <Button
-                                            type='submit'
-                                            variant='contained'
-                                            color='primary'>
-                                            Сохранить
-                                        </Button>
-                                    </form>
-                                </div> */}
                             </Grid>
                             <Grid item className={classes.gridItem}>
-                                <ChatMembers members={detailInfo.members}/>
+                                <ChatMembers members={detailInfo.members} />
                             </Grid>
                             <Grid item className={classes.gridItem}>
-                                <InviteMemberAutocomplete />
+                                <InviteMemberAutocomplete chatId={chatId}/>
                             </Grid>
                         </Grid>
                     )}

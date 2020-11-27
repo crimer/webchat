@@ -145,5 +145,17 @@ namespace Infrastructure.Data
             else
                 return dataReader;
         }
+        public async Task<bool> SubscribeUserToChat(int chatId, int userId, int? userRoleId = 3)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@userRoleId", userRoleId)
+            };
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("SubscribeUserToChat", parameters);
+
+            return addedRows > 0;
+        }
     }
 }
