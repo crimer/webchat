@@ -141,8 +141,15 @@ GO
  END;
  GO
 
---EXEC CreateNewChat 'C# (Ru)', 1
---EXEC CreateNewUser 'nikita', 'nikita'
+ CREATE PROC SearchUsersByLogin
+ 	@userLogin NVARCHAR(50)
+ AS
+ BEGIN
+	SELECT [Users].Id, [Users].Login
+	FROM [Users] 
+	WHERE [Users].Login LIKE @userLogin + '%';
+ END;
+ GO
+
+
 --EXEC CreateNewMessage 'Hello everyone', 1, 1
---EXEC GetChatMessages 1
---EXEC GetUserByLogin 'nikita'

@@ -59,5 +59,24 @@ namespace Infrastructure.Data
 
             return dataReader.FirstOrDefault();
         }
+
+        public async Task<IEnumerable<User>> SearchUsersByLogin(string userLogin)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userLogin", userLogin),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("SearchUsersByLogin", parameters,
+                reader => new User()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<User>();
+            else
+                return dataReader;
+        }
     }
 }

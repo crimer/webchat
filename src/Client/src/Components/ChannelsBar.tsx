@@ -1,16 +1,15 @@
 import {
-    Button,
     Divider,
     IconButton,
+    InputBase,
     ListItem,
     ListItemText,
     makeStyles,
     Menu,
     MenuItem,
+    Paper,
     Theme,
-    Typography,
 } from '@material-ui/core'
-import CreateIcon from '@material-ui/icons/Create'
 import Drawer from '@material-ui/core/Drawer/Drawer'
 import React, { useContext, useEffect, useState } from 'react'
 import GroupIcon from '@material-ui/icons/Group'
@@ -21,6 +20,9 @@ import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { NavLink, useHistory } from 'react-router-dom'
 import { ChatType, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
+import AccountCircleIcon from '@material-ui/icons/AccountCircle'
+import AddIcon from '@material-ui/icons/Add'
+import SearchIcon from '@material-ui/icons/Search'
 
 const drawerWidth = 320
 
@@ -30,17 +32,23 @@ const useStyles = makeStyles((theme: Theme) => ({
         gridColumn: 1,
         gridRow: 1,
     },
+    drawerHeader: {
+        display: 'flex',
+        flexFlow: 'column nowrap',
+        padding: theme.spacing(2),
+    },
+    drawerHeaderTop: {
+        display: 'flex',
+        flexFlow: 'row nowrap',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     drawerPaper: {
         width: drawerWidth,
         backgroundColor: '#2F343D',
         color: '#fff',
     },
-    drawerHeader: {
-        display: 'flex',
-        alignItems: 'center',
-        padding: theme.spacing(0, 1),
-        ...theme.mixins.toolbar,
-    },
+
     options: {
         padding: theme.spacing(1),
         display: 'flex',
@@ -53,14 +61,6 @@ const useStyles = makeStyles((theme: Theme) => ({
     chatIcon: {
         marginRight: '10px',
     },
-    avatarSize: {
-        width: theme.spacing(15),
-        height: theme.spacing(15),
-        fontSize: '45px',
-    },
-    gridItem: {
-        minWidth: '500px',
-    },
     paper: {
         padding: theme.spacing(3, 2),
     },
@@ -72,8 +72,22 @@ const useStyles = makeStyles((theme: Theme) => ({
         backgroundColor: '#4a525f',
     },
     accountMenu: {
-        backgroundColor: '#4a525f',
         color: '#fff',
+    },
+    searchWRapper: {
+        backgroundColor: '#4a525f',
+        padding: '2px 4px',
+        display: 'flex',
+        alignItems: 'center',
+    },
+    input: {
+        color: '#fff',
+        marginLeft: theme.spacing(1),
+        flex: 1,
+    },
+    iconButton: {
+        color: '#fff',
+        padding: 10,
     },
 }))
 
@@ -120,8 +134,8 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
             icon: <ChatIcon className={classes.chatIcon} />,
         },
     ]
-    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) =>
-        setCreateChatMenu(event.currentTarget)
+
+    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) => setCreateChatMenu(event.currentTarget)
     const handleClose = () => setCreateChatMenu(null)
 
     const selectChatType = (chatType: { type: ChatType; text: string }) => {
@@ -130,6 +144,7 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
         setSelectedChatType(chatType)
         console.log(chatType)
     }
+
     const modalClose = () => {
         setCreateChatOpen(false)
         setSelectedChatType(undefined)
@@ -142,11 +157,13 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const handleCloseMenu = () => {
         setAccountMenu(null)
     }
+
     const handleLogout = () => {
         setAccountMenu(null)
         logout()
         history.push('/login')
     }
+
     const navigateToProfile = () => {
         setAccountMenu(null)
         history.push(`/profile/${authUser.id}`)
@@ -170,56 +187,66 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                     paper: classes.drawerPaper,
                 }}
                 anchor='left'>
-                <div className={classes.options}>
-                    <div>
-                        <Button
-                            className={classes.accountMenu}
-                            aria-controls='simple-menu'
-                            aria-haspopup='true'
-                            onClick={handleClick}>
-                            Аккаунт
-                        </Button>
-                        <Menu
-                            anchorEl={accountMenu}
-                            keepMounted
-                            open={Boolean(accountMenu)}
-                            onClose={handleCloseMenu}>
-                            <MenuItem onClick={navigateToProfile}>
-                                Профиль
-                            </MenuItem>
-                            <MenuItem onClick={handleLogout}>Выйти</MenuItem>
-                        </Menu>
+                <header className={classes.drawerHeader}>
+                    <div className={classes.drawerHeaderTop}>
+                        <h1>Mega Chat</h1>
+                        <div className={classes.options}>
+                            <div>
+                                <IconButton
+                                    aria-label='createChat'
+                                    onClick={openCreateChatMenu}>
+                                    <AddIcon
+                                        fontSize='default'
+                                        className={classes.createChatIcon}
+                                    />
+                                </IconButton>
+                                <Menu
+                                    anchorEl={createChatMenu}
+                                    keepMounted
+                                    open={Boolean(createChatMenu)}
+                                    onClose={handleClose}>
+                                    {channelTypes.map((type) => (
+                                        <MenuItem
+                                            onClick={() =>
+                                                selectChatType({
+                                                    text: type.text,
+                                                    type: type.type,
+                                                })
+                                            }
+                                            key={type.type}>
+                                            {type.icon}
+                                            {type.text}
+                                        </MenuItem>
+                                    ))}
+                                </Menu>
+                            </div>
+                            <div>
+                                <IconButton
+                                    className={classes.accountMenu}
+                                    aria-controls='simple-menu'
+                                    aria-haspopup='true'
+                                    onClick={handleClick}>
+                                    <AccountCircleIcon fontSize='default' />
+                                </IconButton>
+                                <Menu
+                                    anchorEl={accountMenu}
+                                    keepMounted
+                                    open={Boolean(accountMenu)}
+                                    onClose={handleCloseMenu}>
+                                    <MenuItem onClick={navigateToProfile}>
+                                        Профиль
+                                    </MenuItem>
+                                    <MenuItem onClick={handleLogout}>
+                                        Выйти
+                                    </MenuItem>
+                                </Menu>
+                            </div>
+                        </div>
                     </div>
                     <div>
-                        <IconButton
-                            aria-label='createChat'
-                            onClick={openCreateChatMenu}>
-                            <CreateIcon
-                                fontSize='default'
-                                className={classes.createChatIcon}
-                            />
-                        </IconButton>
-                        <Menu
-                            anchorEl={createChatMenu}
-                            keepMounted
-                            open={Boolean(createChatMenu)}
-                            onClose={handleClose}>
-                            {channelTypes.map((type) => (
-                                <MenuItem
-                                    onClick={() =>
-                                        selectChatType({
-                                            text: type.text,
-                                            type: type.type,
-                                        })
-                                    }
-                                    key={type.type}>
-                                    {type.icon}
-                                    {type.text}
-                                </MenuItem>
-                            ))}
-                        </Menu>
+                        <SearchChats />
                     </div>
-                </div>
+                </header>
                 <ChannelList allChats={chats} />
             </Drawer>
         </aside>
@@ -227,52 +254,30 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
 }
 export default ChannelsBar
 
+const SearchChats = () => {
+    const classes = useStyles()
+    return (
+        <Paper component='div' className={classes.searchWRapper}>
+            <InputBase
+                fullWidth
+                className={classes.input}
+                aria-label='search'
+                placeholder='Поиск здесь...'
+            />
+            <IconButton className={classes.iconButton} aria-label='search'>
+                <SearchIcon />
+            </IconButton>
+        </Paper>
+    )
+}
+
 const ChannelList: React.FC<{ allChats: UserChatDto[] }> = ({ allChats }) => {
     const classes = useStyles()
-
-    const groups = allChats.filter((chat) => chat.chatType === ChatType.Group)
-    const channels = allChats.filter((chat) => chat.chatType === ChatType.Channel)
-    const directs = allChats.filter((chat) => chat.chatType === ChatType.Direct)
 
     return (
         <>
             <Divider />
-            <div className={classes.drawerHeader}>
-                <Typography>
-                    Каналы: {channels.length === 0 && 'нет'}
-                </Typography>
-            </div>
-            {channels.map((chat: UserChatDto) => (
-                <NavLink
-                    to={`/chat/${chat.id}`}
-                    className={classes.chatLink}
-                    activeClassName={classes.activeChat}
-                    key={chat.id}>
-                    <ChannelItem chatItem={chat} />
-                </NavLink>
-            ))}
-
-            <Divider />
-            <div className={classes.drawerHeader}>
-                <Typography>Группы: {groups.length === 0 && 'нет'}</Typography>
-            </div>
-            {groups.map((chat: UserChatDto) => (
-                <NavLink
-                    to={`/chat/${chat.id}`}
-                    className={classes.chatLink}
-                    activeClassName={classes.activeChat}
-                    key={chat.id}>
-                    <ChannelItem chatItem={chat} />
-                </NavLink>
-            ))}
-
-            <Divider />
-            <div className={classes.drawerHeader}>
-                <Typography>
-                    Directs: {directs.length === 0 && 'нет'}
-                </Typography>
-            </div>
-            {directs.map((chat: UserChatDto) => (
+            {allChats.map((chat: UserChatDto) => (
                 <NavLink
                     to={`/chat/${chat.id}`}
                     className={classes.chatLink}
