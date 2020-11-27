@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useMemo, useState } from 'react'
 import { AccountContext } from '../Contexts/AccountContext'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles'
 import AppBar from '@material-ui/core/AppBar'
@@ -13,6 +13,7 @@ import { ChatContext } from '../Contexts/ChatContext'
 import ToggleButton from '@material-ui/lab/ToggleButton'
 import AttachmentOutlinedIcon from '@material-ui/icons/AttachmentOutlined'
 import TextsmsOutlinedIcon from '@material-ui/icons/TextsmsOutlined'
+import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -65,29 +66,28 @@ const useStyles = makeStyles((theme: Theme) =>
     })
 )
 
-type HeaderProps = {}
+type HeaderProps = {
+    chat: UserChatDto | undefined
+}
 
-const Header: React.FC<HeaderProps> = () => {
+export const Header: React.FC<HeaderProps> = ({chat}) => {
     const { authUser } = useContext(AccountContext)
-    const { isPinned, setPinned, getChatById } = useContext(ChatContext)
+    const { isPinned, setPinned } = useContext(ChatContext)
     const classes = useStyles()
     const { chatId } = useParams()
     const history = useHistory()
     const [channelMenu, setChannelMenu] = useState<null | HTMLElement>(null)
 
-    const handleClose = () => setChannelMenu(null)
-    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) =>
-        setChannelMenu(event.currentTarget)
+    const closeCreateChatMenu = () => setChannelMenu(null)
+    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) => setChannelMenu(event.currentTarget)
 
-    const toDetailPage = (chatId: number) => {
-        history.push(`/chat/${chatId}/detail`)
-    }
+    const toDetailPage = (chatId: number) => history.push(`/chat/${chatId}/detail`)
 
     return (
         <AppBar position='static' className={classes.root}>
             <Toolbar className={classes.toolbar}>
                 <Typography variant='h6' className={classes.title} noWrap>
-                    Mega Chat
+                    {chat ? chat.name : "Mega Chat" }
                 </Typography>
                 <ToggleButton
                     className={classes.togglePinnedBtn}
@@ -126,7 +126,7 @@ const Header: React.FC<HeaderProps> = () => {
                     anchorEl={channelMenu}
                     keepMounted
                     open={Boolean(channelMenu)}
-                    onClose={handleClose}>
+                    onClose={closeCreateChatMenu}>
                     <MenuItem onClick={() => toDetailPage(chatId)}>
                         Детально
                     </MenuItem>
@@ -135,5 +135,3 @@ const Header: React.FC<HeaderProps> = () => {
         </AppBar>
     )
 }
-
-export default Header

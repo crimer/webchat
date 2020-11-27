@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const ChatDetailPage = () => {
+export const ChatDetailPage = () => {
     const [detailInfo, setDetailInfo] = useState<ChatDetailDto>()
     const { chatId } = useParams()
     const classes = useStyles()
@@ -128,4 +128,3 @@ const ChatDetailPage = () => {
     )
 }
 
-export default ChatDetailPage

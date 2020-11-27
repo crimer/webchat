@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const RegisterPage = () => {
+export const RegisterPage = () => {
     const classes = useStyles()
     const history = useHistory()
     const [auth, setAuth] = useState({ login: '', password: '', repeatPassword: '' })
@@ -141,4 +141,3 @@ const RegisterPage = () => {
     )
 }
 
-export default RegisterPage

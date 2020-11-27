@@ -10,10 +10,11 @@ import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { DateType, formatDate } from '../libs/DateFormat'
 import { makeStyles, TextField } from '@material-ui/core'
-import Header from './Header'
+import { Header } from './Header'
 import { useParams } from 'react-router-dom'
 import AttachmentOutlinedIcon from '@material-ui/icons/AttachmentOutlined'
 import { ReciveMessageDto } from '../common/Dtos/Chat/MessageDtos'
+import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 
 const useStyles = makeStyles((theme) => ({
     appBarSpacer: theme.mixins.toolbar,
@@ -301,15 +302,20 @@ const ChatInputBlockComponent: React.FC = () => {
 export const ChatComponent: React.FC = () => {
     const classes = useStyles()
     const { chatId } = useParams()
-    const { getChatMessagesById } = useContext(ChatContext)
+    const [chat, setChat] = useState<UserChatDto>()
+    const { getChatMessagesById, getChatById } = useContext(ChatContext)
 
     useEffect(() => {
-        if (chatId) getChatMessagesById(chatId)
+        if (chatId) {
+            getChatMessagesById(chatId)
+            const currentChat = getChatById(chatId)
+            setChat(currentChat)
+        }
     }, [chatId])
 
     return (
         <main className={classes.content}>
-            <Header />
+            <Header chat={chat}/>
 
             <div className={classes.container}>
                 <ChatMessageListComponent />

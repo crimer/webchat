@@ -34,7 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const LoginPage: React.FC = () => {
+export const LoginPage: React.FC = () => {
     const classes = useStyles()
     const history = useHistory()
     const [auth, setAuth] = useState({ login: '', password: '' })
@@ -125,4 +125,3 @@ const LoginPage: React.FC = () => {
         </Container>
     )
 }
-export default LoginPage

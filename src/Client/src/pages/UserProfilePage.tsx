@@ -49,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-const UserFrofilePage = () => {
+export const UserFrofilePage = () => {
     const data = {
         login: 'Nikita@mail.ru',
         name: 'nikita',
@@ -235,4 +235,3 @@ const UserFrofilePage = () => {
     )
 }
 
-export default UserFrofilePage

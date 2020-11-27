@@ -16,7 +16,7 @@ interface IAccountContext {
     authUser: AuthUserDto
     login: (name: string, password: string) => Promise<boolean>
     register: (login: string, password: string) => Promise<boolean>
-    logout: () => void
+    logout: () => Promise<void>
 }
 
 export const AccountContext = React.createContext<IAccountContext>({
@@ -56,7 +56,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const login = async (login: string, password: string) => {
         const response = await accountRepository
             .login<AuthUserDto>(login, password)
-            .catch((e: Error) =>
+            .catch(() =>
                 openToast({
                     body:
                         'Извините, не удалось подключиться к серверу, повторите попытку позже',
@@ -81,7 +81,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const register = async (login: string, password: string) => {
         const response = await accountRepository
             .register(login, password)
-            .catch((e: Error) =>
+            .catch(() =>
                 openToast({
                     body:
                         'Извините, не удалось подключиться к серверу, повторите попытку позже',
@@ -99,7 +99,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const logout = async () => {
         const response = await accountRepository
             .logout()
-            .catch((e) =>
+            .catch(() =>
                 openToast({
                     body:
                         'Извините, не удалось подключиться к серверу, повторите попытку позже',
@@ -110,10 +110,13 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             setAuthUser(initUserValue)
             await stopConnection()
             Cookies.remove('userData')
+            return Promise.resolve()
         } else if (response) {
+            Cookies.remove('userData')
             openToast({
                 body: `При выходе произошла ошибка. ${response.statusText}`,
             })
+            return Promise.reject()
         }
     }
 

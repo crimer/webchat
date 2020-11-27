@@ -15,7 +15,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import GroupIcon from '@material-ui/icons/Group'
 import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
-import CreateChatModal, { CreateChatType } from '../Components/CreateChatModal'
+import {CreateChatModal} from '../Components/CreateChatModal'
 import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { NavLink, useHistory } from 'react-router-dom'
@@ -93,7 +93,7 @@ const useStyles = makeStyles((theme: Theme) => ({
 
 type ChannelsBarProps = {}
 
-const ChannelsBar: React.FC<ChannelsBarProps> = () => {
+export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const classes = useStyles()
     const history = useHistory()
 
@@ -101,67 +101,21 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const { authUser, logout } = useContext(AccountContext)
 
     const [accountMenu, setAccountMenu] = useState<null | HTMLElement>(null)
-    const [createChatMenu, setCreateChatMenu] = useState<null | HTMLElement>(
-        null
-    )
-
+    const [searchValue, setSearchValue] = useState<string>('')
     const [isCreateChatOpen, setCreateChatOpen] = useState<boolean>(false)
-    const [selectedChatType, setSelectedChatType] = useState<
-        | {
-              type: ChatType
-              text: string
-          }
-        | undefined
-    >()
 
-    const channelTypes: CreateChatType[] = [
-        {
-            id: 1,
-            type: ChatType.Group,
-            text: 'Группа',
-            icon: <GroupIcon className={classes.chatIcon} />,
-        },
-        {
-            id: 2,
-            type: ChatType.Channel,
-            text: 'Канал',
-            icon: <RadioIcon className={classes.chatIcon} />,
-        },
-        {
-            id: 3,
-            type: ChatType.Direct,
-            text: 'Личная переписка',
-            icon: <ChatIcon className={classes.chatIcon} />,
-        },
-    ]
+    const openAccountMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAccountMenu(event.currentTarget)
+    const closeAccountMenu = () => setAccountMenu(null)
 
-    const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) => setCreateChatMenu(event.currentTarget)
-    const handleClose = () => setCreateChatMenu(null)
+    const filteredChats = chats.filter((chat) => chat.name.toLowerCase().includes(searchValue.toLowerCase()))
 
-    const selectChatType = (chatType: { type: ChatType; text: string }) => {
-        setCreateChatMenu(null)
-        setCreateChatOpen(true)
-        setSelectedChatType(chatType)
-        console.log(chatType)
-    }
-
-    const modalClose = () => {
-        setCreateChatOpen(false)
-        setSelectedChatType(undefined)
-    }
-
-    const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-        setAccountMenu(event.currentTarget)
-    }
-
-    const handleCloseMenu = () => {
-        setAccountMenu(null)
-    }
+    const modalClose = () => setCreateChatOpen(false)
 
     const handleLogout = () => {
         setAccountMenu(null)
-        logout()
-        history.push('/login')
+        logout().then((res) => {
+            history.push('/login')
+        })
     }
 
     const navigateToProfile = () => {
@@ -177,7 +131,6 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
         <aside>
             <CreateChatModal
                 open={isCreateChatOpen}
-                createChatType={selectedChatType}
                 onModalClose={modalClose}
             />
             <Drawer
@@ -194,45 +147,26 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                             <div>
                                 <IconButton
                                     aria-label='createChat'
-                                    onClick={openCreateChatMenu}>
+                                    onClick={() => setCreateChatOpen(true)}>
                                     <AddIcon
                                         fontSize='default'
                                         className={classes.createChatIcon}
                                     />
                                 </IconButton>
-                                <Menu
-                                    anchorEl={createChatMenu}
-                                    keepMounted
-                                    open={Boolean(createChatMenu)}
-                                    onClose={handleClose}>
-                                    {channelTypes.map((type) => (
-                                        <MenuItem
-                                            onClick={() =>
-                                                selectChatType({
-                                                    text: type.text,
-                                                    type: type.type,
-                                                })
-                                            }
-                                            key={type.type}>
-                                            {type.icon}
-                                            {type.text}
-                                        </MenuItem>
-                                    ))}
-                                </Menu>
                             </div>
                             <div>
                                 <IconButton
                                     className={classes.accountMenu}
                                     aria-controls='simple-menu'
                                     aria-haspopup='true'
-                                    onClick={handleClick}>
+                                    onClick={openAccountMenu}>
                                     <AccountCircleIcon fontSize='default' />
                                 </IconButton>
                                 <Menu
                                     anchorEl={accountMenu}
                                     keepMounted
                                     open={Boolean(accountMenu)}
-                                    onClose={handleCloseMenu}>
+                                    onClose={closeAccountMenu}>
                                     <MenuItem onClick={navigateToProfile}>
                                         Профиль
                                     </MenuItem>
@@ -244,22 +178,35 @@ const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                         </div>
                     </div>
                     <div>
-                        <SearchChats />
+                        <SearchChats
+                            searchQuery={searchValue}
+                            onChangeSearch={setSearchValue}
+                        />
                     </div>
                 </header>
-                <ChannelList allChats={chats} />
+                <ChannelList allChats={filteredChats} />
             </Drawer>
         </aside>
     )
 }
-export default ChannelsBar
 
-const SearchChats = () => {
+type SearchChatsProps = {
+    searchQuery: string
+    onChangeSearch: (value: string) => void
+}
+
+const SearchChats: React.FC<SearchChatsProps> = ({
+    searchQuery,
+    onChangeSearch,
+}) => {
     const classes = useStyles()
+
     return (
         <Paper component='div' className={classes.searchWRapper}>
             <InputBase
                 fullWidth
+                value={searchQuery || ''}
+                onChange={(e) => onChangeSearch(e.target.value)}
                 className={classes.input}
                 aria-label='search'
                 placeholder='Поиск здесь...'
@@ -277,6 +224,7 @@ const ChannelList: React.FC<{ allChats: UserChatDto[] }> = ({ allChats }) => {
     return (
         <>
             <Divider />
+            {allChats.length === 0 && <p>Чатов нет</p>}
             {allChats.map((chat: UserChatDto) => (
                 <NavLink
                     to={`/chat/${chat.id}`}

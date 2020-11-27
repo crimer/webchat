@@ -15,8 +15,8 @@ interface IChatContext {
     getMessages: (isPinned: boolean) => ReciveMessageDto[]
     setPinned: (isPinned: boolean) => void
     sendMessage: (message: string, chatId: number) => Promise<void>
-    getChatById: (chatId: number) => UserChatDto
     getChatMessagesById: (chatId: number) => Promise<void>
+    getChatById: (chatId: number) => UserChatDto
     getPinnedMessagesByChatId: (chatId: number) => Promise<void>
     getChatsByUserId: (userId: number) => Promise<void>
 }
@@ -27,7 +27,7 @@ export const ChatContext = createContext<IChatContext>({
     getMessages: (sPinned: boolean) => {
         throw new Error('Контекст чата не проинициализирован')
     },
-    getChatById: (chatId: number): UserChatDto => {
+    getChatById: (chatId: number) => {
         throw new Error('Контекст чата не проинициализирован')
     },
     setPinned: (isPinned: boolean) => {
@@ -85,13 +85,12 @@ export const ChatContextProvider: React.FC = ({ children }) => {
     }
 
     const getChatMessagesById = async (chatId: number) => {
-        const response = await chatRepository.getMessagesByChatId<
-            ReciveMessageDto[]
-        >(chatId)
+        const response = await chatRepository.getMessagesByChatId<ReciveMessageDto[]>(chatId)
         if (response && response.responseCode === 200) {
             setMessages(response.data)
         }
     }
+    const getChatById = (chatId: number) => chats.filter(chat => chat.id === +chatId)[0]
 
     const getPinnedMessagesByChatId = async (chatId: number) => {
         const response = await chatRepository.getMessagesByChatId<ReciveMessageDto[]>(chatId)
@@ -101,15 +100,11 @@ export const ChatContextProvider: React.FC = ({ children }) => {
     }
 
     const getChatsByUserId = async (userId: number) => {
-        const response = await chatRepository.getChatsByUserId<UserChatDto[]>(
-            userId
-        )
+        const response = await chatRepository.getChatsByUserId<UserChatDto[]>(userId)
         if (response && response.responseCode === 200) {
             setChats(response.data)
         }
     }
-
-    const getChatById = (chatId: number): UserChatDto => chats.filter(chat => chat.id === chatId)[0]
 
     const sendMessage = (text: string, chatId: number) => {
         const sendMessageDto: SendMessageDto = {
@@ -134,9 +129,9 @@ export const ChatContextProvider: React.FC = ({ children }) => {
             value={{
                 chats,
                 sendMessage,
+                getChatById,
                 setPinned,
                 getMessages,
-                getChatById,
                 isPinned,
                 getChatMessagesById,
                 getPinnedMessagesByChatId,

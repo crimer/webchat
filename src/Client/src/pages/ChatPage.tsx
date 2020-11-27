@@ -1,9 +1,9 @@
 import React from 'react'
-import ChannelsBar from '../Components/ChannelsBar'
+import { ChannelsBar } from '../Components/ChannelsBar'
 import { ChatComponent } from '../Components/ChatComponent'
 import { Container, makeStyles } from '@material-ui/core'
 import { Route } from 'react-router-dom'
-import ChatDetailPage from '../pages/ChatDetailPage'
+import { ChatDetailPage } from '../pages/ChatDetailPage'
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -14,7 +14,7 @@ const useStyles = makeStyles(() => ({
     },
 }))
 
-const ChatPage = () => {
+export const ChatPage = () => {
     const classes = useStyles()
 
     return (
@@ -33,4 +33,3 @@ const ChatPage = () => {
     )
 }
 
-export default ChatPage

@@ -1,9 +1,9 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
-import LoginPage from './LoginPage'
-import RegisterPage from './RegisterPage'
-import ChatPage from './ChatPage'
-import UserFrofilePage from './UserProfilePage'
+import { LoginPage } from './LoginPage'
+import { RegisterPage } from './RegisterPage'
+import { ChatPage } from './ChatPage'
+import { UserFrofilePage } from './UserProfilePage'
 
 const AppTemplate = () => {
     return (
