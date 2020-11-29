@@ -42,7 +42,25 @@ namespace Infrastructure.Data
                     Id = AdoDataAccess.GetValue<int>(reader, "Id"),
                     Login = AdoDataAccess.GetValue<string>(reader, "Login"),
                     Password = AdoDataAccess.GetValue<string>(reader, "Password"),
-                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId")
+                    UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId")
+                });
+
+            return dataReader.FirstOrDefault();
+        }
+
+        public async Task<User> GetUserById(int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetUserById", parameters,
+                reader => new User()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    Password = AdoDataAccess.GetValue<string>(reader, "Password"),
+                    UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId")
                 });
 
             return dataReader.FirstOrDefault();

@@ -9,7 +9,6 @@ import { AuthUserDto, UserRole } from '../common/Dtos/User/UserDtos'
 const initUserValue: AuthUserDto = {
     id: -1,
     login: '',
-    role: UserRole.Member,
 }
 
 interface IAccountContext {

@@ -1,15 +1,16 @@
-﻿using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
+using MessageChat.ApiHelpers;
 using MessageChat.Dto;
+using MessageChat.Dto.User;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
-using MessageChat.ApiHelpers;
+using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Net;
-using ApplicationCore.Interfaces;
-using ApplicationCore.Entities;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace MessageChat.Controllers
 {
@@ -30,10 +31,10 @@ namespace MessageChat.Controllers
 
             User user = await _authService.Login(loginData.Login, loginData.Password);
 
-            if(user == null)
+            if (user == null)
                 return new ApiResponse((int)HttpStatusCode.NotFound, $"Не существует пользователя с таким логином и паролем");
 
-            var claims = new []
+            var claims = new[]
             {
                 new Claim(ClaimTypes.NameIdentifier, Guid.NewGuid().ToString()),
                 new Claim(ClaimTypes.Name, user.Login),
@@ -47,7 +48,7 @@ namespace MessageChat.Controllers
                 ExpiresUtc = DateTime.UtcNow.AddMinutes(3)
             });
 
-            return new ApiResponse<object>(new { id = user.Id, login = user.Login }, (int)HttpStatusCode.OK);
+            return new ApiResponse<AuthUserDto>(new AuthUserDto() { Id = user.Id, Login = user.Login }, (int)HttpStatusCode.OK);
         }
 
         [HttpPost("register")]
@@ -57,8 +58,8 @@ namespace MessageChat.Controllers
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин или пароль не должен быть пустым");
 
             var isRegistred = await _authService.Register(userRegisterDto.Login, userRegisterDto.Password);
-            
-            if(!isRegistred)
+
+            if (!isRegistred)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Уже существует пользователь с логином {userRegisterDto.Login}");
 
             return new ApiResponse((int)HttpStatusCode.OK);

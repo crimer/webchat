@@ -7,6 +7,7 @@ namespace ApplicationCore.Interfaces
     public interface IUserRepository
     {
         Task<User> GetUser(string login, string password);
+        Task<User> GetUserById(int userId);
         Task<bool> CreateNewUser(string login, string password, int? avatarId);
         Task<IEnumerable<User>> SearchUsersByLogin(string userLogin);
     }

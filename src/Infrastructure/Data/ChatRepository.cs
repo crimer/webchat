@@ -17,6 +17,19 @@ namespace Infrastructure.Data
         {
             _dataAccess = dataAccess;
         }
+
+        public async Task<bool> ChangeChatName(int chatId, string newChatName)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@newChatName", newChatName),
+            };
+            var dataReader = await _dataAccess.ExecuteProcedureAsync("ChangeChatName", parameters);
+                
+            return dataReader > 0;
+        }
+
         public async Task<int> CreateNewChat(string chatName, int chatTypeId, int? mediaId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
@@ -46,8 +59,6 @@ namespace Infrastructure.Data
                     Id = AdoDataAccess.GetValue<int>(reader, "Id"),
                     Name = AdoDataAccess.GetValue<string>(reader, "Name"),
                     ChatType = (ChatType)AdoDataAccess.GetValue<int>(reader, "ChatType"),
-                    //MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
-                    //MediaPath = AdoDataAccess.GetValue<string>(reader, "Path"),
                 });
 
             if (dataReader == null || dataReader.Count() == 0)

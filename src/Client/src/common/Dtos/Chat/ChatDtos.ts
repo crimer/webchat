@@ -32,3 +32,9 @@ export type InviteMembersDto = {
     chatId: number
     userIds: number[]
 }
+
+export type ChangeChatNameDto = {
+    userId: number,
+    chatId: number,
+    newName: string,
+}

@@ -7,7 +7,7 @@ import {
     Avatar,
     IconButton,
 } from '@material-ui/core'
-import React, { FormEvent, useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import ChatMembers from '../Components/ChatMembers'
@@ -15,6 +15,9 @@ import InviteMemberAutocomplete from '../Components/InviteMemberAutocomplete'
 import chatRepository from '../repository/ChatRepository'
 import { ChatDetailDto } from '../common/Dtos/Chat/ChatDtos'
 import { ToastContext } from '../Contexts/ToastContext'
+import { ChangeChatName } from '../Components/ChangeChatName'
+import { AccountContext } from '../Contexts/AccountContext'
+import { UserRole } from '../common/Dtos/User/UserDtos'
 
 const useStyles = makeStyles((theme) => ({
     heroContent: {
@@ -56,11 +59,8 @@ export const ChatDetailPage = () => {
     const classes = useStyles()
     const history = useHistory()
     const { openToast } = useContext(ToastContext)
+    const { authUser } = useContext(AccountContext)
 
-    const submitChangeProfile = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        console.log('submitChangeProfile form')
-    }
     useEffect(() => {
         const fetchDetailInfo = async () => {
             const response = await chatRepository.getDetailChatInfo<ChatDetailDto>(
@@ -74,6 +74,8 @@ export const ChatDetailPage = () => {
         }
         fetchDetailInfo()
     }, [])
+
+    const currentUserRoleId = detailInfo?.members.find(u => u.id === authUser.id)?.userRoleId
 
     return (
         <div className={classes.heroContent}>
@@ -118,6 +120,9 @@ export const ChatDetailPage = () => {
                                 <ChatMembers members={detailInfo.members} />
                             </div>
                             <div className={classes.gridRow}>
+                                {currentUserRoleId === UserRole.Administrator && (
+                                    <ChangeChatName chatId={chatId}/>
+                                )}
                                 <InviteMemberAutocomplete chatId={chatId}/>
                             </div>
                         </section>

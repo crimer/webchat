@@ -10,7 +10,5 @@
     {
         public string Name { get; set; }
         public ChatType ChatType { get; set; }
-        public int MediaId { get; set; }
-        public string MediaPath { get; set; }
     }
 }

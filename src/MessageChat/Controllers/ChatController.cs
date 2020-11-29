@@ -17,10 +17,12 @@ namespace MessageChat.Controllers
     {
         private readonly IChatRepository _chatRepository;
         private readonly IChatService _chatService;
-        public ChatController(IChatRepository chatRepository, IChatService chatService)
+        private readonly IUserRepository _userRepository;
+        public ChatController(IChatRepository chatRepository, IChatService chatService, IUserRepository userRepository)
         {
             _chatRepository = chatRepository;
             _chatService = chatService;
+            _userRepository = userRepository;
         }
 
         [HttpGet("getChatsByUserId/{userId}")]
@@ -34,8 +36,6 @@ namespace MessageChat.Controllers
                 Id = chat.Id,
                 ChatType = chat.ChatType,
                 Name = chat.Name
-                //MediaId = chat.MediaId,
-                //MediaPath = chat.MediaPath,
             });
             return new ApiResponse<IEnumerable<UserChatDto>>(data, (int)HttpStatusCode.OK);
         }
@@ -86,6 +86,22 @@ namespace MessageChat.Controllers
             await _chatService.InviteMembersToChat(inviteUsersDto.ChatId, inviteUsersDto.UserIds);
 
             return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно приглашены");
+        }
+
+        [HttpPost("changeChatName")]
+        public async Task<object> ChangeChatName([FromBody] ChangeChatNameDto changeChatNameDto)
+        {
+            if (changeChatNameDto == null || changeChatNameDto.ChatId <= 0 || changeChatNameDto.UserId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
+            if (string.IsNullOrWhiteSpace(changeChatNameDto.NewName)) return new ApiResponse((int)HttpStatusCode.BadRequest, "Новое название не должно быть пустым");
+
+            User user = await _userRepository.GetUserById(changeChatNameDto.UserId);
+
+            if(user.UserRoleId == 1)
+                await _chatService.ChangeChatName(changeChatNameDto.ChatId, changeChatNameDto.NewName);
+            else 
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "У вас нет прав изменить название чата");
+
+            return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно изменили имя чата");
         }
     }
 }

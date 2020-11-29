@@ -7,5 +7,4 @@ export enum UserRole {
 export type AuthUserDto = {
     id: number
     login: string
-    role: UserRole
 }

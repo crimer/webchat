@@ -67,7 +67,22 @@ CREATE PROC GetUserByLoginAndPassword
 	@userPassword NVARCHAR(50)
 AS
 BEGIN
-	SELECT Id,Login,Password,MediaId FROM [Users] WHERE [Login] = @userLogin AND [Password] = @userPassword;
+	SELECT [Users].Id, Login, Password FROM [Users] 
+	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
+	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
+	WHERE [Login] = @userLogin AND [Password] = @userPassword;
+END;
+GO
+
+CREATE PROC GetUserById
+	@userId INT,
+	@chatId INT
+AS
+BEGIN
+	SELECT [Users].Id, Login, Password, UserRoles.Id as UserRoleId FROM [Users] 
+	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
+	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
+	WHERE [Users].Id = @userId AND ChatToUser.ChatId = @chatId;
 END;
 GO
 
@@ -110,14 +125,16 @@ BEGIN
 END;
 GO
 
--- �������� ���� �� Id
--- CREATE PROC DeleteChatById
--- 	@chatId INT
--- AS
--- BEGIN
-
--- END;
--- GO
+CREATE PROC ChangeChatName
+ 	@chatId INT,
+	@newChatName NVARCHAR(50)
+ AS
+ BEGIN
+	UPDATE [Chats]
+	SET [Name] = @newChatName
+	WHERE Id = @chatId;
+ END;
+ GO
 
  CREATE PROC GetChat
  	@chatId INT
