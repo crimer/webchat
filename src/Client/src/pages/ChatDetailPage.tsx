@@ -10,7 +10,7 @@ import {
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
-import ChatMembers from '../Components/ChatMembers'
+import { ChatMembers } from '../Components/ChatMembers'
 import InviteMemberAutocomplete from '../Components/InviteMemberAutocomplete'
 import chatRepository from '../repository/ChatRepository'
 import { ChatDetailDto } from '../common/Dtos/Chat/ChatDtos'
@@ -49,9 +49,10 @@ const useStyles = makeStyles((theme) => ({
 
     chatLogo: {
         marginRight: '20px',
-
     },
 }))
+
+
 
 export const ChatDetailPage = () => {
     const [detailInfo, setDetailInfo] = useState<ChatDetailDto>()
@@ -75,7 +76,9 @@ export const ChatDetailPage = () => {
         fetchDetailInfo()
     }, [])
 
-    const currentUserRoleId = detailInfo?.members.find(u => u.id === authUser.id)?.userRoleId
+    const currentUserRoleId = detailInfo?.members.find(
+        (u) => u.id === authUser.id
+    )?.userRoleId
 
     return (
         <div className={classes.heroContent}>
@@ -117,13 +120,17 @@ export const ChatDetailPage = () => {
                                         {detailInfo.name}
                                     </p>
                                 </div>
-                                <ChatMembers members={detailInfo.members} />
+                                <ChatMembers
+                                    currentUserRoleId={currentUserRoleId}
+                                    members={detailInfo.members}
+                                />
                             </div>
                             <div className={classes.gridRow}>
-                                {currentUserRoleId === UserRole.Administrator && (
-                                    <ChangeChatName chatId={chatId}/>
+                                {currentUserRoleId ===
+                                    UserRole.Administrator && (
+                                    <ChangeChatName chatId={chatId} />
                                 )}
-                                <InviteMemberAutocomplete chatId={chatId}/>
+                                <InviteMemberAutocomplete chatId={chatId} />
                             </div>
                         </section>
                     )}
@@ -132,4 +139,3 @@ export const ChatDetailPage = () => {
         </div>
     )
 }
-

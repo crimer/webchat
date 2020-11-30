@@ -1,5 +1,4 @@
 USE WebChat
--- �������� ������ ����
 GO
 
 CREATE PROC CreateNewChat
@@ -14,7 +13,6 @@ BEGIN
 END;
 GO
 
--- �������� ������ ������������ (��� �����������)
 CREATE PROC CreateNewUser
 	@login NVARCHAR(50),
 	@password NVARCHAR(50),
@@ -25,7 +23,6 @@ BEGIN
 END;
 GO
 
--- ���������� ��������
 CREATE PROC CreateNewMedia
 	@name NVARCHAR(255),
 	@path NVARCHAR(255),
@@ -36,7 +33,6 @@ BEGIN
 END;
 GO
 
--- ������������ ���������� �� ��� (@userRoleId ���� �� ��������� - Member)
 CREATE PROC SubscribeUserToChat
 	@userId INT,
 	@chatId INT,
@@ -47,7 +43,6 @@ BEGIN
 END;
 GO
 
--- ����� ���������
 CREATE PROC CreateNewMessage
 	@text NVARCHAR(MAX),
 	@userId INT,
@@ -61,7 +56,6 @@ BEGIN
 END;
 GO
 
--- ��������� ������������ �� ������
 CREATE PROC GetUserByLoginAndPassword
 	@userLogin NVARCHAR(50),
 	@userPassword NVARCHAR(50)
@@ -75,6 +69,17 @@ END;
 GO
 
 CREATE PROC GetUserById
+	@userId INT
+AS
+BEGIN
+	SELECT [Users].Id, Login, Password FROM [Users] 
+	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
+	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
+	WHERE [Users].Id = @userId;
+END;
+GO
+
+CREATE PROC GetChatMember
 	@userId INT,
 	@chatId INT
 AS
@@ -86,7 +91,6 @@ BEGIN
 END;
 GO
 
--- ��������� ���� ��������� ������������� ����
 CREATE PROC GetChatMessages
 	@chatId INT
 AS
@@ -98,7 +102,6 @@ BEGIN
 END;
 GO
 
--- ��������� ���� �����
 CREATE PROC GetAllChatsByUserId
 	@userId INT
 AS
@@ -136,6 +139,19 @@ CREATE PROC ChangeChatName
  END;
  GO
 
+CREATE PROC ChangeUserRole
+ 	@chatId INT,
+	@userId INT,
+	@userRoleId INT
+ AS
+ BEGIN
+	UPDATE [ChatToUser]
+	SET UserRoleId = @userRoleId
+	WHERE [ChatToUser].ChatId = @chatId AND [ChatToUser].UserId = @userId;
+ END;
+ GO
+
+
  CREATE PROC GetChat
  	@chatId INT
  AS
@@ -162,7 +178,7 @@ CREATE PROC ChangeChatName
  	@userLogin NVARCHAR(50)
  AS
  BEGIN
-	SELECT [Users].Id, [Users].Login
+	SELECT [Users].Id, [Users].Login, [Users].Password
 	FROM [Users] 
 	WHERE [Users].Login LIKE @userLogin + '%';
  END;

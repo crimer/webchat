@@ -35,7 +35,7 @@ namespace MessageChat.Controllers
             {
                 Id = chat.Id,
                 ChatType = chat.ChatType,
-                Name = chat.Name
+                Name = chat.Name,
             });
             return new ApiResponse<IEnumerable<UserChatDto>>(data, (int)HttpStatusCode.OK);
         }
@@ -46,7 +46,7 @@ namespace MessageChat.Controllers
             if (chatId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить информацию о чате");
 
             Chat chatDetail = await _chatRepository.GetChat(chatId);
-            IEnumerable<User> members = await _chatRepository.GetChatMembers(chatId);
+            IEnumerable<ChatMember> members = await _chatRepository.GetChatMembers(chatId);
             var chatMembers = members.Select(member => new UserChatDto()
             {
                 Id = member.Id,
@@ -94,7 +94,7 @@ namespace MessageChat.Controllers
             if (changeChatNameDto == null || changeChatNameDto.ChatId <= 0 || changeChatNameDto.UserId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
             if (string.IsNullOrWhiteSpace(changeChatNameDto.NewName)) return new ApiResponse((int)HttpStatusCode.BadRequest, "Новое название не должно быть пустым");
 
-            User user = await _userRepository.GetUserById(changeChatNameDto.UserId);
+            ChatMember user = await _userRepository.GetChatMember(changeChatNameDto.ChatId, changeChatNameDto.UserId);
 
             if(user.UserRoleId == 1)
                 await _chatService.ChangeChatName(changeChatNameDto.ChatId, changeChatNameDto.NewName);
@@ -102,6 +102,23 @@ namespace MessageChat.Controllers
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "У вас нет прав изменить название чата");
 
             return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно изменили имя чата");
+        }
+        
+        [HttpPost("changeMemberRole")]
+        public async Task<object> ChangeMemberRole([FromBody] ChangeUserRoleDto changeUserRoleDto)
+        {
+            if (changeUserRoleDto == null || changeUserRoleDto.ChatId <= 0 
+                || changeUserRoleDto.UserId <= 0 || changeUserRoleDto.UserRoleId <= 0)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
+
+            ChatMember user = await _userRepository.GetChatMember(changeUserRoleDto.ChatId, changeUserRoleDto.UserId);
+
+            if(user.UserRoleId == changeUserRoleDto.UserRoleId)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "У этого пользователя и так установлена эта роль");
+            else 
+                await _chatService.ChangeUserRole(changeUserRoleDto.ChatId, changeUserRoleDto.UserId, changeUserRoleDto.UserRoleId);
+
+            return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно изменили роль пользователя");
         }
     }
 }

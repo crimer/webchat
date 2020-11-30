@@ -30,6 +30,19 @@ namespace Infrastructure.Data
             return dataReader > 0;
         }
 
+        public async Task<bool> ChangeChatName(int chatId, int userId, int userRoleId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@userId", userId),
+                new SqlParameter("@userRoleId", userRoleId),
+            };
+            var dataReader = await _dataAccess.ExecuteProcedureAsync("ChangeUserRole", parameters);
+
+            return dataReader > 0;
+        }
+
         public async Task<int> CreateNewChat(string chatName, int chatTypeId, int? mediaId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
@@ -85,14 +98,14 @@ namespace Infrastructure.Data
             return dataReader.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<User>> GetChatMembers(int chatId)
+        public async Task<IEnumerable<ChatMember>> GetChatMembers(int chatId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
                 new SqlParameter("@chatId", chatId),
             };
-            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetChatMembers", parameters,
-                reader => new User()
+            var dataReader = await _dataAccess.GetProcedureDataAsync<ChatMember>("GetChatMembers", parameters,
+                reader => new ChatMember()
                 {
                     Id = AdoDataAccess.GetValue<int>(reader, "Id"),
                     Login = AdoDataAccess.GetValue<string>(reader, "Login"),
@@ -100,7 +113,7 @@ namespace Infrastructure.Data
                 });
 
             if (dataReader == null || dataReader.Count() == 0)
-                return Enumerable.Empty<User>();
+                return Enumerable.Empty<ChatMember>();
             else
                 return dataReader;
         }

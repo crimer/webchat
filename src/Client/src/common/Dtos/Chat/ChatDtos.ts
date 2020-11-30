@@ -10,15 +10,12 @@ export type CreateChatDto = {
     chatName: string
     chatTypeId: number
     userCreatorId: number
-    mediaId?: number
 }
 
 export type UserChatDto = {
     id: number
     name: string
     chatType: ChatType
-    mediaPath: string
-    mediaId: number
     userRoleId: UserRole
 }
 
@@ -37,4 +34,10 @@ export type ChangeChatNameDto = {
     userId: number,
     chatId: number,
     newName: string,
+}
+
+export type ChangeUserRoleDto = {
+    userId: number,
+    chatId: number,
+    userRoleId: number,
 }

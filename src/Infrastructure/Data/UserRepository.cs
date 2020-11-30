@@ -28,6 +28,24 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
+        public async Task<ChatMember> GetChatMember(int chatId, int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@userId", userId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<ChatMember>("GetChatMember", parameters,
+                reader => new ChatMember()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    Password = AdoDataAccess.GetValue<string>(reader, "Password"),
+                    UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId"),
+                });
+
+            return dataReader.FirstOrDefault();
+        }
 
         public async Task<User> GetUser(string login, string password)
         {
@@ -42,7 +60,6 @@ namespace Infrastructure.Data
                     Id = AdoDataAccess.GetValue<int>(reader, "Id"),
                     Login = AdoDataAccess.GetValue<string>(reader, "Login"),
                     Password = AdoDataAccess.GetValue<string>(reader, "Password"),
-                    UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId")
                 });
 
             return dataReader.FirstOrDefault();
@@ -60,7 +77,6 @@ namespace Infrastructure.Data
                     Id = AdoDataAccess.GetValue<int>(reader, "Id"),
                     Login = AdoDataAccess.GetValue<string>(reader, "Login"),
                     Password = AdoDataAccess.GetValue<string>(reader, "Password"),
-                    UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId")
                 });
 
             return dataReader.FirstOrDefault();
@@ -77,6 +93,7 @@ namespace Infrastructure.Data
                 {
                     Id = AdoDataAccess.GetValue<int>(reader, "Id"),
                     Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    Password = AdoDataAccess.GetValue<string>(reader, "Password"),
                 });
 
             if (dataReader == null || dataReader.Count() == 0)

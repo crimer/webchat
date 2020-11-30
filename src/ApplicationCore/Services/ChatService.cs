@@ -17,6 +17,11 @@ namespace ApplicationCore.Services
             await _chatRepository.ChangeChatName(chatId, newChatName);
         }
 
+        public async Task ChangeUserRole(int chatId, int userId, int userRoleId)
+        {
+            await _chatRepository.ChangeChatName(chatId, userId, userRoleId);
+        }
+
         public async Task<bool> CreateNewChat(string chatName, int chatTypeId, int userCreatorId, int? mediaId)
         {
             int createdChatId = await _chatRepository.CreateNewChat(chatName, chatTypeId, mediaId);

@@ -1,5 +1,5 @@
 import { ApiResponse, apiRequest } from '../common/Api/ApiHelper'
-import { ChangeChatNameDto, CreateChatDto, InviteMembersDto } from '../common/Dtos/Chat/ChatDtos'
+import { ChangeChatNameDto, ChangeUserRoleDto, CreateChatDto, InviteMembersDto } from '../common/Dtos/Chat/ChatDtos'
 
 class ChatRepository {
     public async getMessagesByChatId<T>(chatId: number): Promise<ApiResponse<T>> {
@@ -36,6 +36,14 @@ class ChatRepository {
     public async changeChatName<T>(changeChatNameDto: ChangeChatNameDto): Promise<ApiResponse<T>> {
         const response = await apiRequest<T>('POST', `/chat/changeChatName`, {
             body:{ ...changeChatNameDto },
+            headers: { 'Content-Type': 'application/json' },
+        })
+        return response
+    }
+
+    public async changeMemberRole<T>(changeUserRoleDto: ChangeUserRoleDto): Promise<ApiResponse<T>> {
+        const response = await apiRequest<T>('POST', `/chat/changeMemberRole`, {
+            body:{ ...changeUserRoleDto },
             headers: { 'Content-Type': 'application/json' },
         })
         return response
