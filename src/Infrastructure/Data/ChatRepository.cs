@@ -175,9 +175,49 @@ namespace Infrastructure.Data
             {
                 new SqlParameter("@userId", userId),
                 new SqlParameter("@chatId", chatId),
-                new SqlParameter("@userRoleId", userRoleId)
+                new SqlParameter("@memberStatus", 1),
+                new SqlParameter("@userRoleId", userRoleId),
             };
             var addedRows = await _dataAccess.ExecuteProcedureAsync("SubscribeUserToChat", parameters);
+
+            return addedRows > 0;
+        }
+
+        public async Task<bool> UserLaveChat(int chatId, int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@memberStatus", 2),
+            };
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeMemberStatus", parameters);
+
+            return addedRows > 0;
+        }
+        
+        public async Task<bool> AdminKikUser(int chatId, int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@memberStatus", 3),
+            };
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeMemberStatus", parameters);
+
+            return addedRows > 0;
+        }
+        
+        public async Task<bool> BackUserToChat(int chatId, int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@memberStatus", 1),
+            };
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeMemberStatus", parameters);
 
             return addedRows > 0;
         }

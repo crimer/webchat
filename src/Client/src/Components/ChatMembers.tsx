@@ -13,12 +13,14 @@ import {
     TableHead,
     TableRow,
 } from '@material-ui/core'
-import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
+import { LeaveChatDto, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 import { UserRole } from '../common/Dtos/User/UserDtos'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
 import { ChangeUserRoleModal } from './ChangeUserRoleModal'
 import { useParams } from 'react-router-dom'
 import { AccountContext } from '../Contexts/AccountContext'
+import { ToastContext } from '../Contexts/ToastContext'
+import chatRepository from '../repository/ChatRepository'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -57,7 +59,9 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
     const classes = useStyles()
     const [isOpenModal, setIsOpenModal] = useState(false)
     const [selectedMember, setSelectedMember] = useState()
-
+    const { authUser } = useContext(AccountContext)
+    const { openToast } = useContext(ToastContext)
+    const { chatId } = useParams()
 
     const closeModal = () => setIsOpenModal(false)
     const openModal = (member: UserChatDto) => {
@@ -65,7 +69,23 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
         setIsOpenModal(true)
     }
 
+    const deleteMemberFromChat = async (member: UserChatDto) => {
+        const kikUserFromChatDto: LeaveChatDto = {
+            chatId: +chatId,
+            userId: +authUser.id,
+        }
 
+        const response = await chatRepository.kikUserFromChat<undefined>(
+            kikUserFromChatDto
+        )
+        if (response && response.isValid && response.successMessage) {
+            openToast({
+                body: `Пользователь ${authUser.login} был изгнан администратором`,
+            })
+        } else if (response && !response.isValid) {
+            openToast({ body: response.errorMessage })
+        }
+    }
 
     return (
         <div className={classes.wrapper}>
@@ -106,17 +126,28 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
                                 {currentUserRoleId ===
                                     UserRole.Administrator && (
                                     <TableCell align='left'>
-                                        <IconButton
-                                            onClick={() =>
-                                                openModal(memberRow)
-                                            }>
-                                            <SupervisorAccountIcon />
-                                        </IconButton>
-                                        <IconButton>
-                                            <DeleteIcon
-                                                className={classes.deleteIcon}
-                                            />
-                                        </IconButton>
+                                        {authUser.id !== memberRow.id && (
+                                            <div>
+                                                <IconButton
+                                                    onClick={() =>
+                                                        openModal(memberRow)
+                                                    }>
+                                                    <SupervisorAccountIcon />
+                                                </IconButton>
+                                                <IconButton>
+                                                    <DeleteIcon
+                                                        onClick={() =>
+                                                            deleteMemberFromChat(
+                                                                memberRow
+                                                            )
+                                                        }
+                                                        className={
+                                                            classes.deleteIcon
+                                                        }
+                                                    />
+                                                </IconButton>
+                                            </div>
+                                        )}
                                     </TableCell>
                                 )}
                             </TableRow>

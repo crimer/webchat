@@ -7,34 +7,45 @@ namespace ApplicationCore.Services
     public class ChatService : IChatService
     {
         private readonly IChatRepository _chatRepository;
-        public ChatService(IChatRepository chatRepository)
+        private readonly IUserRepository _userRepository;
+        public ChatService(IChatRepository chatRepository, IUserRepository userRepository)
         {
             _chatRepository = chatRepository;
+            _userRepository = userRepository;
         }
 
-        public async Task ChangeChatName(int chatId, string newChatName)
+        public async Task ChangeChatNameAsync(int chatId, string newChatName)
         {
             await _chatRepository.ChangeChatName(chatId, newChatName);
         }
 
-        public async Task ChangeUserRole(int chatId, int userId, int userRoleId)
+        public async Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId)
         {
             await _chatRepository.ChangeChatName(chatId, userId, userRoleId);
         }
 
-        public async Task<bool> CreateNewChat(string chatName, int chatTypeId, int userCreatorId, int? mediaId)
+        public async Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId, int? mediaId)
         {
             int createdChatId = await _chatRepository.CreateNewChat(chatName, chatTypeId, mediaId);
             var subscribeSuccess = await _chatRepository.SubscribeUserToChat(userCreatorId, createdChatId, 1);
             return subscribeSuccess;
         }
 
-        public async Task InviteMembersToChat(int chatId, IEnumerable<int> usersIds)
+        public async Task InviteMembersToChatAsync(int chatId, IEnumerable<int> usersIds)
         {
             foreach (var userId in usersIds)
             {
-                await _chatRepository.SubscribeUserToChat(chatId, userId);
+                var member = await _userRepository.GetChatMember(chatId, userId);
+                if(member == null)
+                {
+                    await _chatRepository.SubscribeUserToChat(chatId, userId);
+                }
+                else if(member.MemberStatusId == 2)
+                {
+                    await _chatRepository.BackUserToChat(chatId, userId);
+                }
             }
         }
+
     }
 }

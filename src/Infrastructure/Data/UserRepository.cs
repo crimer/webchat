@@ -42,6 +42,7 @@ namespace Infrastructure.Data
                     Login = AdoDataAccess.GetValue<string>(reader, "Login"),
                     Password = AdoDataAccess.GetValue<string>(reader, "Password"),
                     UserRoleId = AdoDataAccess.GetValue<int>(reader, "UserRoleId"),
+                    MemberStatusId = AdoDataAccess.GetValue<int>(reader, "MemberStatusId"),
                 });
 
             return dataReader.FirstOrDefault();

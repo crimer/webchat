@@ -31,13 +31,18 @@ export type InviteMembersDto = {
 }
 
 export type ChangeChatNameDto = {
-    userId: number,
-    chatId: number,
-    newName: string,
+    userId: number
+    chatId: number
+    newName: string
 }
 
 export type ChangeUserRoleDto = {
-    userId: number,
-    chatId: number,
-    userRoleId: number,
+    userId: number
+    chatId: number
+    userRoleId: number
+}
+
+export type LeaveChatDto = {
+    userId: number
+    chatId: number
 }

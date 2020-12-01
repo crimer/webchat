@@ -23,23 +23,14 @@ BEGIN
 END;
 GO
 
-CREATE PROC CreateNewMedia
-	@name NVARCHAR(255),
-	@path NVARCHAR(255),
-	@mimeType NVARCHAR(50) = NULL
-AS
-BEGIN
-	INSERT INTO Media ([Name], [Path], MimeType) VALUES (@name, @path, @mimeType)
-END;
-GO
-
 CREATE PROC SubscribeUserToChat
 	@userId INT,
 	@chatId INT,
-	@userRoleId INT = 3
+	@memberStatus INT,
+	@userRoleId INT = 1
 AS
 BEGIN
-	INSERT INTO ChatToUser (UserId, ChatId, UserRoleId) VALUES (@userId, @chatId, @userRoleId)
+	INSERT INTO ChatToUser (UserId, ChatId, UserRoleId, MemberStatusId) VALUES (@userId, @chatId, @userRoleId, @memberStatus)
 END;
 GO
 
@@ -84,7 +75,7 @@ CREATE PROC GetChatMember
 	@chatId INT
 AS
 BEGIN
-	SELECT [Users].Id, Login, Password, UserRoles.Id as UserRoleId FROM [Users] 
+	SELECT [Users].Id, [Users].Login, [Users].Password, UserRoles.Id as UserRoleId, ChatToUser.MemberStatusId FROM [Users] 
 	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
 	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
 	WHERE [Users].Id = @userId AND ChatToUser.ChatId = @chatId;
@@ -109,8 +100,7 @@ BEGIN
 	SELECT [Chats].Id, [Chats].Name, [Chats].ChatType
 	FROM [Chats]
 	JOIN [ChatToUser] ON [Chats].Id = [ChatToUser].ChatId
-	JOIN [Users] ON [Users].Id = [ChatToUser].UserId
-	WHERE [Users].Id = @userId;
+	WHERE [ChatToUser].UserId = @userId AND [ChatToUser].MemberStatusId = 1;
 
 END;
 GO
@@ -170,7 +160,7 @@ CREATE PROC ChangeUserRole
 	FROM [Chats] 
 	JOIN ChatToUser ON  ChatToUser.ChatId = [Chats].Id
 	JOIN [Users] ON  ChatToUser.UserId = [Users].Id
-	WHERE [Chats].Id = @chatId;
+	WHERE [Chats].Id = @chatId AND ChatToUser.MemberStatusId = 1;
  END;
  GO
 
@@ -184,6 +174,17 @@ CREATE PROC ChangeUserRole
  END;
  GO
 
+ CREATE PROC ChangeMemberStatus
+	@chatId INT,
+	@userId INT,
+	@memberStatus INT
+AS
+BEGIN
+	UPDATE [ChatToUser]
+	SET [MemberStatusId] = @memberStatus
+	WHERE [ChatToUser].ChatId = @chatId AND [ChatToUser].UserId = @userId;
+END;
+GO
  
 
 --EXEC CreateNewMessage 'Hello everyone', 1, 1

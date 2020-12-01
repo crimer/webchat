@@ -16,10 +16,10 @@ import GroupIcon from '@material-ui/icons/Group'
 import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
 import {CreateChatModal} from '../Components/CreateChatModal'
+import { ChatType, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
 import { NavLink, useHistory } from 'react-router-dom'
-import { ChatType, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import AddIcon from '@material-ui/icons/Add'
 import SearchIcon from '@material-ui/icons/Search'
@@ -89,6 +89,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: '#fff',
         padding: 10,
     },
+    emptyChats:{
+        textAlign: 'center'
+    }
 }))
 
 type ChannelsBarProps = {}
@@ -224,7 +227,9 @@ const ChannelList: React.FC<{ allChats: UserChatDto[] }> = ({ allChats }) => {
     return (
         <>
             <Divider />
-            {allChats.length === 0 && <p>Чатов нет</p>}
+            {allChats.length === 0 && (
+                <p className={classes.emptyChats}>Чатов нет</p>
+            )}
             {allChats.map((chat: UserChatDto) => (
                 <NavLink
                     to={`/chat/${chat.id}`}

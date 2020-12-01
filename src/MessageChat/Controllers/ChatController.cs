@@ -68,7 +68,7 @@ namespace MessageChat.Controllers
         {
             if (createChatDto == null) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно создать чат");
 
-            bool creationSuccess = await _chatService.CreateNewChat(createChatDto.ChatName, createChatDto.ChatTypeId,
+            bool creationSuccess = await _chatService.CreateNewChatAsync(createChatDto.ChatName, createChatDto.ChatTypeId,
                 createChatDto.UserCreatorId, createChatDto.MediaId);
 
             if (creationSuccess)
@@ -83,7 +83,7 @@ namespace MessageChat.Controllers
             if (inviteUsersDto == null || inviteUsersDto.ChatId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
             if (inviteUsersDto.UserIds.Count() == 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Некого приглашать в чат");
 
-            await _chatService.InviteMembersToChat(inviteUsersDto.ChatId, inviteUsersDto.UserIds);
+            await _chatService.InviteMembersToChatAsync(inviteUsersDto.ChatId, inviteUsersDto.UserIds);
 
             return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно приглашены");
         }
@@ -97,7 +97,7 @@ namespace MessageChat.Controllers
             ChatMember user = await _userRepository.GetChatMember(changeChatNameDto.ChatId, changeChatNameDto.UserId);
 
             if(user.UserRoleId == 1)
-                await _chatService.ChangeChatName(changeChatNameDto.ChatId, changeChatNameDto.NewName);
+                await _chatService.ChangeChatNameAsync(changeChatNameDto.ChatId, changeChatNameDto.NewName);
             else 
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "У вас нет прав изменить название чата");
 
@@ -116,7 +116,29 @@ namespace MessageChat.Controllers
             if(user.UserRoleId == changeUserRoleDto.UserRoleId)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "У этого пользователя и так установлена эта роль");
             else 
-                await _chatService.ChangeUserRole(changeUserRoleDto.ChatId, changeUserRoleDto.UserId, changeUserRoleDto.UserRoleId);
+                await _chatService.ChangeUserRoleAsync(changeUserRoleDto.ChatId, changeUserRoleDto.UserId, changeUserRoleDto.UserRoleId);
+
+            return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно изменили роль пользователя");
+        }
+        
+        [HttpPost("leaveChat")]
+        public async Task<object> UserLaveChat([FromBody] UserLeaveChatDto userLeaveChatDto)
+        {
+            if (userLeaveChatDto == null || userLeaveChatDto.ChatId <= 0 || userLeaveChatDto.UserId <= 0)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
+
+            await _chatRepository.UserLaveChat(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
+
+            return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно изменили роль пользователя");
+        }
+
+        [HttpPost("kikUserFromChat")]
+        public async Task<object> KikUserFromChat([FromBody] UserLeaveChatDto userLeaveChatDto)
+        {
+            if (userLeaveChatDto == null || userLeaveChatDto.ChatId <= 0 || userLeaveChatDto.UserId <= 0)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
+
+            await _chatRepository.AdminKikUser(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
 
             return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Все успешно изменили роль пользователя");
         }

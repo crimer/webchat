@@ -5,9 +5,9 @@ namespace ApplicationCore.Interfaces
 {
     public interface IChatService
     {
-        Task<bool> CreateNewChat(string chatName, int chatTypeId, int userCreatorId, int? mediaId);
-        Task InviteMembersToChat(int chatId, IEnumerable<int> usersIds);
-        Task ChangeChatName(int chatId, string newChatName);
-        Task ChangeUserRole(int chatId, int userId, int userRoleId);
+        Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId, int? mediaId);
+        Task InviteMembersToChatAsync(int chatId, IEnumerable<int> usersIds);
+        Task ChangeChatNameAsync(int chatId, string newChatName);
+        Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId);
     }
 }

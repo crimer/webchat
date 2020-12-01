@@ -6,6 +6,7 @@ import {
     Paper,
     Avatar,
     IconButton,
+    Button,
 } from '@material-ui/core'
 import React, { useContext, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
@@ -13,7 +14,10 @@ import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import { ChatMembers } from '../Components/ChatMembers'
 import InviteMemberAutocomplete from '../Components/InviteMemberAutocomplete'
 import chatRepository from '../repository/ChatRepository'
-import { ChatDetailDto } from '../common/Dtos/Chat/ChatDtos'
+import {
+    ChatDetailDto,
+    LeaveChatDto,
+} from '../common/Dtos/Chat/ChatDtos'
 import { ToastContext } from '../Contexts/ToastContext'
 import { ChangeChatName } from '../Components/ChangeChatName'
 import { AccountContext } from '../Contexts/AccountContext'
@@ -52,15 +56,13 @@ const useStyles = makeStyles((theme) => ({
     },
 }))
 
-
-
 export const ChatDetailPage = () => {
     const [detailInfo, setDetailInfo] = useState<ChatDetailDto>()
     const { chatId } = useParams()
     const classes = useStyles()
-    const history = useHistory()
     const { openToast } = useContext(ToastContext)
     const { authUser } = useContext(AccountContext)
+    const history = useHistory()
 
     useEffect(() => {
         const fetchDetailInfo = async () => {
@@ -79,6 +81,21 @@ export const ChatDetailPage = () => {
     const currentUserRoleId = detailInfo?.members.find(
         (u) => u.id === authUser.id
     )?.userRoleId
+
+    const leaveChannel = async () => {
+        const leaveChatDto: LeaveChatDto = {
+            chatId: +chatId,
+            userId: +authUser.id,
+        }
+
+        const response = await chatRepository.leaveChat<undefined>(leaveChatDto)
+        if (response && response.isValid && response.successMessage) {
+            openToast({ body: `Вы полинули чат` })
+            history.push('/chat/')
+        } else if (response && !response.isValid) {
+            openToast({ body: response.errorMessage })
+        }
+    }
 
     return (
         <div className={classes.heroContent}>
@@ -119,6 +136,14 @@ export const ChatDetailPage = () => {
                                     <p className={classes.userName}>
                                         {detailInfo.name}
                                     </p>
+                                    {detailInfo.members.length > 1 && (
+                                        <Button
+                                            variant='contained'
+                                            onClick={leaveChannel}
+                                            color='secondary'>
+                                            Покинуть чат
+                                        </Button>
+                                    )}
                                 </div>
                                 <ChatMembers
                                     currentUserRoleId={currentUserRoleId}

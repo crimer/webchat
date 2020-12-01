@@ -15,5 +15,8 @@ namespace ApplicationCore.Interfaces
         Task<bool> SubscribeUserToChat(int chatId, int userId, int? userRole = 3);
         Task<bool> ChangeChatName(int chatId, string newChatName);
         Task<bool> ChangeChatName(int chatId, int userId, int userRoleId);
+        Task<bool> UserLaveChat(int chatId, int userId);
+        Task<bool> AdminKikUser(int chatId, int userId);
+        Task<bool> BackUserToChat(int chatId, int userId);
     }
 }
