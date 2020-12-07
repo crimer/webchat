@@ -16,7 +16,7 @@ import {
 import { LeaveChatDto, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 import { UserRole } from '../common/Dtos/User/UserDtos'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
-import { ChangeUserRoleModal } from './ChangeUserRoleModal'
+import { ChangeUserRoleModal } from './Modals/ChangeUserRoleModal'
 import { useParams } from 'react-router-dom'
 import { AccountContext } from '../Contexts/AccountContext'
 import { ToastContext } from '../Contexts/ToastContext'
@@ -72,7 +72,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
     const deleteMemberFromChat = async (member: UserChatDto) => {
         const kikUserFromChatDto: LeaveChatDto = {
             chatId: +chatId,
-            userId: +authUser.id,
+            userId: +member.id,
         }
 
         const response = await chatRepository.kikUserFromChat<undefined>(
@@ -80,7 +80,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
         )
         if (response && response.isValid && response.successMessage) {
             openToast({
-                body: `Пользователь ${authUser.login} был изгнан администратором`,
+                body: `Пользователь ${member.name} был изгнан администратором`,
             })
         } else if (response && !response.isValid) {
             openToast({ body: response.errorMessage })

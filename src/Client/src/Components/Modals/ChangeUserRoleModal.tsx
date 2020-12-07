@@ -16,12 +16,12 @@ import {
 } from '@material-ui/core'
 import React, { useContext, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
-import { UserRole } from '../common/Dtos/User/UserDtos'
-import { AccountContext } from '../Contexts/AccountContext'
-import { ToastContext } from '../Contexts/ToastContext'
-import { ChangeUserRoleDto } from '../common/Dtos/Chat/ChatDtos'
-import chatRepository from '../repository/ChatRepository'
+import { UserChatDto } from '../../common/Dtos/Chat/ChatDtos'
+import { UserRole } from '../../common/Dtos/User/UserDtos'
+import { AccountContext } from '../../Contexts/AccountContext'
+import { ToastContext } from '../../Contexts/ToastContext'
+import { ChangeUserRoleDto } from '../../common/Dtos/Chat/ChatDtos'
+import chatRepository from '../../repository/ChatRepository'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -98,7 +98,6 @@ export const ChangeUserRoleModal: React.FC<ChangeUserRoleModalProps> = ({
     const classes = useStyles()
     const [selectedRole, setSelectedRole] = useState<number>()
     const { chatId } = useParams()
-    const { authUser } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
 
     const memberShortName = member && member.name.trim().toUpperCase()[0]

@@ -116,7 +116,7 @@ export const LoginPage: React.FC = () => {
                     <Grid container justify='flex-end'>
                         <Grid item>
                             <Link to='/register'>
-                                Нет аккаутна? Зерегестрируйтесь
+                                Нет аккаутна? Зарегистрируйтесь
                             </Link>
                         </Grid>
                     </Grid>

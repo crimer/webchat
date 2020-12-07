@@ -16,10 +16,10 @@ import {
     Theme,
 } from '@material-ui/core'
 import React, { FormEvent, useContext, useMemo, useState } from 'react'
-import { AccountContext } from '../Contexts/AccountContext'
-import { ChatType, CreateChatDto } from '../common/Dtos/Chat/ChatDtos'
-import chatRepository from '../repository/ChatRepository'
-import { ToastContext } from '../Contexts/ToastContext'
+import { AccountContext } from '../../Contexts/AccountContext'
+import { ChatType, CreateChatDto } from '../../common/Dtos/Chat/ChatDtos'
+import chatRepository from '../../repository/ChatRepository'
+import { ToastContext } from '../../Contexts/ToastContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({

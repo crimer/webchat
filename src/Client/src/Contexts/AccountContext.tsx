@@ -61,6 +61,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                         'Извините, не удалось подключиться к серверу, повторите попытку позже',
                 })
             )
+        console.log(response && response.isValid);
 
         if (response && response.isValid) {
             setAuthUser(response.data)

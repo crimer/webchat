@@ -14,20 +14,20 @@ namespace ApplicationCore.Services
             _userRepository = userRepository;
         }
 
-        public async Task ChangeChatNameAsync(int chatId, string newChatName)
+        public Task ChangeChatNameAsync(int chatId, string newChatName)
         {
-            await _chatRepository.ChangeChatName(chatId, newChatName);
+            return _chatRepository.ChangeChatName(chatId, newChatName);
         }
 
-        public async Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId)
+        public Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId)
         {
-            await _chatRepository.ChangeChatName(chatId, userId, userRoleId);
+            return _chatRepository.ChangeChatName(chatId, userId, userRoleId);
         }
 
         public async Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId, int? mediaId)
         {
             int createdChatId = await _chatRepository.CreateNewChat(chatName, chatTypeId, mediaId);
-            var subscribeSuccess = await _chatRepository.SubscribeUserToChat(userCreatorId, createdChatId, 1);
+            var subscribeSuccess = await _chatRepository.SubscribeUserToChat(createdChatId, userCreatorId, 1);
             return subscribeSuccess;
         }
 

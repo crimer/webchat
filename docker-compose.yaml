@@ -1,0 +1,23 @@
+version: '3'
+services:
+    client:
+        build: ./src/Client
+        ports:
+            - 3000:3000
+        container_name: 'chat-react-client'
+        depends_on: api
+
+    api:
+        build: ./src/MessageChat
+        ports:
+            - 5001:5001
+        depends_on: ms-sql-server
+        container_name: 'chat-web-api'
+
+    ms-sql-server:
+        image: "mcr.microsoft.com/mssql/server"
+        ports:
+            - 1433:1433
+        environment:
+            SA_PASSWORD: "Pa$$w0rd1234"
+            ACCEPT_EULA: "Y"

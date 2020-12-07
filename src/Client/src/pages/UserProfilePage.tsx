@@ -222,7 +222,7 @@ export const UserFrofilePage = () => {
                                             }}
                                             className={classes.changePassBtn}
                                             variant='contained'>
-                                            Изминить пароль
+                                            Изменить пароль
                                         </Button>
                                     </form>
                                 </Paper>

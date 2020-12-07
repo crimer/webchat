@@ -221,5 +221,25 @@ namespace Infrastructure.Data
 
             return addedRows > 0;
         }
+
+        public async Task<IEnumerable<Chat>> GetChatsToReturnByUserId(int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<Chat>("GetChatsToReturnByUserId", parameters,
+                reader => new Chat()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Name = AdoDataAccess.GetValue<string>(reader, "Name"),
+                    ChatType = (ChatType)AdoDataAccess.GetValue<int>(reader, "ChatType"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<Chat>();
+            else
+                return dataReader;
+        }
     }
 }

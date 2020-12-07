@@ -15,7 +15,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import GroupIcon from '@material-ui/icons/Group'
 import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
-import {CreateChatModal} from '../Components/CreateChatModal'
+import { CreateChatModal } from './Modals/CreateChatModal'
 import { ChatType, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 import { ChatContext } from '../Contexts/ChatContext'
 import { AccountContext } from '../Contexts/AccountContext'
@@ -23,6 +23,8 @@ import { NavLink, useHistory } from 'react-router-dom'
 import AccountCircleIcon from '@material-ui/icons/AccountCircle'
 import AddIcon from '@material-ui/icons/Add'
 import SearchIcon from '@material-ui/icons/Search'
+import MeetingRoomIcon from '@material-ui/icons/MeetingRoom'
+import { ReturnToChatModal } from './Modals/ReturnToChatModal'
 
 const drawerWidth = 320
 
@@ -55,9 +57,7 @@ const useStyles = makeStyles((theme: Theme) => ({
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-    createChatIcon: {
-        color: '#00e676',
-    },
+
     chatIcon: {
         marginRight: '10px',
     },
@@ -71,7 +71,7 @@ const useStyles = makeStyles((theme: Theme) => ({
     activeChat: {
         backgroundColor: '#4a525f',
     },
-    accountMenu: {
+    iconColor: {
         color: '#fff',
     },
     searchWRapper: {
@@ -89,9 +89,9 @@ const useStyles = makeStyles((theme: Theme) => ({
         color: '#fff',
         padding: 10,
     },
-    emptyChats:{
-        textAlign: 'center'
-    }
+    emptyChats: {
+        textAlign: 'center',
+    },
 }))
 
 type ChannelsBarProps = {}
@@ -105,14 +105,22 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
 
     const [accountMenu, setAccountMenu] = useState<null | HTMLElement>(null)
     const [searchValue, setSearchValue] = useState<string>('')
-    const [isCreateChatOpen, setCreateChatOpen] = useState<boolean>(false)
 
-    const openAccountMenu = (event: React.MouseEvent<HTMLButtonElement>) => setAccountMenu(event.currentTarget)
+    const [isCreareModalOpen, setIsCreareModalOpen] = useState<boolean>(false)
+    const [isReturnChatModalOpen, setIsReturnChatModalOpen] = useState<boolean>(
+        false
+    )
+
+    const createModalClose = () => setIsCreareModalOpen(false)
+    const returnModalClose = () => setIsReturnChatModalOpen(false)
+
+    const openAccountMenu = (event: React.MouseEvent<HTMLButtonElement>) =>
+        setAccountMenu(event.currentTarget)
     const closeAccountMenu = () => setAccountMenu(null)
 
-    const filteredChats = chats.filter((chat) => chat.name.toLowerCase().includes(searchValue.toLowerCase()))
-
-    const modalClose = () => setCreateChatOpen(false)
+    const filteredChats = chats.filter((chat) =>
+        chat.name.toLowerCase().includes(searchValue.toLowerCase())
+    )
 
     const handleLogout = () => {
         setAccountMenu(null)
@@ -133,8 +141,12 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     return (
         <aside>
             <CreateChatModal
-                open={isCreateChatOpen}
-                onModalClose={modalClose}
+                open={isCreareModalOpen}
+                onModalClose={createModalClose}
+            />
+            <ReturnToChatModal
+                open={isReturnChatModalOpen}
+                onModalClose={returnModalClose}
             />
             <Drawer
                 variant='permanent'
@@ -150,16 +162,28 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                             <div>
                                 <IconButton
                                     aria-label='createChat'
-                                    onClick={() => setCreateChatOpen(true)}>
+                                    onClick={() => setIsCreareModalOpen(true)}>
                                     <AddIcon
                                         fontSize='default'
-                                        className={classes.createChatIcon}
+                                        className={classes.iconColor}
                                     />
                                 </IconButton>
                             </div>
                             <div>
                                 <IconButton
-                                    className={classes.accountMenu}
+                                    aria-label='createChat'
+                                    onClick={() =>
+                                        setIsReturnChatModalOpen(true)
+                                    }>
+                                    <MeetingRoomIcon
+                                        fontSize='default'
+                                        className={classes.iconColor}
+                                    />
+                                </IconButton>
+                            </div>
+                            <div>
+                                <IconButton
+                                    className={classes.iconColor}
                                     aria-controls='simple-menu'
                                     aria-haspopup='true'
                                     onClick={openAccountMenu}>

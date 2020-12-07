@@ -52,9 +52,7 @@ CREATE PROC GetUserByLoginAndPassword
 	@userPassword NVARCHAR(50)
 AS
 BEGIN
-	SELECT [Users].Id, Login, Password FROM [Users] 
-	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
-	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
+	SELECT Id, Login, Password FROM [Users] 
 	WHERE [Login] = @userLogin AND [Password] = @userPassword;
 END;
 GO
@@ -101,6 +99,18 @@ BEGIN
 	FROM [Chats]
 	JOIN [ChatToUser] ON [Chats].Id = [ChatToUser].ChatId
 	WHERE [ChatToUser].UserId = @userId AND [ChatToUser].MemberStatusId = 1;
+
+END;
+GO
+
+CREATE PROC GetChatsToReturnByUserId
+	@userId INT
+AS
+BEGIN
+	SELECT [Chats].Id, [Chats].Name, [Chats].ChatType
+	FROM [Chats]
+	JOIN [ChatToUser] ON [Chats].Id = [ChatToUser].ChatId
+	WHERE [ChatToUser].UserId = @userId AND [ChatToUser].MemberStatusId = 2;
 
 END;
 GO

@@ -27,7 +27,7 @@ CREATE TABLE Media (
 CREATE TABLE [Users] (
 	Id INT PRIMARY KEY IDENTITY,
 	[Login] NVARCHAR(50) UNIQUE NOT NULL,
-	[Password] NVARCHAR(50) UNIQUE NOT NULL,
+	[Password] NVARCHAR(50) NOT NULL,
 	MediaId INT REFERENCES Media(Id) NULL,
 )
 
@@ -42,7 +42,6 @@ CREATE TABLE ChatToUser (
 	Id INT PRIMARY KEY IDENTITY,
 	UserId INT REFERENCES Users(Id) NOT NULL,
 	ChatId INT REFERENCES Chats(Id) NOT NULL,
-	IsAdminRemoved BIT DEFAULT 0,
 	UserRoleId INT REFERENCES UserRoles(Id) NOT NULL,
 	MemberStatusId INT REFERENCES MemberStatus(Id) NOT NULL,
 )
@@ -75,12 +74,12 @@ INSERT INTO MemberStatus([Name]) VALUES
 
 INSERT INTO Users (Login,Password) VALUES ('nikita', 'B0-0A-50-C4-48-23-8A-71-ED-47-9F-81-FA-4D-90-66');
 INSERT INTO Chats (Name,ChatType) VALUES ('C# (Ru)', 1);
-INSERT INTO ChatToUser (ChatId,UserId,UserRoleId) VALUES (1, 1, 1);
+INSERT INTO ChatToUser (ChatId,UserId,UserRoleId,MemberStatusId) VALUES (1, 1, 1, 1);
 INSERT INTO [Messages] (Text,ChatId,UserId,CreatedAt) VALUES ('Hello everyone', 1, 1, GETDATE());
 
 select * from ChatTypes;
 
-ALTER TABLE ChatToUser DROP COLUMN IsAdminRemoved;
-ALTER TABLE [ChatToUser] ADD MemberStatusId INT REFERENCES MemberStatus(Id) NULL;
+--ALTER TABLE ChatToUser DROP COLUMN IsAdminRemoved;
+--ALTER TABLE [ChatToUser] ADD MemberStatusId INT REFERENCES MemberStatus(Id) NULL;
 
-Delete ChatToUser where Id = 7
+--Delete ChatToUser where Id = 7
