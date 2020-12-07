@@ -2,16 +2,19 @@ import {
     Container,
     Typography,
     Grid,
-    Button,
     makeStyles,
     Paper,
     Avatar,
     TextField,
     IconButton,
 } from '@material-ui/core'
-import React, { FormEvent, useState } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
+import React, { useContext, useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
+import usersRepository from '../repository/UsersRepository'
+import { UserProfileDto } from '../common/Dtos/User/UserDtos'
+import { AccountContext } from '../Contexts/AccountContext'
+import { ToastContext } from '../Contexts/ToastContext'
 
 const useStyles = makeStyles((theme) => ({
     heroContent: {
@@ -50,25 +53,38 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 export const UserFrofilePage = () => {
-    const data = {
-        login: 'Nikita@mail.ru',
-        name: 'nikita',
-        password: '',
-        newPassword: '',
-        repeatNewPassword: '',
-        avatarPath: '',
-        shortName: 'N',
-    }
-    const { id } = useParams()
     const classes = useStyles()
     const history = useHistory()
-    const [userData, setUserData] = useState(data)
-    const [changePassword, setChangePassword] = useState(false)
+    const { authUser } = useContext(AccountContext)
+    const { openToast } = useContext(ToastContext)
+    const [userData, setUserData] = useState<UserProfileDto>()
 
-    const submitChangeProfile = (e: FormEvent<HTMLFormElement>) => {
-        e.preventDefault()
-        console.log('submitChangeProfile form')
-    }
+    useEffect(() => {
+        const fetchProfile = async () => {
+            const response = await usersRepository
+                .getUserProfile<UserProfileDto>(authUser.id)
+                .catch(() => {
+                    openToast({
+                        body:
+                            'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                        type: 'error',
+                    })
+                    history.push('/chat/')
+                })
+
+            if (response && response.isValid) {
+                setUserData(response.data)
+                console.log(response.data)
+            } else if (response) {
+                openToast({
+                    body: `Не удалось получить данные профиля`,
+                    type: 'error',
+                })
+                history.push('/chat/')
+            }
+        }
+        fetchProfile()
+    }, [])
 
     return (
         <main>
@@ -89,149 +105,56 @@ export const UserFrofilePage = () => {
                             Профиль
                         </Typography>
                     </Grid>
-                    <div>
-                        <Grid container spacing={2} justify='center'>
-                            <Grid item className={classes.gridItem}>
-                                <Paper className={classes.paper}>
-                                    {userData.avatarPath === '' ? (
+                    {userData && (
+                        <div>
+                            <Grid container spacing={2} justify='center'>
+                                <Grid item className={classes.gridItem}>
+                                    <Paper className={classes.paper}>
                                         <Avatar
-                                            alt={userData.name}
+                                            alt={userData.login}
                                             className={classes.avatarSize}>
-                                            {userData.shortName}
+                                            {userData.login[0]}
                                         </Avatar>
-                                    ) : (
-                                        <Avatar
-                                            className={classes.avatarSize}
-                                            alt={userData.name}
-                                            src={userData.avatarPath}
-                                        />
-                                    )}
+                                        <p className={classes.userName}>
+                                            {userData.login}
+                                        </p>
+                                    </Paper>
+                                </Grid>
 
-                                    <p className={classes.userName}>
-                                        {userData.name}
-                                    </p>
-                                </Paper>
+                                <Grid item className={classes.gridItem}>
+                                    <Paper className={classes.paper}>
+                                        <div>
+                                            <TextField
+                                                variant='outlined'
+                                                margin='normal'
+                                                required
+                                                fullWidth
+                                                id='login'
+                                                label='Логин'
+                                                name='login'
+                                                value={userData.login}
+                                                disabled
+                                            />
+                                            <TextField
+                                                variant='outlined'
+                                                margin='normal'
+                                                required
+                                                disabled
+                                                fullWidth
+                                                name='password'
+                                                label='Пароль'
+                                                type='password'
+                                                id='password'
+                                                value={userData.password}
+                                            />
+                                        </div>
+                                    </Paper>
+                                </Grid>
                             </Grid>
-                            <Grid item className={classes.gridItem}>
-                                <Paper className={classes.paper}>
-                                    <form
-                                        noValidate
-                                        onSubmit={submitChangeProfile}>
-                                        <TextField
-                                            variant='outlined'
-                                            margin='normal'
-                                            required
-                                            fullWidth
-                                            id='name'
-                                            label='Имя'
-                                            name='name'
-                                            value={userData.name}
-                                            onChange={(e) =>
-                                                setUserData({
-                                                    ...userData,
-                                                    name: e.target.value,
-                                                })
-                                            }
-                                        />
-                                        <TextField
-                                            variant='outlined'
-                                            margin='normal'
-                                            required
-                                            fullWidth
-                                            id='login'
-                                            label='Логин'
-                                            name='login'
-                                            value={userData.login}
-                                            onChange={(e) =>
-                                                setUserData({
-                                                    ...userData,
-                                                    login: e.target.value,
-                                                })
-                                            }
-                                        />
-                                        <TextField
-                                            variant='outlined'
-                                            margin='normal'
-                                            required
-                                            disabled={!changePassword}
-                                            fullWidth
-                                            name='password'
-                                            label='Пароль'
-                                            type='password'
-                                            id='password'
-                                            value={userData.password}
-                                            onChange={(e) =>
-                                                setUserData({
-                                                    ...userData,
-                                                    password: e.target.value,
-                                                })
-                                            }
-                                        />
-                                        {changePassword && (
-                                            <div>
-                                                <TextField
-                                                    variant='outlined'
-                                                    margin='normal'
-                                                    fullWidth
-                                                    name='newPassword'
-                                                    label='Новый пароль'
-                                                    type='password'
-                                                    id='newPassword'
-                                                    value={userData.newPassword}
-                                                    onChange={(e) =>
-                                                        setUserData({
-                                                            ...userData,
-                                                            newPassword:
-                                                                e.target.value,
-                                                        })
-                                                    }
-                                                />
-                                                <TextField
-                                                    variant='outlined'
-                                                    margin='normal'
-                                                    fullWidth
-                                                    name='repeatNewPassword'
-                                                    label='Повторите новый пароль'
-                                                    type='password'
-                                                    id='repeatNewPassword'
-                                                    value={
-                                                        userData.repeatNewPassword
-                                                    }
-                                                    onChange={(e) =>
-                                                        setUserData({
-                                                            ...userData,
-                                                            repeatNewPassword:
-                                                                e.target.value,
-                                                        })
-                                                    }
-                                                />
-                                            </div>
-                                        )}
-
-                                        <Button
-                                            type='submit'
-                                            variant='contained'
-                                            color='primary'>
-                                            Сохранить
-                                        </Button>
-                                        <Button
-                                            onClick={() => {
-                                                setChangePassword(
-                                                    !changePassword
-                                                )
-                                            }}
-                                            className={classes.changePassBtn}
-                                            variant='contained'>
-                                            Изменить пароль
-                                        </Button>
-                                    </form>
-                                </Paper>
-                            </Grid>
-                        </Grid>
-                    </div>
+                        </div>
+                    )}
                 </Container>
             </div>
         </main>
     )
 }
-

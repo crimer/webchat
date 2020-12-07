@@ -8,3 +8,9 @@ export type AuthUserDto = {
     id: number
     login: string
 }
+
+export type UserProfileDto = {
+    id: number
+    login: string
+    password: string
+}

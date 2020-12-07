@@ -4,7 +4,8 @@ import { ConnectionContext } from './ConnectionContext'
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
 import { ToastContext } from './ToastContext'
-import { AuthUserDto, UserRole } from '../common/Dtos/User/UserDtos'
+import { AuthUserDto, UserProfileDto, UserRole } from '../common/Dtos/User/UserDtos'
+import usersRepository from '../repository/UsersRepository'
 
 const initUserValue: AuthUserDto = {
     id: -1,
@@ -51,6 +52,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         }
         autoStartConnection()
     }, [])
+
 
     const login = async (login: string, password: string) => {
         const response = await accountRepository
