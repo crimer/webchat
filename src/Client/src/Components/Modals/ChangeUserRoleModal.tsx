@@ -112,11 +112,11 @@ export const ChangeUserRoleModal: React.FC<ChangeUserRoleModalProps> = ({
 
     const submitChangeRole = async (selectedRoleId: number | undefined) => {
         if (selectedRoleId === undefined || selectedRoleId <= 0) {
-            openToast({ body: 'Роль не выбрана!' })
+            openToast({ body: 'Роль не выбрана!', type:'warning' })
             return
         }
         if(member === undefined){
-            openToast({ body: 'Что-то пошло не так!' })
+            openToast({ body: 'Что-то пошло не так!', type:'error' })
             return
         }
         const changeRoleDto: ChangeUserRoleDto = {
@@ -127,9 +127,9 @@ export const ChangeUserRoleModal: React.FC<ChangeUserRoleModalProps> = ({
 
         const response = await chatRepository.changeMemberRole<undefined>(changeRoleDto)
         if (response && response.isValid) {
-            openToast({ body: 'Роль успешно изменена' })
+            openToast({ body: 'Роль успешно изменена', type:'success' })
         } else if (response) {
-            openToast({ body: response.errorMessage })
+            openToast({ body: response.errorMessage, type:'error' })
         }
         closeModal()
     }

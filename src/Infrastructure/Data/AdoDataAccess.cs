@@ -15,11 +15,12 @@ namespace Infrastructure.Data
         private string _connectionString { get; set; }
         public AdoDataAccess(IOptions<DatabaseSettings> options)
         {
-#if Release
-                _connectionString = options.Value.DockerString;
-#elif Debug
-                _connectionString = options.Value.ConnectionString;
-#endif
+            //#if Release
+            //                _connectionString = options.Value.DockerString;
+            //#elif Debug
+            //                _connectionString = options.Value.ConnectionString;
+            //#endif
+            _connectionString = options.Value.ConnectionString;
         }
 
         private async Task<SqlConnection> GetConnectionAsync()

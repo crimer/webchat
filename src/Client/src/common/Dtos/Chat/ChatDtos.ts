@@ -19,6 +19,16 @@ export type UserChatDto = {
     userRoleId: UserRole
 }
 
+export type ChatDto = {
+    id: number
+    name: string
+    chatType: ChatType
+}
+export type ReturnToChatDto = {
+    chatId: number
+    userId: number
+}
+
 export type ChatDetailDto = {
     id: number
     name: string

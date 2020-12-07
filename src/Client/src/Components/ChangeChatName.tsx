@@ -39,7 +39,7 @@ export const ChangeChatName: React.FC<ChangeChatNameProps> = ({ chatId }) => {
 
     const handleChangeName = async () => {
         if (newName.trim().length <= 0) {
-            openToast({ body: 'Имя чата не может быть пустым' })
+            openToast({ body: 'Имя чата не может быть пустым', type:'warning' })
             return
         }
         const changeChatNameDto: ChangeChatNameDto = {
@@ -52,9 +52,9 @@ export const ChangeChatName: React.FC<ChangeChatNameProps> = ({ chatId }) => {
             changeChatNameDto
         )
         if (response && response.isValid && response.successMessage) {
-            openToast({ body: 'Вы успешно поменяли имя чата' })
+            openToast({ body: 'Вы успешно поменяли имя чата', type:'success' })
         } else if (response && !response.isValid) {
-            openToast({ body: response.errorMessage })
+            openToast({ body: response.errorMessage, type:'error' })
         }
         setNewName('')
     }

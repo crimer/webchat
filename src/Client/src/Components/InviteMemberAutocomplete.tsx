@@ -59,9 +59,9 @@ const InviteMemberAutocomplete: React.FC<InviteMemberAutocompleteProps> = ({chat
 
         const response = await chatRepository.inviteMembersToChat<undefined>(inviteMembersDto)
         if(response && response.isValid && response.successMessage){
-            openToast({ body: response.successMessage })
+            openToast({ body: response.successMessage, type:'success' })
         } else if(response && !response.isValid) {
-            openToast({ body: response.errorMessage })
+            openToast({ body: response.errorMessage, type:'error' })
         }
     }
 

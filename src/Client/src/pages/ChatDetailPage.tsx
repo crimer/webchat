@@ -72,7 +72,7 @@ export const ChatDetailPage = () => {
             if (response && response.isValid) {
                 setDetailInfo(response.data)
             } else if (response) {
-                openToast({ body: response.errorMessage })
+                openToast({ body: response.errorMessage, type:'error' })
             }
         }
         fetchDetailInfo()
@@ -90,10 +90,10 @@ export const ChatDetailPage = () => {
 
         const response = await chatRepository.leaveChat<undefined>(leaveChatDto)
         if (response && response.isValid && response.successMessage) {
-            openToast({ body: `Вы полинули чат` })
+            openToast({ body: `Вы полинули чат`, type:'success' })
             history.push('/chat/')
         } else if (response && !response.isValid) {
-            openToast({ body: response.errorMessage })
+            openToast({ body: response.errorMessage, type:'error' })
         }
     }
 

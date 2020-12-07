@@ -241,5 +241,17 @@ namespace Infrastructure.Data
             else
                 return dataReader;
         }
+
+        public async Task<bool> ReturnUserToChat(int chatId, int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@chatId", chatId),
+                new SqlParameter("@userId", userId),
+            };
+            var dataReader = await _dataAccess.ExecuteProcedureAsync("ReturnUserToChat", parameters);
+
+            return dataReader > 0;
+        }
     }
 }

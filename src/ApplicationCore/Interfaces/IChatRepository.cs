@@ -19,5 +19,6 @@ namespace ApplicationCore.Interfaces
         Task<bool> UserLaveChat(int chatId, int userId);
         Task<bool> AdminKikUser(int chatId, int userId);
         Task<bool> BackUserToChat(int chatId, int userId);
+        Task<bool> ReturnUserToChat(int chatId, int userId);
     }
 }

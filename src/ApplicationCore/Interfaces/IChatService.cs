@@ -9,5 +9,6 @@ namespace ApplicationCore.Interfaces
         Task InviteMembersToChatAsync(int chatId, IEnumerable<int> usersIds);
         Task ChangeChatNameAsync(int chatId, string newChatName);
         Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId);
+        Task<bool> BackToChatAsync(int chatId, int userId);
     }
 }

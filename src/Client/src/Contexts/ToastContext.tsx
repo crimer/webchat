@@ -1,6 +1,7 @@
 import React, { createContext, useState } from 'react'
 import { makeStyles, Theme, createStyles } from '@material-ui/core/styles'
 import Snackbar from '@material-ui/core/Snackbar'
+import { Alert } from '@material-ui/lab'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -15,6 +16,7 @@ type ToastOptions = {
     body: string
     vertical?: 'bottom' | 'top'
     horizontal?: 'left' | 'right' | 'center'
+    type: 'success' | 'info' | 'error' | 'warning'
 }
 
 interface IToastContext {
@@ -34,6 +36,7 @@ export const ToastContextProvider: React.FC = ({ children }) => {
         body: '',
         horizontal: 'center',
         vertical: 'top',
+        type: 'success'
     })
 
     const closeToast = () => setIsOpen(false)
@@ -44,6 +47,7 @@ export const ToastContextProvider: React.FC = ({ children }) => {
             body: options.body,
             horizontal: options.horizontal,
             vertical: options.vertical,
+            type: options.type,
         })
     }
 
@@ -58,9 +62,11 @@ export const ToastContextProvider: React.FC = ({ children }) => {
                     horizontal: options.horizontal || 'center',
                     vertical: options.vertical || 'top',
                 }}
-                message={options.body}
-                key={options.body}
-            />
+                key={options.body}>
+                <Alert onClose={closeToast} severity={options.type || 'success'}>
+                    {options.body}
+                </Alert>
+            </Snackbar>
 
             {children}
         </ToastContext.Provider>

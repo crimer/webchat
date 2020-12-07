@@ -58,7 +58,7 @@ export const RegisterPage = () => {
         const isRegister = await register(auth.login, auth.password)
         if (isRegister) {
             setAuth({ login: '', password: '', repeatPassword: '' })
-            openToast({ body:'Вы успешно создали аккаунт' })
+            openToast({ body:'Вы успешно создали аккаунт', type:'success' })
             history.push('/login')
         }
         setDisable(false)

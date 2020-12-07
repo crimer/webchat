@@ -47,14 +47,14 @@ export const LoginPage: React.FC = () => {
         setDisable(true)
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0) {
             setAuth({ login: '', password: '' })
-            openToast({body: 'Логин или пароль не должны быть пустыми'})
+            openToast({body: 'Логин или пароль не должны быть пустыми', type:'warning'})
             setDisable(false)
             return
         }
         const isLogin = await login(auth.login, auth.password)
         if (isLogin) {
             await SignalRManager.instance.reconnect()
-            openToast({ body:'Вы вошли' })
+            openToast({ body:'Вы вошли', type:'success' })
             setAuth({ login: '', password: '' })
             history.push('/chat/')
         }

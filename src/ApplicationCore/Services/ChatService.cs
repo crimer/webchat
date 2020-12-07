@@ -14,6 +14,17 @@ namespace ApplicationCore.Services
             _userRepository = userRepository;
         }
 
+        public async Task<bool> BackToChatAsync(int chatId, int userId)
+        {
+            var chatMember = await _userRepository.GetChatMember(chatId, userId);
+            bool isSuccessReturn = false;
+
+            if (chatMember.MemberStatusId == 2)
+                isSuccessReturn = await _chatRepository.ReturnUserToChat(chatId, userId);
+
+            return isSuccessReturn;
+        }
+
         public Task ChangeChatNameAsync(int chatId, string newChatName)
         {
             return _chatRepository.ChangeChatName(chatId, newChatName);

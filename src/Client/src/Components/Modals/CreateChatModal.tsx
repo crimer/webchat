@@ -100,9 +100,9 @@ export const CreateChatModal: React.FC<CreateChatModalProps> = ({
         }
         const response = await chatRepository.createNewChat<undefined>(chatDto)
         if (response && response.isValid && response.successMessage) {
-            openToast({ body: response.successMessage })
+            openToast({ body: response.successMessage, type:'success' })
         } else if (response) {
-            openToast({ body: response.errorMessage })
+            openToast({ body: response.errorMessage, type:'error' })
         }
         closeModal()
     }

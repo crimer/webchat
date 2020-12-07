@@ -68,6 +68,7 @@ BEGIN
 END;
 GO
 
+
 CREATE PROC GetChatMember
 	@userId INT,
 	@chatId INT
@@ -136,6 +137,18 @@ CREATE PROC ChangeChatName
 	UPDATE [Chats]
 	SET [Name] = @newChatName
 	WHERE Id = @chatId;
+ END;
+ GO
+
+ 
+CREATE PROC ReturnUserToChat
+ 	@chatId INT,
+	@userId INT
+ AS
+ BEGIN
+	UPDATE [ChatToUser]
+	SET [MemberStatusId] = 1
+	WHERE ChatId = @chatId AND UserId = @userId;
  END;
  GO
 

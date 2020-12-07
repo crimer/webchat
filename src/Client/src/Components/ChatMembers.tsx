@@ -81,9 +81,10 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
         if (response && response.isValid && response.successMessage) {
             openToast({
                 body: `Пользователь ${member.name} был изгнан администратором`,
+                type:'success'
             })
         } else if (response && !response.isValid) {
-            openToast({ body: response.errorMessage })
+            openToast({ body: response.errorMessage, type:'error'})
         }
     }
 

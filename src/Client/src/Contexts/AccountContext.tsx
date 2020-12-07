@@ -59,6 +59,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                 openToast({
                     body:
                         'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                        type:'error'
                 })
             )
         console.log(response && response.isValid);
@@ -73,6 +74,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         } else if (response) {
             openToast({
                 body: `При авторизации произошла ошибка. ${response.errorMessage}`,
+                type:'error'
             })
         }
         return false
@@ -85,13 +87,14 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                 openToast({
                     body:
                         'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                        type:'error'
                 })
             )
 
         if (response && response.responseCode === 200) {
             return true
         } else {
-            openToast({ body: `При авторизации произошла ошибка.` })
+            openToast({ body: `При авторизации произошла ошибка.`, type:'error' })
             return false
         }
     }
@@ -102,7 +105,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             .catch(() =>
                 openToast({
                     body:
-                        'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                        'Извините, не удалось подключиться к серверу, повторите попытку позже', type:'error'
                 })
             )
 
@@ -114,7 +117,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
         } else if (response) {
             Cookies.remove('userData')
             openToast({
-                body: `При выходе произошла ошибка. ${response.statusText}`,
+                body: `При выходе произошла ошибка. ${response.statusText}`, type:'error'
             })
             return Promise.reject()
         }

@@ -46,13 +46,13 @@ namespace MessageChat.Controllers
             if (userId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить чаты такого пользователя");
 
             var userChats = await _chatRepository.GetChatsToReturnByUserId(userId);
-            IEnumerable<UserChatDto> data = userChats.Select(chat => new UserChatDto()
+            IEnumerable<ChatDto> data = userChats.Select(chat => new ChatDto()
             {
                 Id = chat.Id,
                 ChatType = chat.ChatType,
                 Name = chat.Name,
             });
-            return new ApiResponse<IEnumerable<UserChatDto>>(data, (int)HttpStatusCode.OK);
+            return new ApiResponse<IEnumerable<ChatDto>>(data, (int)HttpStatusCode.OK);
         }
 
         [HttpGet("detailChatInfo/{chatId}")]
@@ -101,6 +101,18 @@ namespace MessageChat.Controllers
             await _chatService.InviteMembersToChatAsync(inviteUsersDto.ChatId, inviteUsersDto.UserIds);
 
             return new ApiResponse((int)HttpStatusCode.OK, successMessage: "Пользователь успешно приглашен");
+        }
+        
+        [HttpPost("returnToChat")]
+        public async Task<object> ReturnToChat([FromBody] ReturnToChatDto returnToChatDto)
+        {
+            if (returnToChatDto == null || returnToChatDto.ChatId <= 0 || returnToChatDto.UserId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
+
+            bool isSuccessReturn = await _chatService.BackToChatAsync(returnToChatDto.ChatId, returnToChatDto.UserId);
+            if(isSuccessReturn)
+                return new ApiResponse((int)HttpStatusCode.OK);
+            else
+                return new ApiResponse((int)HttpStatusCode.BadRequest);
         }
 
         [HttpPost("changeChatName")]

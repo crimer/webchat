@@ -5,7 +5,7 @@ services:
         ports:
             - 3000:3000
         container_name: 'chat-react-client'
-        depends_on: api
+        depends_on: 'chat-web-api'
 
     api:
         build: ./src/MessageChat
