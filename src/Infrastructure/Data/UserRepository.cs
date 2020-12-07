@@ -15,7 +15,8 @@ namespace Infrastructure.Data
         {
             _dataAccess = dataAccess;
         }
-        public async Task<bool> CreateNewUser(string login, string password, int? avatarId)
+
+        public async Task<bool> CreateNewUserAsync(string login, string password, int? avatarId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -28,7 +29,7 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
-        public async Task<ChatMember> GetChatMember(int chatId, int userId)
+        public async Task<ChatMember> GetChatMemberAsync(int chatId, int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -48,7 +49,7 @@ namespace Infrastructure.Data
             return dataReader.FirstOrDefault();
         }
 
-        public async Task<User> GetUser(string login, string password)
+        public async Task<User> GetUserAsync(string login, string password)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -66,7 +67,7 @@ namespace Infrastructure.Data
             return dataReader.FirstOrDefault();
         }
 
-        public async Task<User> GetUserById(int userId)
+        public async Task<User> GetUserByIdAsync(int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -83,7 +84,7 @@ namespace Infrastructure.Data
             return dataReader.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<User>> SearchUsersByLogin(string userLogin)
+        public async Task<IEnumerable<User>> SearchUsersByLoginAsync(string userLogin)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {

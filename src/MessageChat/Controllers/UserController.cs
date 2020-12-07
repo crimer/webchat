@@ -23,7 +23,7 @@ namespace MessageChat.Controllers
         public async Task<object> SearchUsersByLogin(string userLogin)
         {
             if (string.IsNullOrWhiteSpace(userLogin)) return new ApiResponse((int)HttpStatusCode.BadRequest, "Пустое имя пользователя");
-            var users = await _userRepository.SearchUsersByLogin(userLogin);
+            var users = await _userRepository.SearchUsersByLoginAsync(userLogin);
             var userDtos = users.Select(user => new UserChatDto()
             {
                 Id = user.Id,

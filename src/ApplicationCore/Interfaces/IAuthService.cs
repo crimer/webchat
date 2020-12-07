@@ -5,7 +5,7 @@ namespace ApplicationCore.Interfaces
 {
     public interface IAuthService
     {
-        Task<User> Login(string login, string password);
-        Task<bool> Register(string login, string password);
+        Task<User> LoginAsync(string login, string password);
+        Task<bool> RegisterAsync(string login, string password);
     }
 }

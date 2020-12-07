@@ -16,29 +16,29 @@ namespace ApplicationCore.Services
 
         public async Task<bool> BackToChatAsync(int chatId, int userId)
         {
-            var chatMember = await _userRepository.GetChatMember(chatId, userId);
+            var chatMember = await _userRepository.GetChatMemberAsync(chatId, userId);
             bool isSuccessReturn = false;
 
             if (chatMember.MemberStatusId == 2)
-                isSuccessReturn = await _chatRepository.ReturnUserToChat(chatId, userId);
+                isSuccessReturn = await _chatRepository.ReturnUserToChatAsync(chatId, userId);
 
             return isSuccessReturn;
         }
 
         public Task ChangeChatNameAsync(int chatId, string newChatName)
         {
-            return _chatRepository.ChangeChatName(chatId, newChatName);
+            return _chatRepository.ChangeChatNameAsync(chatId, newChatName);
         }
 
         public Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId)
         {
-            return _chatRepository.ChangeChatName(chatId, userId, userRoleId);
+            return _chatRepository.ChangeUserRoleAsync(chatId, userId, userRoleId);
         }
 
         public async Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId, int? mediaId)
         {
-            int createdChatId = await _chatRepository.CreateNewChat(chatName, chatTypeId, mediaId);
-            var subscribeSuccess = await _chatRepository.SubscribeUserToChat(createdChatId, userCreatorId, 1);
+            int createdChatId = await _chatRepository.CreateNewChatAsync(chatName, chatTypeId, mediaId);
+            var subscribeSuccess = await _chatRepository.SubscribeUserToChatAsync(createdChatId, userCreatorId, 1);
             return subscribeSuccess;
         }
 
@@ -46,14 +46,14 @@ namespace ApplicationCore.Services
         {
             foreach (var userId in usersIds)
             {
-                var member = await _userRepository.GetChatMember(chatId, userId);
+                var member = await _userRepository.GetChatMemberAsync(chatId, userId);
                 if(member == null)
                 {
-                    await _chatRepository.SubscribeUserToChat(chatId, userId);
+                    await _chatRepository.SubscribeUserToChatAsync(chatId, userId);
                 }
                 else if(member.MemberStatusId == 2)
                 {
-                    await _chatRepository.BackUserToChat(chatId, userId);
+                    await _chatRepository.BackUserToChatAsync(chatId, userId);
                 }
             }
         }

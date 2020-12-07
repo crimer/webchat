@@ -32,7 +32,7 @@ namespace MessageChat.Controllers
             if (string.IsNullOrWhiteSpace(loginData.Login) || string.IsNullOrWhiteSpace(loginData.Password))
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Пустые данные");
 
-            User user = await _authService.Login(loginData.Login, loginData.Password);
+            User user = await _authService.LoginAsync(loginData.Login, loginData.Password);
 
             if (user == null)
                 return new ApiResponse((int)HttpStatusCode.NotFound, $"Не существует пользователя с таким логином и паролем");
@@ -63,7 +63,7 @@ namespace MessageChat.Controllers
             if (string.IsNullOrWhiteSpace(userRegisterDto.Login) || string.IsNullOrWhiteSpace(userRegisterDto.Password))
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин или пароль не должен быть пустым");
 
-            var isRegistred = await _authService.Register(userRegisterDto.Login, userRegisterDto.Password);
+            var isRegistred = await _authService.RegisterAsync(userRegisterDto.Login, userRegisterDto.Password);
 
             if (!isRegistred)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Уже существует пользователь с логином {userRegisterDto.Login}");

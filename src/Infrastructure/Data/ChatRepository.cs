@@ -18,7 +18,7 @@ namespace Infrastructure.Data
             _dataAccess = dataAccess;
         }
 
-        public async Task<bool> ChangeChatName(int chatId, string newChatName)
+        public async Task<bool> ChangeChatNameAsync(int chatId, string newChatName)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -30,7 +30,7 @@ namespace Infrastructure.Data
             return dataReader > 0;
         }
 
-        public async Task<bool> ChangeChatName(int chatId, int userId, int userRoleId)
+        public async Task<bool> ChangeUserRoleAsync(int chatId, int userId, int userRoleId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -43,7 +43,7 @@ namespace Infrastructure.Data
             return dataReader > 0;
         }
 
-        public async Task<int> CreateNewChat(string chatName, int chatTypeId, int? mediaId)
+        public async Task<int> CreateNewChatAsync(string chatName, int chatTypeId, int? mediaId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -60,7 +60,7 @@ namespace Infrastructure.Data
             return (int)createdChatIdParam.Value;
         }
 
-        public async Task<IEnumerable<Chat>> GetAllChatsByUserId(int userId)
+        public async Task<IEnumerable<Chat>> GetAllChatsByUserIdAsync(int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -80,7 +80,7 @@ namespace Infrastructure.Data
                 return dataReader;
         }
 
-        public async Task<Chat> GetChat(int chatId)
+        public async Task<Chat> GetChatAsync(int chatId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -98,7 +98,7 @@ namespace Infrastructure.Data
             return dataReader.FirstOrDefault();
         }
 
-        public async Task<IEnumerable<ChatMember>> GetChatMembers(int chatId)
+        public async Task<IEnumerable<ChatMember>> GetChatMembersAsync(int chatId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -118,7 +118,7 @@ namespace Infrastructure.Data
                 return dataReader;
         }
 
-        public async Task<IEnumerable<Message>> GetChatMessagesById(int id)
+        public async Task<IEnumerable<Message>> GetChatMessagesByIdAsync(int id)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -144,7 +144,7 @@ namespace Infrastructure.Data
                 return dataReader;
         }
 
-        public async Task<IEnumerable<Message>> GetPinnedMessagesByChatId(int id)
+        public async Task<IEnumerable<Message>> GetPinnedMessagesByChatIdAsync(int id)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -169,7 +169,7 @@ namespace Infrastructure.Data
             else
                 return dataReader;
         }
-        public async Task<bool> SubscribeUserToChat(int chatId, int userId, int? userRoleId = 3)
+        public async Task<bool> SubscribeUserToChatAsync(int chatId, int userId, int? userRoleId = 3)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -183,7 +183,7 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
-        public async Task<bool> UserLaveChat(int chatId, int userId)
+        public async Task<bool> UserLaveChatAsync(int chatId, int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -196,7 +196,7 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
         
-        public async Task<bool> AdminKikUser(int chatId, int userId)
+        public async Task<bool> AdminKikUserAsync(int chatId, int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -209,7 +209,7 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
         
-        public async Task<bool> BackUserToChat(int chatId, int userId)
+        public async Task<bool> BackUserToChatAsync(int chatId, int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -222,7 +222,7 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
-        public async Task<IEnumerable<Chat>> GetChatsToReturnByUserId(int userId)
+        public async Task<IEnumerable<Chat>> GetChatsToReturnByUserIdAsync(int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
@@ -242,7 +242,7 @@ namespace Infrastructure.Data
                 return dataReader;
         }
 
-        public async Task<bool> ReturnUserToChat(int chatId, int userId)
+        public async Task<bool> ReturnUserToChatAsync(int chatId, int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {

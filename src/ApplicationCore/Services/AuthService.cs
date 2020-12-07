@@ -22,21 +22,21 @@ namespace ApplicationCore.Services
             res = BitConverter.ToString(tmpHash);
             return res;
         }
-        public async Task<User> Login(string login, string password)
+        public async Task<User> LoginAsync(string login, string password)
         {
             string hashPassword = Crypt(password);
-            User dbUser = await _userRepository.GetUser(login, hashPassword);
+            User dbUser = await _userRepository.GetUserAsync(login, hashPassword);
             return dbUser;
         }
 
-        public async Task<bool> Register(string login, string password)
+        public async Task<bool> RegisterAsync(string login, string password)
         {
             string hashPassword = Crypt(password);
-            User dbUser = await _userRepository.GetUser(login, hashPassword);
+            User dbUser = await _userRepository.GetUserAsync(login, hashPassword);
             if(dbUser != null)
                 return false;
 
-            bool isRegistred = await _userRepository.CreateNewUser(login, hashPassword, null);
+            bool isRegistred = await _userRepository.CreateNewUserAsync(login, hashPassword, null);
             return isRegistred;
         }
     }

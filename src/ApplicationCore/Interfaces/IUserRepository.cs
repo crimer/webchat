@@ -6,10 +6,10 @@ namespace ApplicationCore.Interfaces
 {
     public interface IUserRepository
     {
-        Task<User> GetUser(string login, string password);
-        Task<User> GetUserById(int userId);
-        Task<ChatMember> GetChatMember(int chatId, int userId);
-        Task<bool> CreateNewUser(string login, string password, int? avatarId);
-        Task<IEnumerable<User>> SearchUsersByLogin(string userLogin);
+        Task<User> GetUserAsync(string login, string password);
+        Task<User> GetUserByIdAsync(int userId);
+        Task<ChatMember> GetChatMemberAsync(int chatId, int userId);
+        Task<bool> CreateNewUserAsync(string login, string password, int? avatarId);
+        Task<IEnumerable<User>> SearchUsersByLoginAsync(string userLogin);
     }
 }

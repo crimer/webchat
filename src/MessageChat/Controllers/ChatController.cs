@@ -30,7 +30,7 @@ namespace MessageChat.Controllers
         {
             if (userId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить чаты такого пользователя");
 
-            var userChats = await _chatRepository.GetAllChatsByUserId(userId);
+            var userChats = await _chatRepository.GetAllChatsByUserIdAsync(userId);
             IEnumerable<UserChatDto> data = userChats.Select(chat => new UserChatDto()
             {
                 Id = chat.Id,
@@ -45,7 +45,7 @@ namespace MessageChat.Controllers
         {
             if (userId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить чаты такого пользователя");
 
-            var userChats = await _chatRepository.GetChatsToReturnByUserId(userId);
+            var userChats = await _chatRepository.GetChatsToReturnByUserIdAsync(userId);
             IEnumerable<ChatDto> data = userChats.Select(chat => new ChatDto()
             {
                 Id = chat.Id,
@@ -60,8 +60,8 @@ namespace MessageChat.Controllers
         {
             if (chatId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить информацию о чате");
 
-            Chat chatDetail = await _chatRepository.GetChat(chatId);
-            IEnumerable<ChatMember> members = await _chatRepository.GetChatMembers(chatId);
+            Chat chatDetail = await _chatRepository.GetChatAsync(chatId);
+            IEnumerable<ChatMember> members = await _chatRepository.GetChatMembersAsync(chatId);
             var chatMembers = members.Select(member => new UserChatDto()
             {
                 Id = member.Id,
@@ -121,7 +121,7 @@ namespace MessageChat.Controllers
             if (changeChatNameDto == null || changeChatNameDto.ChatId <= 0 || changeChatNameDto.UserId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
             if (string.IsNullOrWhiteSpace(changeChatNameDto.NewName)) return new ApiResponse((int)HttpStatusCode.BadRequest, "Новое название не должно быть пустым");
 
-            ChatMember user = await _userRepository.GetChatMember(changeChatNameDto.ChatId, changeChatNameDto.UserId);
+            ChatMember user = await _userRepository.GetChatMemberAsync(changeChatNameDto.ChatId, changeChatNameDto.UserId);
 
             if(user.UserRoleId == 1)
                 await _chatService.ChangeChatNameAsync(changeChatNameDto.ChatId, changeChatNameDto.NewName);
@@ -138,7 +138,7 @@ namespace MessageChat.Controllers
                 || changeUserRoleDto.UserId <= 0 || changeUserRoleDto.UserRoleId <= 0)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
 
-            ChatMember user = await _userRepository.GetChatMember(changeUserRoleDto.ChatId, changeUserRoleDto.UserId);
+            ChatMember user = await _userRepository.GetChatMemberAsync(changeUserRoleDto.ChatId, changeUserRoleDto.UserId);
 
             if(user.UserRoleId == changeUserRoleDto.UserRoleId)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "У этого пользователя и так установлена эта роль");
@@ -154,7 +154,7 @@ namespace MessageChat.Controllers
             if (userLeaveChatDto == null || userLeaveChatDto.ChatId <= 0 || userLeaveChatDto.UserId <= 0)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
 
-            await _chatRepository.UserLaveChat(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
+            await _chatRepository.UserLaveChatAsync(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
 
             return new ApiResponse((int)HttpStatusCode.OK);
         }
@@ -165,7 +165,7 @@ namespace MessageChat.Controllers
             if (userLeaveChatDto == null || userLeaveChatDto.ChatId <= 0 || userLeaveChatDto.UserId <= 0)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
 
-            await _chatRepository.AdminKikUser(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
+            await _chatRepository.AdminKikUserAsync(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
 
             return new ApiResponse((int)HttpStatusCode.OK);
         }
