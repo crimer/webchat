@@ -51,10 +51,10 @@ export const ChangeChatName: React.FC<ChangeChatNameProps> = ({ chatId }) => {
         const response = await chatRepository.changeChatName<undefined>(
             changeChatNameDto
         )
-        if (response && response.isValid && response.successMessage) {
+        if (response && response.isValid) {
             openToast({ body: 'Вы успешно поменяли имя чата', type:'success' })
         } else if (response && !response.isValid) {
-            openToast({ body: response.errorMessage, type:'error' })
+            openToast({ body: 'Не удалось поменять имя чата', type:'error' })
         }
         setNewName('')
     }

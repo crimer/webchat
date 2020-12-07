@@ -20,6 +20,7 @@ import { AccountContext } from '../../Contexts/AccountContext'
 import { ChatType, CreateChatDto } from '../../common/Dtos/Chat/ChatDtos'
 import chatRepository from '../../repository/ChatRepository'
 import { ToastContext } from '../../Contexts/ToastContext'
+import { ChatContext } from '../../Contexts/ChatContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -77,6 +78,7 @@ export const CreateChatModal: React.FC<CreateChatModalProps> = ({
     const classes = useStyles()
     const { authUser } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
+    const { getChatsByUserId } = useContext(ChatContext)
 
     const [chatTitle, setChatTitle] = useState<string>('')
     const [selectedType, setSelectedType] = useState<number>(1)
@@ -99,10 +101,11 @@ export const CreateChatModal: React.FC<CreateChatModalProps> = ({
             userCreatorId: authUser.id,
         }
         const response = await chatRepository.createNewChat<undefined>(chatDto)
-        if (response && response.isValid && response.successMessage) {
-            openToast({ body: response.successMessage, type:'success' })
+        if (response && response.isValid) {
+            openToast({ body: 'Чат успешно создан', type:'success' })
+            getChatsByUserId(authUser.id)
         } else if (response) {
-            openToast({ body: response.errorMessage, type:'error' })
+            openToast({ body: 'Не удалось создать чат', type:'error' })
         }
         closeModal()
     }

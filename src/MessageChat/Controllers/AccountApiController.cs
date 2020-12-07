@@ -24,7 +24,7 @@ namespace MessageChat.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<object> Login([FromBody] UserLoginDto loginData)
+        public async Task<ApiResponse> Login([FromBody] UserLoginDto loginData)
         {
             if (string.IsNullOrWhiteSpace(loginData.Login) || loginData.Login.Length > 25)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин не должен быть пустым");
@@ -52,7 +52,7 @@ namespace MessageChat.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<object> Register([FromBody] UserRegisterDto userRegisterDto)
+        public async Task<ApiResponse> Register([FromBody] UserRegisterDto userRegisterDto)
         {
             if (string.IsNullOrWhiteSpace(userRegisterDto.Login) || userRegisterDto.Login.Length > 25 || string.IsNullOrWhiteSpace(userRegisterDto.Password))
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин или пароль не должен быть пустым");

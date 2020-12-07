@@ -129,7 +129,7 @@ export const ChangeUserRoleModal: React.FC<ChangeUserRoleModalProps> = ({
         if (response && response.isValid) {
             openToast({ body: 'Роль успешно изменена', type:'success' })
         } else if (response) {
-            openToast({ body: response.errorMessage, type:'error' })
+            openToast({ body: 'Не удалось изменить роль', type:'error' })
         }
         closeModal()
     }

@@ -62,7 +62,6 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                         type:'error'
                 })
             )
-        console.log(response && response.isValid);
 
         if (response && response.isValid) {
             setAuthUser(response.data)

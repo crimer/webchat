@@ -78,13 +78,13 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
         const response = await chatRepository.kikUserFromChat<undefined>(
             kikUserFromChatDto
         )
-        if (response && response.isValid && response.successMessage) {
+        if (response && response.isValid) {
             openToast({
                 body: `Пользователь ${member.name} был изгнан администратором`,
                 type:'success'
             })
         } else if (response && !response.isValid) {
-            openToast({ body: response.errorMessage, type:'error'})
+            openToast({ body: 'Не удалось удалить пользователя', type:'error'})
         }
     }
 

@@ -107,9 +107,7 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
     const [searchValue, setSearchValue] = useState<string>('')
 
     const [isCreareModalOpen, setIsCreareModalOpen] = useState<boolean>(false)
-    const [isReturnChatModalOpen, setIsReturnChatModalOpen] = useState<boolean>(
-        false
-    )
+    const [isReturnChatModalOpen, setIsReturnChatModalOpen] = useState<boolean>(false)
 
     const createModalClose = () => setIsCreareModalOpen(false)
     const returnModalClose = () => setIsReturnChatModalOpen(false)

@@ -46,12 +46,12 @@ export const RegisterPage = () => {
         setDisable(true)
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0 || auth.repeatPassword.trim().length === 0) {
             setAuth({ login: '', password: '', repeatPassword: '' })
-            openModal('Внимание!', 'Логин или пароль не должны быть пустыми')
+            openToast({ body:'Все поля должны быть заполнены', type:'warning' })
             setDisable(false)
             return
         }
         if(auth.password !== auth.repeatPassword) {
-            openModal('Внимание!', 'Пароли должны совпадать')
+            openToast({ body:'Пароли должны совпадать', type:'warning' })
             setDisable(false)
             return
         }
