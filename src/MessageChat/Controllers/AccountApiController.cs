@@ -26,8 +26,11 @@ namespace MessageChat.Controllers
         [HttpPost("login")]
         public async Task<ApiResponse> Login([FromBody] UserLoginDto loginData)
         {
-            if (string.IsNullOrWhiteSpace(loginData.Login) || loginData.Login.Length > 25)
-                return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин не должен быть пустым");
+            if(loginData == null)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, $"Что-то пошло не так");
+
+            if (string.IsNullOrWhiteSpace(loginData.Login) || string.IsNullOrWhiteSpace(loginData.Password))
+                return new ApiResponse((int)HttpStatusCode.BadRequest, $"Пустые данные");
 
             User user = await _authService.Login(loginData.Login, loginData.Password);
 
@@ -54,7 +57,10 @@ namespace MessageChat.Controllers
         [HttpPost("register")]
         public async Task<ApiResponse> Register([FromBody] UserRegisterDto userRegisterDto)
         {
-            if (string.IsNullOrWhiteSpace(userRegisterDto.Login) || userRegisterDto.Login.Length > 25 || string.IsNullOrWhiteSpace(userRegisterDto.Password))
+            if(userRegisterDto == null)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, $"Что-то пошло не так");
+
+            if (string.IsNullOrWhiteSpace(userRegisterDto.Login) || string.IsNullOrWhiteSpace(userRegisterDto.Password))
                 return new ApiResponse((int)HttpStatusCode.BadRequest, $"Логин или пароль не должен быть пустым");
 
             var isRegistred = await _authService.Register(userRegisterDto.Login, userRegisterDto.Password);

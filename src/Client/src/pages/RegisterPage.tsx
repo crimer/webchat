@@ -9,8 +9,9 @@ import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { AccountContext } from '../Contexts/AccountContext'
-import { ModalContext } from '../Contexts/ModalContext'
 import { ToastContext } from '../Contexts/ToastContext'
+import { CircularProgress } from '@material-ui/core'
+import SignalRManager from '../SignalR/SignalRManager'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -22,6 +23,9 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
         margin: theme.spacing(1),
         backgroundColor: theme.palette.secondary.main,
+    },
+    loader: {
+        margin: theme.spacing(1),
     },
     form: {
         width: '100%', // Fix IE 11 issue.
@@ -36,40 +40,56 @@ export const RegisterPage = () => {
     const classes = useStyles()
     const history = useHistory()
     const [auth, setAuth] = useState({ login: '', password: '', repeatPassword: '' })
-    const [disable, setDisable] = useState(false)
-    const { register } = useContext(AccountContext)
-    const { openModal } = useContext(ModalContext)
+    const [loading, setLoading] = useState(false)
+    const { register, login } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
 
     const submitRegister = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setDisable(true)
+        setLoading(true)
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0 || auth.repeatPassword.trim().length === 0) {
             setAuth({ login: '', password: '', repeatPassword: '' })
             openToast({ body:'Все поля должны быть заполнены', type:'warning' })
-            setDisable(false)
+            setLoading(false)
             return
         }
         if(auth.password !== auth.repeatPassword) {
             openToast({ body:'Пароли должны совпадать', type:'warning' })
-            setDisable(false)
+            setLoading(false)
             return
         }
         const isRegister = await register(auth.login, auth.password)
         if (isRegister) {
-            setAuth({ login: '', password: '', repeatPassword: '' })
             openToast({ body:'Вы успешно создали аккаунт', type:'success' })
-            history.push('/login')
+            const isLogin = await autoLogin(auth.login, auth.password)
+
+            if(!isLogin) return
+        } else {
+            setAuth({ login: '', password: '', repeatPassword: '' })
         }
-        setDisable(false)
+        setLoading(false)
+    }
+
+    const autoLogin = async (userLogin: string, userPassword: string): Promise<boolean> => {
+        const isLogin = await login(userLogin, userPassword)
+        if (isLogin) {
+            await SignalRManager.instance.reconnect()
+            openToast({ body:'Вы вошли', type:'success' })
+            history.push('/chat/')
+        }
+        return isLogin
     }
 
     return (
         <Container component='main' maxWidth='xs'>
             <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon />
-                </Avatar>
+                {loading ? (
+                    <CircularProgress className={classes.loader}/>
+                ) : (
+                    <Avatar className={classes.avatar}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                )}
                 <Typography component='h1' variant='h5'>
                     Регистрация
                 </Typography>
@@ -82,7 +102,7 @@ export const RegisterPage = () => {
                                 variant='outlined'
                                 required
                                 fullWidth
-                                disabled={disable}
+                                disabled={loading}
                                 id='login'
                                 label='Логин'
                                 name='login'
@@ -97,7 +117,7 @@ export const RegisterPage = () => {
                                 variant='outlined'
                                 required
                                 fullWidth
-                                disabled={disable}
+                                disabled={loading}
                                 label='Пароль'
                                 name='password'
                                 type='password'
@@ -110,7 +130,7 @@ export const RegisterPage = () => {
                                 onChange={(e)=> setAuth({...auth, repeatPassword: e.target.value})}
                                 variant='outlined'
                                 required
-                                disabled={disable}
+                                disabled={loading}
                                 fullWidth
                                 label='Повторите пароль'
                                 name='repeatPassword'
@@ -124,7 +144,7 @@ export const RegisterPage = () => {
                         fullWidth
                         variant='contained'
                         color='primary'
-                        disabled={disable}
+                        disabled={loading}
                         className={classes.submit}>
                         Создать аккаунт
                     </Button>

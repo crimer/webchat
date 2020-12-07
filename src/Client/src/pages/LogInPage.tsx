@@ -11,6 +11,7 @@ import { Link, useHistory } from 'react-router-dom'
 import { AccountContext } from '../Contexts/AccountContext'
 import SignalRManager from '../SignalR/SignalRManager'
 import { ToastContext } from '../Contexts/ToastContext'
+import { CircularProgress } from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -24,6 +25,9 @@ const useStyles = makeStyles((theme) => ({
     avatar: {
         margin: theme.spacing(1),
         backgroundColor: theme.palette.secondary.main,
+    },
+    loader: {
+        margin: theme.spacing(1),
     },
     form: {
         width: '100%', // Fix IE 11 issue.
@@ -40,15 +44,15 @@ export const LoginPage: React.FC = () => {
     const [auth, setAuth] = useState({ login: '', password: '' })
     const { login } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
-    const [disable, setDisable] = useState(false)
+    const [loading, setLoading] = useState(false)
 
     const submitLogin = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        setDisable(true)
+        setLoading(true)
         if (auth.login.trim().length === 0 || auth.password.trim().length === 0) {
             setAuth({ login: '', password: '' })
             openToast({body: 'Логин или пароль не должны быть пустыми', type:'warning'})
-            setDisable(false)
+            setLoading(false)
             return
         }
         const isLogin = await login(auth.login, auth.password)
@@ -57,16 +61,22 @@ export const LoginPage: React.FC = () => {
             openToast({ body:'Вы вошли', type:'success' })
             setAuth({ login: '', password: '' })
             history.push('/chat/')
+        }else{
+            setAuth({ login: '', password: '' })
         }
-        setDisable(false)
+        setLoading(false)
     }
 
     return (
         <Container component='main' maxWidth='xs'>
             <div className={classes.paper}>
-                <Avatar className={classes.avatar}>
-                    <LockOutlinedIcon />
-                </Avatar>
+                {loading ? (
+                    <CircularProgress className={classes.loader}/>
+                ) : (
+                    <Avatar className={classes.avatar}>
+                        <LockOutlinedIcon />
+                    </Avatar>
+                )}
                 <Typography component='h1' variant='h5'>
                     Авторизация
                 </Typography>
@@ -78,7 +88,7 @@ export const LoginPage: React.FC = () => {
                         variant='outlined'
                         margin='normal'
                         required
-                        disabled={disable}
+                        disabled={loading}
                         fullWidth
                         value={auth.login}
                         onChange={(e) =>
@@ -93,7 +103,7 @@ export const LoginPage: React.FC = () => {
                         variant='outlined'
                         margin='normal'
                         required
-                        disabled={disable}
+                        disabled={loading}
                         value={auth.password}
                         fullWidth
                         onChange={(e) =>
@@ -109,7 +119,7 @@ export const LoginPage: React.FC = () => {
                         fullWidth
                         variant='contained'
                         color='primary'
-                        disabled={disable}
+                        disabled={loading}
                         className={classes.submit}>
                         Войти
                     </Button>
