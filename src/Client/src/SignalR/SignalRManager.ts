@@ -7,7 +7,7 @@ class SignalRManager {
 
     constructor() {
         this.connection = new SignalR.HubConnectionBuilder()
-            .withUrl('https://localhost:5001/lothub', {
+            .withUrl('http://localhost:5000/lothub', {
                 transport: SignalR.HttpTransportType.WebSockets,
                 skipNegotiation: true,
             })

@@ -11,8 +11,8 @@ import { useHistory, useParams } from 'react-router-dom'
 import MoreVertIcon from '@material-ui/icons/MoreVert'
 import { ChatContext } from '../Contexts/ChatContext'
 import ToggleButton from '@material-ui/lab/ToggleButton'
-import AttachmentOutlinedIcon from '@material-ui/icons/AttachmentOutlined'
-import TextsmsOutlinedIcon from '@material-ui/icons/TextsmsOutlined'
+import StarIcon from '@material-ui/icons/Star'
+import StarBorderIcon from '@material-ui/icons/StarBorder'
 import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -98,9 +98,9 @@ export const Header: React.FC<HeaderProps> = ({chat}) => {
                         setPinned(!isPinned)
                     }}>
                     {isPinned ? (
-                        <AttachmentOutlinedIcon />
+                        <StarIcon />
                     ) : (
-                        <TextsmsOutlinedIcon />
+                        <StarBorderIcon />
                     )}
                 </ToggleButton>
                 <Box className={classes.authBlock}>

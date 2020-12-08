@@ -3,19 +3,22 @@ services:
     client:
         build: ./src/Client
         ports:
-            - 3000:3000
+            - 3000:80
         container_name: 'chat-react-client'
-        depends_on: 'chat-web-api'
+        depends_on:
+            - api
 
     api:
-        build: ./src/MessageChat
+        build: ./src
         ports:
-            - 5001:5001
-        depends_on: ms-sql-server
+            - 8080:5001
         container_name: 'chat-web-api'
+        depends_on:
+            - ms-sql-server
 
     ms-sql-server:
-        image: "mcr.microsoft.com/mssql/server"
+        container_name: 'ms-sql-web-chat'
+        build: ./src/Database
         ports:
             - 1433:1433
         environment:

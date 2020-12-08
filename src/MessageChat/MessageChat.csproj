@@ -5,7 +5,7 @@
         <AssemblyName>MessageChat</AssemblyName>
         <RootNamespace>MessageChat</RootNamespace>
         <UserSecretsId>468d61c7-b996-40a0-9184-51a2ac71aba3</UserSecretsId>
-        <DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
     </PropertyGroup>
 
     <ItemGroup>

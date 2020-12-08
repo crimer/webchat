@@ -12,7 +12,8 @@ import { DateType, formatDate } from '../libs/DateFormat'
 import { makeStyles, TextField } from '@material-ui/core'
 import { Header } from './Header'
 import { useHistory, useParams } from 'react-router-dom'
-import AttachmentOutlinedIcon from '@material-ui/icons/AttachmentOutlined'
+import StarBorderIcon from '@material-ui/icons/StarBorder'
+import StarIcon from '@material-ui/icons/Star'
 import { ReciveMessageDto } from '../common/Dtos/Chat/MessageDtos'
 import { UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 
@@ -47,13 +48,15 @@ const useStyles = makeStyles((theme) => ({
         },
     },
     messageFooter: {
-        marginTop: '5px',
+        marginTop: 'auto',
         display: 'flex',
+        height: '25px',
         flexFlow: 'row-reverse',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
     message: {
+        height: '92px',
         backgroundColor: 'white',
         filter: 'drop-shadow(0px 3px 6px rgba(0, 0, 0, 0.36))',
         padding: '1em 1.5em',
@@ -95,15 +98,15 @@ const useStyles = makeStyles((theme) => ({
         fontWeight: 'bold',
         color: 'white',
     },
-
     userLogoMy: {
         justifySelf: 'start',
     },
-
     userLogoAnother: {
         justifySelf: 'end',
     },
-
+    favMessage: {
+        display: 'none',
+    },
     myMessage: {
         justifySelf: 'start',
         marginRight: '15px',
@@ -124,6 +127,9 @@ const useStyles = makeStyles((theme) => ({
             right: '-11px',
             border: '10px solid transparent',
             borderBottom: '10px solid whitesmoke',
+        },
+        '&:hover $favMessage':{
+            display: 'block',
         },
     },
     anotherMessage: {
@@ -191,7 +197,7 @@ const ChatMessageListComponent: React.FC = () => {
                 messages.map((m) => (
                     <ChatMessagesBlockComponent key={m.id} message={m} />
                 ))}
-            <div ref={bottomRef}></div>
+            <span ref={bottomRef}></span>
         </div>
     )
 }
@@ -256,7 +262,16 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
                     <span className={classes.messageTime}>
                         {formatDate(createdAt, DateType.DateTime)}
                     </span>
-                    {isPinned && <AttachmentOutlinedIcon fontSize='small' />}
+                    {authUser.login === userName && (
+                        // {isPinned && (
+                        //     <span>
+                        //         <StarIcon fontSize='small' />
+                        //     </span>
+                        // )}
+                        <span className={classes.favMessage} onClick={() => console.log('w')}>
+                            <StarBorderIcon fontSize='small' />
+                        </span>
+                    )}
                 </div>
             </div>
         </span>
@@ -309,7 +324,7 @@ export const ChatComponent: React.FC = () => {
     useEffect(() => {
         const fetchChatData = async () => {
             const hasMessages = await getChatMessagesById(chatId)
-            if(!hasMessages) {
+            if (!hasMessages) {
                 history.push('/chat/')
                 return
             }
@@ -324,7 +339,7 @@ export const ChatComponent: React.FC = () => {
 
     return (
         <main className={classes.content}>
-            <Header chat={chat}/>
+            <Header chat={chat} />
 
             <div className={classes.container}>
                 <ChatMessageListComponent />

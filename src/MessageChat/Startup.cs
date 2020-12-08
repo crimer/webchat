@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using ApplicationCore.Interfaces;
 using ApplicationCore.Options;
 using ApplicationCore.Services;
@@ -49,6 +50,11 @@ namespace MessageChat
                 .AddCookie(options =>
                 {
                     options.Cookie.SameSite = SameSiteMode.None;
+                    options.Events.OnRedirectToLogin = (context) =>
+                    {
+                        context.Response.StatusCode = 401;
+                        return Task.CompletedTask;
+                    };
                 });
         }
 
@@ -61,12 +67,12 @@ namespace MessageChat
             else
             {
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
+              //  app.UseHsts();
             }
 
             app.UseMiddleware<ErrorsMiddleware>();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -79,7 +85,8 @@ namespace MessageChat
                 builder.AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
-                    .WithOrigins("http://localhost:3000");
+                    .WithOrigins("http://localhost:3000")
+                    .WithOrigins("http://localhost:80");
             });
 
             app.UseEndpoints(endpoints =>
