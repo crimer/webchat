@@ -64,7 +64,6 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                         type:'error'
                 })
             )
-
         if (response && response.isValid) {
             setAuthUser(response.data)
             Cookies.set('userData', JSON.stringify(response.data), {

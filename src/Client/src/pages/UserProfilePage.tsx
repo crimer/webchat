@@ -74,7 +74,6 @@ export const UserFrofilePage = () => {
 
             if (response && response.isValid) {
                 setUserData(response.data)
-                console.log(response.data)
             } else if (response) {
                 openToast({
                     body: `Не удалось получить данные профиля`,

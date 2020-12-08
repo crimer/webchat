@@ -5,33 +5,27 @@ import {
     SendMessageDto,
 } from '../common/Dtos/Chat/MessageDtos'
 import chatRepository from '../repository/ChatRepository'
+import messageRepository from '../repository/MessageRepository'
 import SignalRManager from '../SignalR/SignalRManager'
 import { AccountContext } from './AccountContext'
-import { ModalContext } from './ModalContext'
 import { ToastContext } from './ToastContext'
 
 interface IChatContext {
     chats: UserChatDto[]
-    isPinned: boolean
-    getMessages: (isPinned: boolean) => ReciveMessageDto[]
-    setPinned: (isPinned: boolean) => void
+    messages: ReciveMessageDto[]
     sendMessage: (message: string, chatId: number) => Promise<void>
+    getMessages: (chatId: number, isPinned: boolean) => Promise<void>
     getChatMessagesById: (chatId: number) => Promise<boolean>
     getChatById: (chatId: number) => UserChatDto
     getPinnedMessagesByChatId: (chatId: number) => Promise<void>
     getChatsByUserId: (userId: number) => Promise<void>
+    pinMessage: (messageId: number, isPin: boolean) => Promise<void>
 }
 
 export const ChatContext = createContext<IChatContext>({
     chats: [],
-    isPinned: false,
-    getMessages: (sPinned: boolean) => {
-        throw new Error('Контекст чата не проинициализирован')
-    },
+    messages: [],
     getChatById: (chatId: number) => {
-        throw new Error('Контекст чата не проинициализирован')
-    },
-    setPinned: (isPinned: boolean) => {
         throw new Error('Контекст чата не проинициализирован')
     },
     sendMessage: (message: string) => {
@@ -46,12 +40,17 @@ export const ChatContext = createContext<IChatContext>({
     getChatsByUserId: (userId: number) => {
         throw new Error('Контекст чата не проинициализирован')
     },
+    getMessages: (chatId: number, isPinned: boolean = false) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
+    pinMessage: (messageId: number, isPin: boolean) => {
+        throw new Error('Контекст чата не проинициализирован')
+    },
 })
 
 export const ChatContextProvider: React.FC = ({ children }) => {
     const [messages, setMessages] = useState<ReciveMessageDto[]>([])
     const [chats, setChats] = useState<UserChatDto[]>([])
-    const [isPinned, setIsPinned] = useState<boolean>(false)
     const { authUser } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
 
@@ -75,13 +74,12 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         if (authUser.login === '') setMessages([])
     }, [authUser])
 
-    const setPinned = (pinned: boolean) => setIsPinned(pinned)
 
-    const getMessages = (pinned: boolean = false) => {
-        if (pinned) {
-            return messages.filter((message) => message.isPinned === pinned)
+    const getMessages = async (chatId: number, isPinned: boolean = false) => {
+        if (isPinned) {
+            await getPinnedMessagesByChatId(chatId)
         } else {
-            return messages
+            await getChatMessagesById(chatId)
         }
     }
 
@@ -99,7 +97,8 @@ export const ChatContextProvider: React.FC = ({ children }) => {
     const getChatById = (chatId: number) => chats.filter(chat => chat.id === +chatId)[0]
 
     const getPinnedMessagesByChatId = async (chatId: number) => {
-        const response = await chatRepository.getMessagesByChatId<ReciveMessageDto[]>(chatId)
+        const response = await chatRepository.getPinnedMessagesByChatId<ReciveMessageDto[]>(chatId)
+
         if (response && response.responseCode === 200) {
             setMessages(response.data)
         } else if (response && response.responseCode === 404){
@@ -111,6 +110,15 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         const response = await chatRepository.getChatsByUserId<UserChatDto[]>(userId)
         if (response && response.responseCode === 200) {
             setChats(response.data)
+        }
+    }
+
+    const pinMessage = async (messageId: number, isPin: boolean) => {
+        const response = await messageRepository.togglePinMessage<undefined>(messageId, isPin)
+        if(response && response.responseCode === 200){
+            openToast({body:'Вы закрепили сообщение', type:'success'})
+        }else if(response && response.errorMessage){
+            openToast({body: response.errorMessage, type:'warning'})
         }
     }
 
@@ -133,14 +141,14 @@ export const ChatContextProvider: React.FC = ({ children }) => {
         <ChatContext.Provider
             value={{
                 chats,
+                messages,
                 sendMessage,
                 getChatById,
-                setPinned,
                 getMessages,
-                isPinned,
                 getChatMessagesById,
                 getPinnedMessagesByChatId,
                 getChatsByUserId,
+                pinMessage,
             }}>
             {children}
         </ChatContext.Provider>

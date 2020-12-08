@@ -128,7 +128,7 @@ const useStyles = makeStyles((theme) => ({
             border: '10px solid transparent',
             borderBottom: '10px solid whitesmoke',
         },
-        '&:hover $favMessage':{
+        '&:hover $favMessage': {
             display: 'block',
         },
     },
@@ -157,6 +157,9 @@ const useStyles = makeStyles((theme) => ({
     inputWrapper: {
         padding: '20px',
     },
+    pinnedMessage: {
+        display: 'block !important',
+    },
     emptyChatList: {
         display: 'block',
         margin: '20px 0',
@@ -170,7 +173,7 @@ interface IMessageBlockProps {
 }
 
 const ChatMessageListComponent: React.FC = () => {
-    const { getMessages, isPinned } = useContext(ChatContext)
+    const { messages } = useContext(ChatContext)
     const { authUser } = useContext(AccountContext)
     const bottomRef = useRef<HTMLDivElement>(null)
     const classes = useStyles()
@@ -183,7 +186,7 @@ const ChatMessageListComponent: React.FC = () => {
         })
     }
 
-    const messages = getMessages(isPinned)
+    // const messages = getMessages(isPinned)
     useEffect(() => {
         scrollToBottom()
     }, [messages])
@@ -206,6 +209,8 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
     message,
 }: IMessageBlockProps) => {
     const { authUser } = useContext(AccountContext)
+    const { pinMessage } = useContext(ChatContext)
+
     const { userName, text, createdAt, isPinned } = message
     const classes = useStyles()
     const names = userName.split(' ')
@@ -222,6 +227,10 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
     }`
     const messageTextClasses = `${classes.message} ${
         authUser.login === userName ? classes.myMessage : classes.anotherMessage
+    }`
+
+    const pinnedClasses = `${classes.favMessage} ${
+        message.isPinned && classes.pinnedMessage
     }`
 
     const userInitials = useMemo(
@@ -251,6 +260,8 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
         backgroundColor: stringToColour(),
     }
 
+    const handlePinClick = async () => await pinMessage(+message.id, !message.isPinned)
+
     return (
         <span className={messageRowClasses}>
             <span style={style} className={userLogoClasses}>
@@ -263,13 +274,14 @@ const ChatMessagesBlockComponent: React.FC<IMessageBlockProps> = ({
                         {formatDate(createdAt, DateType.DateTime)}
                     </span>
                     {authUser.login === userName && (
-                        // {isPinned && (
-                        //     <span>
-                        //         <StarIcon fontSize='small' />
-                        //     </span>
-                        // )}
-                        <span className={classes.favMessage} onClick={() => console.log('w')}>
-                            <StarBorderIcon fontSize='small' />
+                        <span
+                            className={pinnedClasses}
+                            onClick={handlePinClick}>
+                            {isPinned ? (
+                                <StarIcon fontSize='small' />
+                            ) : (
+                                <StarBorderIcon fontSize='small' />
+                            )}
                         </span>
                     )}
                 </div>

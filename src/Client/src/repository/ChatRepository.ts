@@ -7,6 +7,11 @@ class ChatRepository {
         return response
     }
 
+    public async getPinnedMessagesByChatId<T>(chatId: number): Promise<ApiResponse<T>> {
+        const response = await apiRequest<T>('GET', `/message/getPinnedMessagesByChatId/${chatId}`)
+        return response
+    }
+
     public async getChatsByUserId<T>(userId: number): Promise<ApiResponse<T>> {
         const response = await apiRequest<T>('GET', `/chat/getChatsByUserId/${userId}`)
         return response

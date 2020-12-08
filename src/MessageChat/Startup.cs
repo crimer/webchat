@@ -50,11 +50,11 @@ namespace MessageChat
                 .AddCookie(options =>
                 {
                     options.Cookie.SameSite = SameSiteMode.None;
-                    options.Events.OnRedirectToLogin = (context) =>
-                    {
-                        context.Response.StatusCode = 401;
-                        return Task.CompletedTask;
-                    };
+                    //options.Events.OnRedirectToLogin = (context) =>
+                    //{
+                    //    context.Response.StatusCode = 401;
+                    //    return Task.CompletedTask;
+                    //};
                 });
         }
 
@@ -67,12 +67,12 @@ namespace MessageChat
             else
             {
                 app.UseExceptionHandler("/Error");
-              //  app.UseHsts();
+                app.UseHsts();
             }
 
             app.UseMiddleware<ErrorsMiddleware>();
 
-            //app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();

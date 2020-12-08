@@ -27,20 +27,20 @@ namespace MessageChat.SignalR
             if (string.IsNullOrWhiteSpace(reciveMessage.Text)) return;
 
             var currentUserName = Context.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Неизвестный чувак";
-            var sendMessage = new SendMessageDto
-            {
-                Text = reciveMessage.Text,
-                IsMy = false,
-                UserName = currentUserName,
-            };
             try
             {
                 var allAuthUsers = _authUserManager.GetAllAuthUsers();
-                var createMessageSuccess = await _messageRepository.CreateNewMessage(reciveMessage.Text, 
-                    reciveMessage.UserId, reciveMessage.ChatId, reciveMessage.MediaId, reciveMessage.ReplyId);
-            
-                if(createMessageSuccess)
-                    await Clients.Users(allAuthUsers).SendAsync("NewMessage", sendMessage);
+                int newMessageId = await _messageRepository.CreateNewMessageAsync(reciveMessage.Text, reciveMessage.UserId, reciveMessage.ChatId);
+                
+                var sendMessage = new SendMessageDto
+                {
+                    Id = newMessageId,
+                    Text = reciveMessage.Text,
+                    IsMy = false,
+                    UserName = currentUserName,
+                };
+
+                await Clients.Users(allAuthUsers).SendAsync("NewMessage", sendMessage);
             }
             catch (Exception error)
             {

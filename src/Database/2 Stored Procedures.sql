@@ -38,12 +38,11 @@ CREATE PROC CreateNewMessage
 	@text NVARCHAR(MAX),
 	@userId INT,
 	@chatId INT,
-	@mediaId INT = NULL,
-	@replyId INT = NULL
+	@createdMessageId INT OUTPUT
 AS
 BEGIN
-	INSERT INTO [Messages] (Text, UserId, ChatId, CreatedAt, MediaId, ReplyId) VALUES
-	(@text, @userId, @chatId, GETDATE(), @mediaId, @replyId)
+	INSERT INTO [Messages] (Text, UserId, ChatId, CreatedAt) VALUES	(@text, @userId, @chatId, GETDATE());
+	SELECT @createdMessageId = SCOPE_IDENTITY();
 END;
 GO
 
@@ -89,6 +88,29 @@ BEGIN
 	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
 	WHERE [Messages].ChatId = @chatId
 	ORDER BY [Messages].CreatedAt;
+END;
+GO
+
+CREATE PROC GetChatMessage
+	@messageId INT
+AS
+BEGIN
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].MediaId, [Messages].ReplyId, [Messages].IsPinned
+	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
+	WHERE [Messages].Id = @messageId
+	ORDER BY [Messages].CreatedAt;
+END;
+GO
+
+
+CREATE PROC TogglePinMessage
+	@messageId INT,
+	@isPin BIT
+AS
+BEGIN
+	UPDATE [Messages]
+	SET IsPinned = @isPin
+	WHERE [Messages].Id = @messageId;
 END;
 GO
 

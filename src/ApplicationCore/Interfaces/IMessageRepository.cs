@@ -1,10 +1,12 @@
-﻿using System.Threading.Tasks;
+﻿using ApplicationCore.Entities;
+using System.Threading.Tasks;
 
 namespace ApplicationCore.Interfaces
 {
     public interface IMessageRepository
     {
-        Task<bool> CreateNewMessage(string text, int userId, int chatId, int? mediaId, int? replyId);
-        Task<bool> CreateNewMedia(string name, string path, string? mimeType = null);
+        Task<int> CreateNewMessageAsync(string text, int userId, int chatId);
+        Task<Message> GetMessageByIdAsync(int messageId);
+        Task<bool> PinMessageByIdAsync(int messageId, bool isPin);
     }
 }

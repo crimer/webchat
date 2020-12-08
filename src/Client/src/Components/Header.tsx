@@ -72,7 +72,8 @@ type HeaderProps = {
 
 export const Header: React.FC<HeaderProps> = ({chat}) => {
     const { authUser } = useContext(AccountContext)
-    const { isPinned, setPinned } = useContext(ChatContext)
+    const { getMessages } = useContext(ChatContext)
+    const [isPinned, setPinned]  = useState<boolean>(false)
     const classes = useStyles()
     const { chatId } = useParams()
     const history = useHistory()
@@ -82,6 +83,10 @@ export const Header: React.FC<HeaderProps> = ({chat}) => {
     const openCreateChatMenu = (event: React.MouseEvent<HTMLButtonElement>) => setChannelMenu(event.currentTarget)
 
     const toDetailPage = (chatId: number) => history.push(`/chat/${chatId}/detail`)
+
+    useEffect(() => {
+        getMessages(+chatId, isPinned)
+    },[isPinned])
 
     return (
         <AppBar position='static' className={classes.root}>

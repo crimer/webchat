@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Interfaces;
 using MessageChat.ApiHelpers;
 using MessageChat.Dto;
+using MessageChat.Dto.Message;
 using MessageChat.Dto.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,9 +19,11 @@ namespace MessageChat.Controllers
     {
         private readonly IChatRepository _chatRepository;
         private readonly IUserRepository _userRepository;
-        public MessageController(IChatRepository chatRepository,IUserRepository userRepository)
+        private readonly IMessageRepository _messageRepository;
+        public MessageController(IChatRepository chatRepository,IUserRepository userRepository, IMessageRepository messageRepository)
         {
             _chatRepository = chatRepository;
+            _messageRepository = messageRepository;
             _userRepository = userRepository;
         }
 
@@ -46,6 +49,24 @@ namespace MessageChat.Controllers
                 IsPinned = message.IsPinned
             });
             return new ApiResponse<IEnumerable<SendMessageDto>>(data, (int)HttpStatusCode.OK);
+        }
+
+        [HttpPost("togglePinMessage")]
+        public async Task<ApiResponse> TogglePinMessage([FromBody] PinMessageDto pinMessageDto)
+        {
+            if (pinMessageDto == null) return new ApiResponse((int)HttpStatusCode.BadRequest);
+            if (pinMessageDto.MessageId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest);
+
+            var message = await _messageRepository.GetMessageByIdAsync(pinMessageDto.MessageId);
+            if (!message.IsPinned)
+            {
+                await _messageRepository.PinMessageByIdAsync(pinMessageDto.MessageId, pinMessageDto.IsPin);
+                return new ApiResponse((int)HttpStatusCode.OK);
+            }
+            else
+            {
+                return new ApiResponse((int)HttpStatusCode.BadRequest,"Сообщение уже закреплено");
+            }
         }
 
         [HttpGet("getPinnedMessagesByChatId/{chatId}")]

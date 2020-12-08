@@ -13,8 +13,8 @@ type Options = {
     body?: object | string | FormData
 }
 
-const baseUri = 'http://localhost:5000'
-// const baseUri = 'https://localhost:5001'
+// const baseUri = 'http://localhost:5000'
+const baseUri = 'https://localhost:5001'
 
 /**
  * @param Method - 'GET' | 'POST' | 'PUT' | 'DELETE'

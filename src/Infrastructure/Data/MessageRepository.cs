@@ -1,7 +1,11 @@
-﻿using ApplicationCore.Interfaces;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
 using Infrastructure.Interfaces;
+using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Infrastructure.Data
@@ -13,30 +17,53 @@ namespace Infrastructure.Data
         {
             _dataAccess = dataAccess;
         }
-        public async Task<bool> CreateNewMessage(string text, int userId, int chatId, int? mediaId, int? replyId)
+        public async Task<int> CreateNewMessageAsync(string text, int userId, int chatId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
                 new SqlParameter("@text", text),
                 new SqlParameter("@userId", userId),
-                new SqlParameter("@chatId", chatId),
-                new SqlParameter("@mediaId", mediaId),
-                new SqlParameter("@replyId", replyId)
+                new SqlParameter("@chatId", chatId)
             };
-            var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewMessage", parameters);
 
-            return addedRows > 0;
+            SqlParameter createdChatIdParam = new SqlParameter("@createdMessageId", SqlDbType.Int);
+            createdChatIdParam.Direction = ParameterDirection.Output;
+            parameters.Add(createdChatIdParam);
+
+            await _dataAccess.ExecuteProcedureAsync("CreateNewMessage", parameters);
+            return (int)createdChatIdParam.Value;
         }
 
-        public async Task<bool> CreateNewMedia(string name, string path, string mimeType = null)
+        public async Task<Message> GetMessageByIdAsync(int messageId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
-                new SqlParameter("@name", name),
-                new SqlParameter("@path", path),
-                new SqlParameter("@mimeType", mimeType)
+                new SqlParameter("@messageId", messageId),
             };
-            var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewMedia", parameters);
+            var dataReader = await _dataAccess.GetProcedureDataAsync<Message>("GetChatMessage", parameters,
+                reader => new Message()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Text = AdoDataAccess.GetValue<string>(reader, "Text"),
+                    CreatedAt = AdoDataAccess.GetValue<DateTime>(reader, "CreatedAt"),
+                    ChatId = AdoDataAccess.GetValue<int>(reader, "ChatId"),
+                    AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
+                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
+                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId"),
+                    IsPinned = AdoDataAccess.GetValue<bool>(reader, "IsPinned"),
+                });
+            return dataReader.FirstOrDefault();
+        }
+
+        public async Task<bool> PinMessageByIdAsync(int messageId, bool isPin)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@messageId", messageId),
+                new SqlParameter("@isPin", isPin),
+            };
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("TogglePinMessage", parameters);
 
             return addedRows > 0;
         }

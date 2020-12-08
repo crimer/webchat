@@ -60,6 +60,7 @@ export const LoginPage: React.FC = () => {
             await SignalRManager.instance.reconnect()
             openToast({ body:'Вы вошли', type:'success' })
             setAuth({ login: '', password: '' })
+            setLoading(false)
             history.push('/chat/')
         }else{
             setAuth({ login: '', password: '' })
