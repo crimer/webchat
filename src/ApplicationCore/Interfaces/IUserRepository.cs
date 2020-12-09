@@ -10,6 +10,7 @@ namespace ApplicationCore.Interfaces
         Task<User> GetUserByIdAsync(int userId);
         Task<ChatMember> GetChatMemberAsync(int chatId, int userId);
         Task<bool> CreateNewUserAsync(string login, string password);
+        Task<bool> ChangeUserPasswordAsync(int userId, string newPassword);
         Task<IEnumerable<User>> SearchUsersByLoginAsync(string userLogin);
     }
 }

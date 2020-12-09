@@ -205,6 +205,17 @@ CREATE PROC ChangeUserRole
  END;
  GO
 
+CREATE PROC ChangeUserPassword
+ 	@userId INT,
+	@newPassword NVARCHAR(50)
+ AS
+ BEGIN
+	UPDATE [Users] 
+	SET [Password] = @newPassword
+	WHERE Id = @userId;
+ END;
+ GO
+
  CREATE PROC SearchUsersByLogin
  	@userLogin NVARCHAR(50)
  AS

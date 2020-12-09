@@ -16,6 +16,18 @@ namespace Infrastructure.Data
             _dataAccess = dataAccess;
         }
 
+        public async Task<bool> ChangeUserPasswordAsync(int userId, string newPassword)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+                new SqlParameter("@newPassword", newPassword),
+            };
+            var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeUserPassword", parameters);
+
+            return addedRows > 0;
+        }
+
         public async Task<bool> CreateNewUserAsync(string login, string password)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()

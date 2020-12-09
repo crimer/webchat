@@ -14,3 +14,8 @@ export type UserProfileDto = {
     login: string
     password: string
 }
+export type ChangeUserPasswordDto = {
+    userLogin: string
+    userOldPassword: string
+    userNewPassword: string
+}

@@ -1,4 +1,7 @@
-﻿using ApplicationCore.Interfaces;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Helpers;
+using ApplicationCore.Interfaces;
+using ApplicationCore.Services;
 using MessageChat.ApiHelpers;
 using MessageChat.Dto.Chat;
 using MessageChat.Dto.User;
@@ -50,6 +53,30 @@ namespace MessageChat.Controllers
             };
 
             return new ApiResponse<UserProfileDto>(userProfile, (int)HttpStatusCode.OK);
+        }
+
+        [HttpPost("changeUserPassword")]
+        public async Task<ApiResponse> ChangeUserPassword([FromBody] ChangeUserPasswordDto changeUserPasswordDto)
+        {
+            if (changeUserPasswordDto == null) return new ApiResponse((int)HttpStatusCode.BadRequest);
+            if (string.IsNullOrWhiteSpace(changeUserPasswordDto.UserNewPassword) ||
+                string.IsNullOrWhiteSpace(changeUserPasswordDto.UserOldPassword) ||
+                string.IsNullOrWhiteSpace(changeUserPasswordDto.UserLogin) ||
+                changeUserPasswordDto.UserOldPassword == changeUserPasswordDto.UserNewPassword)
+            {
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Не валидные данные");
+            }
+
+            string oldHashPassword = CryptHelper.Crypt(changeUserPasswordDto.UserOldPassword);
+            string newHashPassword = CryptHelper.Crypt(changeUserPasswordDto.UserNewPassword);
+
+            User user = await _userRepository.GetUserAsync(changeUserPasswordDto.UserLogin, oldHashPassword);
+            if(user == null) return new ApiResponse((int)HttpStatusCode.BadRequest, "Такого пользователя не существует");
+
+            bool isSuccessChange = await _userRepository.ChangeUserPasswordAsync(user.Id, newHashPassword);
+            
+            if(isSuccessChange) return new ApiResponse((int)HttpStatusCode.OK);
+            else return new ApiResponse((int)HttpStatusCode.BadRequest, "Не удалось изменить пароль");
         }
     }
 }

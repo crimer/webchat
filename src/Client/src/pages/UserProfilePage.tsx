@@ -7,12 +7,14 @@ import {
     Avatar,
     TextField,
     IconButton,
+    Button,
+    CircularProgress,
 } from '@material-ui/core'
-import React, { useContext, useEffect, useState } from 'react'
+import React, { FormEvent, useContext, useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import usersRepository from '../repository/UsersRepository'
-import { UserProfileDto } from '../common/Dtos/User/UserDtos'
+import { ChangeUserPasswordDto, UserProfileDto } from '../common/Dtos/User/UserDtos'
 import { AccountContext } from '../Contexts/AccountContext'
 import { ToastContext } from '../Contexts/ToastContext'
 
@@ -42,6 +44,9 @@ const useStyles = makeStyles((theme) => ({
         fontSize: '20px',
         textAlign: 'center',
     },
+    loader:{
+        margin: theme.spacing(1)
+    },
     changePassBtn: {
         marginLeft: '20px',
         backgroundColor: '#f58800',
@@ -51,6 +56,12 @@ const useStyles = makeStyles((theme) => ({
         },
     },
 }))
+const defaultPassData = {
+    login: '',
+    oldPassword: '',
+    newPassword: '',
+    repeatNewPassword: '',
+}
 
 export const UserFrofilePage = () => {
     const classes = useStyles()
@@ -58,6 +69,50 @@ export const UserFrofilePage = () => {
     const { authUser } = useContext(AccountContext)
     const { openToast } = useContext(ToastContext)
     const [userData, setUserData] = useState<UserProfileDto>()
+    const [isChangePassword, setIsChangePassword] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
+    const [changePass, setChangePass] = useState(defaultPassData)
+
+    const submitChangePassword = async (e: FormEvent<HTMLFormElement>) => {
+        try {
+            e.preventDefault()
+            setIsLoading(true)
+            if (changePass.login.trim().length === 0 || changePass.oldPassword.trim().length === 0 ||
+                changePass.newPassword.trim().length === 0 || changePass.repeatNewPassword.trim().length === 0) {
+                setChangePass(defaultPassData)
+                openToast({ body:'Все поля должны быть заполнены', type:'warning' })
+                return
+            }
+            if(changePass.newPassword !== changePass.repeatNewPassword) {
+                openToast({ body:'Пароли должны совпадать', type:'warning' })
+                setChangePass({...changePass, newPassword: '', repeatNewPassword: ''})
+                return
+            }
+            if(changePass.oldPassword === changePass.newPassword) {
+                openToast({ body:'Новый и старый пароли должны отличаться', type:'warning' })
+                setChangePass({...changePass, newPassword: '', repeatNewPassword: '', oldPassword: ''})
+                return
+            }
+
+            const changeUserPasswordDto: ChangeUserPasswordDto = {
+                userLogin: changePass.login,
+                userOldPassword: changePass.oldPassword,
+                userNewPassword: changePass.newPassword
+            }
+            const resp = await usersRepository.changeUserPassword<undefined>(changeUserPasswordDto)
+            if (resp && resp.isValid) {
+                openToast({ body:'Вы успешно изменили пароль', type:'success' })
+                setChangePass(defaultPassData)
+            } else if(resp && resp.responseCode === 400) {
+                openToast({ body: resp.errorMessage || 'Извините, не удалось изменить пароль', type:'error' })
+            }
+        } catch(e){
+            openToast({ body: e, type:'error' })
+        } finally {
+            setIsLoading(false)
+        }
+
+    }
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -109,11 +164,16 @@ export const UserFrofilePage = () => {
                             <Grid container spacing={2} justify='center'>
                                 <Grid item className={classes.gridItem}>
                                     <Paper className={classes.paper}>
+                                    {isLoading ? (
+                                        <CircularProgress className={classes.loader}/>
+                                    ) : (
                                         <Avatar
                                             alt={userData.login}
                                             className={classes.avatarSize}>
                                             {userData.login[0]}
                                         </Avatar>
+                                    )}
+
                                         <p className={classes.userName}>
                                             {userData.login}
                                         </p>
@@ -122,31 +182,104 @@ export const UserFrofilePage = () => {
 
                                 <Grid item className={classes.gridItem}>
                                     <Paper className={classes.paper}>
-                                        <div>
+                                        <p>{JSON.stringify(changePass)}</p>
+                                        <form
+                                            noValidate
+                                            onSubmit={submitChangePassword}>
                                             <TextField
                                                 variant='outlined'
                                                 margin='normal'
                                                 required
                                                 fullWidth
                                                 id='login'
+                                                disabled={isLoading}
                                                 label='Логин'
                                                 name='login'
-                                                value={userData.login}
-                                                disabled
+                                                value={changePass.login}
+                                                onChange={(e) =>
+                                                    setChangePass({
+                                                        ...changePass,
+                                                        login: e.target.value,
+                                                    })
+                                                }
                                             />
                                             <TextField
                                                 variant='outlined'
                                                 margin='normal'
                                                 required
-                                                disabled
+                                                disabled={!isChangePassword || isLoading}
                                                 fullWidth
                                                 name='password'
-                                                label='Пароль'
+                                                label='Ваш пароль'
                                                 type='password'
                                                 id='password'
-                                                value={userData.password}
+                                                value={changePass.oldPassword}
+                                                onChange={(e) =>
+                                                    setChangePass({
+                                                        ...changePass,
+                                                        oldPassword: e.target.value,
+                                                    })
+                                                }
                                             />
-                                        </div>
+                                            {isChangePassword && (
+                                                <div>
+                                                    <TextField
+                                                        variant='outlined'
+                                                        margin='normal'
+                                                        fullWidth
+                                                        name='newPassword'
+                                                        disabled={isLoading}
+                                                        label='Новый пароль'
+                                                        type='password'
+                                                        id='newPassword'
+                                                        value={changePass.newPassword}
+                                                        onChange={(e) =>
+                                                            setChangePass({
+                                                                ...changePass,
+                                                                newPassword: e.target.value,
+                                                            })
+                                                        }
+                                                    />
+                                                    <TextField
+                                                        variant='outlined'
+                                                        margin='normal'
+                                                        fullWidth
+                                                        name='repeatNewPassword'
+                                                        disabled={isLoading}
+                                                        label='Повторите новый пароль'
+                                                        type='password'
+                                                        id='repeatNewPassword'
+                                                        value={changePass.repeatNewPassword}
+                                                        onChange={(e) =>
+                                                            setChangePass({
+                                                                ...changePass,
+                                                                repeatNewPassword: e.target.value,
+                                                            })
+                                                        }
+                                                    />
+                                                </div>
+                                            )}
+
+                                            <Button
+                                                type='submit'
+                                                variant='contained'
+                                                color='primary'
+                                                disabled={isLoading}>
+                                                Сохранить
+                                            </Button>
+                                            <Button
+                                                onClick={() => {
+                                                    setIsChangePassword(
+                                                        !isChangePassword
+                                                    )
+                                                }}
+                                                className={
+                                                    classes.changePassBtn
+                                                }
+                                                variant='contained'>
+                                                Изминить пароль
+                                            </Button>
+                                        </form>
                                     </Paper>
                                 </Grid>
                             </Grid>

@@ -1,8 +1,6 @@
 ﻿using ApplicationCore.Entities;
+using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
-using System;
-using System.Security.Cryptography;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -14,26 +12,19 @@ namespace ApplicationCore.Services
         {
             _userRepository = userRepository;
         }
-        public static string Crypt(string sourceData)
-        {
-            string res = string.Empty;
-            byte[] tmpSource = ASCIIEncoding.ASCII.GetBytes(sourceData);
-            byte[] tmpHash = new MD5CryptoServiceProvider().ComputeHash(tmpSource);
-            res = BitConverter.ToString(tmpHash);
-            return res;
-        }
+
         public async Task<User> LoginAsync(string login, string password)
         {
-            string hashPassword = Crypt(password);
+            string hashPassword = CryptHelper.Crypt(password);
             User dbUser = await _userRepository.GetUserAsync(login, hashPassword);
             return dbUser;
         }
 
         public async Task<bool> RegisterAsync(string login, string password)
         {
-            string hashPassword = Crypt(password);
+            string hashPassword = CryptHelper.Crypt(password);
             User dbUser = await _userRepository.GetUserAsync(login, hashPassword);
-            if(dbUser != null)
+            if (dbUser != null)
                 return false;
 
             bool isRegistred = await _userRepository.CreateNewUserAsync(login, hashPassword);
