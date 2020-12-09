@@ -16,13 +16,12 @@ namespace Infrastructure.Data
             _dataAccess = dataAccess;
         }
 
-        public async Task<bool> CreateNewUserAsync(string login, string password, int? avatarId)
+        public async Task<bool> CreateNewUserAsync(string login, string password)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
                 new SqlParameter("@login", login),
                 new SqlParameter("@password", password),
-                new SqlParameter("@avatarId", avatarId)
             };
             var addedRows = await _dataAccess.ExecuteProcedureAsync("CreateNewUser", parameters);
 

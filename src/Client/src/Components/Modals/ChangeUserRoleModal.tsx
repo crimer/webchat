@@ -69,6 +69,7 @@ type ChangeUserRoleModalProps = {
     open: boolean
     member: UserChatDto | undefined
     onModalClose: () => void
+    refreshDetailinfo: (chatId: number) => void
 }
 
 type Role = {
@@ -93,6 +94,7 @@ const roles: Role[] = [
 export const ChangeUserRoleModal: React.FC<ChangeUserRoleModalProps> = ({
     open,
     onModalClose,
+    refreshDetailinfo,
     member,
 }) => {
     const classes = useStyles()
@@ -127,6 +129,7 @@ export const ChangeUserRoleModal: React.FC<ChangeUserRoleModalProps> = ({
 
         const response = await chatRepository.changeMemberRole<undefined>(changeRoleDto)
         if (response && response.isValid) {
+            await refreshDetailinfo(chatId)
             openToast({ body: 'Роль успешно изменена', type:'success' })
         } else if (response) {
             openToast({ body: 'Не удалось изменить роль', type:'error' })

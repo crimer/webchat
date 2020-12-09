@@ -2,8 +2,10 @@
 using ApplicationCore.Interfaces;
 using MessageChat.ApiHelpers;
 using MessageChat.Dto.Chat;
+using MessageChat.Dto.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -60,6 +62,17 @@ namespace MessageChat.Controllers
         {
             if (chatId <= 0) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно получить информацию о чате");
 
+            var userCookiesJson = HttpContext.Request.Cookies["userData"];
+            AuthUserDto userCookiesData = JsonConvert.DeserializeObject<AuthUserDto>(userCookiesJson);
+
+            var chatMember = await _userRepository.GetChatMemberAsync(chatId, userCookiesData.Id);
+
+            if (chatMember == null)
+                return new ApiResponse((int)HttpStatusCode.NotFound, "Вы не зарегистрированны");
+
+            if (chatMember.MemberStatusId != 1)
+                return new ApiResponse((int)HttpStatusCode.NotFound, "Вас нет в этом чате");
+
             Chat chatDetail = await _chatRepository.GetChatAsync(chatId);
             IEnumerable<ChatMember> members = await _chatRepository.GetChatMembersAsync(chatId);
             var chatMembers = members.Select(member => new UserChatDto()
@@ -83,8 +96,7 @@ namespace MessageChat.Controllers
         {
             if (createChatDto == null) return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно создать чат");
 
-            bool creationSuccess = await _chatService.CreateNewChatAsync(createChatDto.ChatName, createChatDto.ChatTypeId,
-                createChatDto.UserCreatorId, createChatDto.MediaId);
+            bool creationSuccess = await _chatService.CreateNewChatAsync(createChatDto.ChatName, createChatDto.ChatTypeId, createChatDto.UserCreatorId);
 
             if (creationSuccess)
                 return new ApiResponse((int)HttpStatusCode.OK);
@@ -123,7 +135,7 @@ namespace MessageChat.Controllers
 
             ChatMember user = await _userRepository.GetChatMemberAsync(changeChatNameDto.ChatId, changeChatNameDto.UserId);
 
-            if(user.UserRoleId == 1)
+            if(user.UserRoleId == 1 && user.MemberStatusId == 1)
                 await _chatService.ChangeChatNameAsync(changeChatNameDto.ChatId, changeChatNameDto.NewName);
             else 
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "У вас нет прав изменить название чата");
@@ -154,7 +166,7 @@ namespace MessageChat.Controllers
             if (userLeaveChatDto == null || userLeaveChatDto.ChatId <= 0 || userLeaveChatDto.UserId <= 0)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
 
-            await _chatRepository.UserLaveChatAsync(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
+            await _chatRepository.ChangeMemberStatusInChatAsync(userLeaveChatDto.ChatId, userLeaveChatDto.UserId, 2);
 
             return new ApiResponse((int)HttpStatusCode.OK);
         }
@@ -165,7 +177,7 @@ namespace MessageChat.Controllers
             if (userLeaveChatDto == null || userLeaveChatDto.ChatId <= 0 || userLeaveChatDto.UserId <= 0)
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "Что-то пошло не так");
 
-            await _chatRepository.AdminKikUserAsync(userLeaveChatDto.ChatId, userLeaveChatDto.UserId);
+            await _chatRepository.ChangeMemberStatusInChatAsync(userLeaveChatDto.ChatId, userLeaveChatDto.UserId, 3);
 
             return new ApiResponse((int)HttpStatusCode.OK);
         }

@@ -24,8 +24,10 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type InviteMemberAutocompleteProps = {
     chatId: number
+    refreshDetailinfo: (chatId: number) => void
 }
-const InviteMemberAutocomplete: React.FC<InviteMemberAutocompleteProps> = ({chatId}) => {
+
+export const InviteMemberAutocomplete: React.FC<InviteMemberAutocompleteProps> = ({chatId, refreshDetailinfo}) => {
     const [users, setUsers] = useState<UserChatDto[]>([])
     const [selectedUsers, setSelectedUsers] = useState<UserChatDto[]>([])
     const [loading, setLoading] = useState<boolean>(false)
@@ -60,6 +62,8 @@ const InviteMemberAutocomplete: React.FC<InviteMemberAutocompleteProps> = ({chat
         const response = await chatRepository.inviteMembersToChat<undefined>(inviteMembersDto)
         if(response && response.isValid){
             openToast({ body: 'Пользователь успешно приглашен', type:'success' })
+            await refreshDetailinfo(chatId)
+            setSelectedUsers([])
         } else if(response && !response.isValid) {
             openToast({ body: 'Не удалось приглосить пользователя', type:'error' })
         }
@@ -111,4 +115,3 @@ const InviteMemberAutocomplete: React.FC<InviteMemberAutocompleteProps> = ({chat
         </div>
     )
 }
-export default InviteMemberAutocomplete

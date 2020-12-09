@@ -51,9 +51,11 @@ const useStyles = makeStyles((theme: Theme) =>
 type ChatMembersProps = {
     members: UserChatDto[]
     currentUserRoleId: number | undefined
+    refreshDetailinfo: (chatId: number) => void
 }
 export const ChatMembers: React.FC<ChatMembersProps> = ({
     members,
+    refreshDetailinfo,
     currentUserRoleId,
 }) => {
     const classes = useStyles()
@@ -79,6 +81,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
             kikUserFromChatDto
         )
         if (response && response.isValid) {
+            await refreshDetailinfo(+chatId)
             openToast({
                 body: `Пользователь ${member.name} был изгнан администратором`,
                 type:'success'
@@ -92,6 +95,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
         <div className={classes.wrapper}>
             <ChangeUserRoleModal
                 open={isOpenModal}
+                refreshDetailinfo={refreshDetailinfo}
                 onModalClose={closeModal}
                 member={selectedMember}
             />
@@ -138,9 +142,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
                                                 <IconButton>
                                                     <DeleteIcon
                                                         onClick={() =>
-                                                            deleteMemberFromChat(
-                                                                memberRow
-                                                            )
+                                                            deleteMemberFromChat(memberRow)
                                                         }
                                                         className={
                                                             classes.deleteIcon

@@ -37,6 +37,9 @@ namespace MessageChat.Controllers
             
             if(chatMember == null)
                 return new ApiResponse((int)HttpStatusCode.NotFound);
+            
+            if(chatMember.MemberStatusId != 1)
+                return new ApiResponse((int)HttpStatusCode.NotFound);
 
             var messages = await _chatRepository.GetChatMessagesByIdAsync(chatId);
             var data = messages.Select(message => new SendMessageDto()

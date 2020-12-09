@@ -12,7 +12,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import { useHistory, useParams } from 'react-router-dom'
 import KeyboardBackspaceIcon from '@material-ui/icons/KeyboardBackspace'
 import { ChatMembers } from '../Components/ChatMembers'
-import InviteMemberAutocomplete from '../Components/InviteMemberAutocomplete'
+import { InviteMemberAutocomplete } from '../Components/InviteMemberAutocomplete'
 import chatRepository from '../repository/ChatRepository'
 import {
     ChatDetailDto,
@@ -22,6 +22,7 @@ import { ToastContext } from '../Contexts/ToastContext'
 import { ChangeChatName } from '../Components/ChangeChatName'
 import { AccountContext } from '../Contexts/AccountContext'
 import { UserRole } from '../common/Dtos/User/UserDtos'
+import { ChatContext } from '../Contexts/ChatContext'
 
 const useStyles = makeStyles((theme) => ({
     heroContent: {
@@ -61,26 +62,25 @@ export const ChatDetailPage = () => {
     const { chatId } = useParams()
     const classes = useStyles()
     const { openToast } = useContext(ToastContext)
+    const { getChatsByUserId } = useContext(ChatContext)
     const { authUser } = useContext(AccountContext)
     const history = useHistory()
 
-    useEffect(() => {
-        const fetchDetailInfo = async () => {
-            const response = await chatRepository.getDetailChatInfo<ChatDetailDto>(
-                chatId
-            )
-            if (response && response.isValid) {
-                setDetailInfo(response.data)
-            } else if (response) {
-                openToast({ body: 'Не удалось получить информацию о чате', type:'error' })
-            }
+    const fetchDetailInfo = async (chatId: number) => {
+        const response = await chatRepository.getDetailChatInfo<ChatDetailDto>(chatId)
+        if (response && response.isValid) {
+            setDetailInfo(response.data)
+        } else if (response) {
+            openToast({ body: response.errorMessage || 'Неудалось получить информацию о чате', type:'error' })
+            history.push('/chat/')
         }
-        fetchDetailInfo()
+    }
+
+    useEffect(() => {
+        fetchDetailInfo(chatId)
     }, [])
 
-    const currentUserRoleId = detailInfo?.members.find(
-        (u) => u.id === authUser.id
-    )?.userRoleId
+    const currentUserRoleId = detailInfo?.members.find((u) => u.id === authUser.id)?.userRoleId
 
     const leaveChannel = async () => {
         const leaveChatDto: LeaveChatDto = {
@@ -91,6 +91,7 @@ export const ChatDetailPage = () => {
         const response = await chatRepository.leaveChat<undefined>(leaveChatDto)
         if (response && response.isValid) {
             openToast({ body: `Вы полинули чат`, type:'success' })
+            getChatsByUserId(+authUser.id)
             history.push('/chat/')
         } else if (response && !response.isValid) {
             openToast({ body: 'Не удалось выйти с чата', type:'error' })
@@ -148,14 +149,15 @@ export const ChatDetailPage = () => {
                                 <ChatMembers
                                     currentUserRoleId={currentUserRoleId}
                                     members={detailInfo.members}
+                                    refreshDetailinfo={fetchDetailInfo}
                                 />
                             </div>
                             <div className={classes.gridRow}>
                                 {currentUserRoleId ===
                                     UserRole.Administrator && (
-                                    <ChangeChatName chatId={chatId} />
+                                    <ChangeChatName chatId={chatId} refreshDetailinfo={fetchDetailInfo}/>
                                 )}
-                                <InviteMemberAutocomplete chatId={chatId} />
+                                <InviteMemberAutocomplete chatId={chatId} refreshDetailinfo={fetchDetailInfo}/>
                             </div>
                         </section>
                     )}

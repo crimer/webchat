@@ -36,7 +36,7 @@ namespace ApplicationCore.Services
             if(dbUser != null)
                 return false;
 
-            bool isRegistred = await _userRepository.CreateNewUserAsync(login, hashPassword, null);
+            bool isRegistred = await _userRepository.CreateNewUserAsync(login, hashPassword);
             return isRegistred;
         }
     }

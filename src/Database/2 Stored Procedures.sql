@@ -4,22 +4,20 @@ GO
 CREATE PROC CreateNewChat
 	@name NVARCHAR(50),
 	@chatType INT,
-	@mediaId INT = Null,
 	@createdChatId INT OUTPUT
 AS
 BEGIN
-	INSERT INTO Chats ([Name], ChatType, MediaId) VALUES (@name, @chatType, @mediaId)
+	INSERT INTO Chats ([Name], ChatType) VALUES (@name, @chatType)
 	SELECT @createdChatId = SCOPE_IDENTITY();
 END;
 GO
 
 CREATE PROC CreateNewUser
 	@login NVARCHAR(50),
-	@password NVARCHAR(50),
-	@avatarId INT = NULL
+	@password NVARCHAR(50)
 AS
 BEGIN
-	INSERT INTO Users ([Login], [Password], MediaId) VALUES (@login, @password, @avatarId)
+	INSERT INTO Users ([Login], [Password]) VALUES (@login, @password)
 END;
 GO
 
@@ -60,10 +58,8 @@ CREATE PROC GetUserById
 	@userId INT
 AS
 BEGIN
-	SELECT [Users].Id, Login, Password FROM [Users] 
-	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
-	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
-	WHERE [Users].Id = @userId;
+	SELECT Id, Login, Password FROM [Users]
+	WHERE Id = @userId;
 END;
 GO
 
@@ -84,7 +80,7 @@ CREATE PROC GetChatMessages
 	@chatId INT
 AS
 BEGIN
-	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].MediaId, [Messages].ReplyId, [Messages].IsPinned
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].IsPinned
 	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
 	WHERE [Messages].ChatId = @chatId
 	ORDER BY [Messages].CreatedAt;
@@ -95,7 +91,7 @@ CREATE PROC GetChatMessage
 	@messageId INT
 AS
 BEGIN
-	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].MediaId, [Messages].ReplyId, [Messages].IsPinned
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].IsPinned
 	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
 	WHERE [Messages].Id = @messageId
 	ORDER BY [Messages].CreatedAt;
@@ -143,7 +139,7 @@ CREATE PROC GetPinnedMessagesByChatId
 	@chatId INT
 AS
 BEGIN
-	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].MediaId, [Messages].ReplyId, [Messages].IsPinned
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].IsPinned
 	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
 	WHERE [Messages].ChatId = @chatId AND [Messages].IsPinned = 1
 	ORDER BY [Messages].CreatedAt;

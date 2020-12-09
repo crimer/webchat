@@ -127,8 +127,6 @@ export const ChatContextProvider: React.FC = ({ children }) => {
             text,
             userId: authUser.id,
             chatId,
-            replyId: null,
-            mediaId: null,
         }
         return SignalRManager.instance
             .sendMessage<SendMessageDto>('NewMessage', sendMessageDto)

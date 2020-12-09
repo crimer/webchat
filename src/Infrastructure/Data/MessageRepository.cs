@@ -49,8 +49,6 @@ namespace Infrastructure.Data
                     ChatId = AdoDataAccess.GetValue<int>(reader, "ChatId"),
                     AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
                     UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
-                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
-                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId"),
                     IsPinned = AdoDataAccess.GetValue<bool>(reader, "IsPinned"),
                 });
             return dataReader.FirstOrDefault();

@@ -43,13 +43,12 @@ namespace Infrastructure.Data
             return dataReader > 0;
         }
 
-        public async Task<int> CreateNewChatAsync(string chatName, int chatTypeId, int? mediaId)
+        public async Task<int> CreateNewChatAsync(string chatName, int chatTypeId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
                 new SqlParameter("@name", chatName),
                 new SqlParameter("@chatType", chatTypeId),
-                new SqlParameter("@mediaId", mediaId),
             };
 
             SqlParameter createdChatIdParam = new SqlParameter("@createdChatId", SqlDbType.Int);
@@ -133,8 +132,6 @@ namespace Infrastructure.Data
                     ChatId = AdoDataAccess.GetValue<int>(reader, "ChatId"),
                     AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
                     UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
-                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
-                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId"),
                     IsPinned = AdoDataAccess.GetValue<bool>(reader, "IsPinned"),
                 });
 
@@ -159,8 +156,6 @@ namespace Infrastructure.Data
                     ChatId = AdoDataAccess.GetValue<int>(reader, "ChatId"),
                     AuthorLogin = AdoDataAccess.GetValue<string>(reader, "Login"),
                     UserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
-                    MediaId = AdoDataAccess.GetValue<int>(reader, "MediaId"),
-                    ReplyId = AdoDataAccess.GetValue<int>(reader, "ReplyId"),
                     IsPinned = AdoDataAccess.GetValue<bool>(reader, "IsPinned"),
                 });
 
@@ -182,40 +177,13 @@ namespace Infrastructure.Data
 
             return addedRows > 0;
         }
-
-        public async Task<bool> UserLaveChatAsync(int chatId, int userId)
+        public async Task<bool> ChangeMemberStatusInChatAsync(int chatId, int userId, int memberStatus)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()
             {
                 new SqlParameter("@userId", userId),
                 new SqlParameter("@chatId", chatId),
-                new SqlParameter("@memberStatus", 2),
-            };
-            var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeMemberStatus", parameters);
-
-            return addedRows > 0;
-        }
-        
-        public async Task<bool> AdminKikUserAsync(int chatId, int userId)
-        {
-            List<SqlParameter> parameters = new List<SqlParameter>()
-            {
-                new SqlParameter("@userId", userId),
-                new SqlParameter("@chatId", chatId),
-                new SqlParameter("@memberStatus", 3),
-            };
-            var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeMemberStatus", parameters);
-
-            return addedRows > 0;
-        }
-        
-        public async Task<bool> BackUserToChatAsync(int chatId, int userId)
-        {
-            List<SqlParameter> parameters = new List<SqlParameter>()
-            {
-                new SqlParameter("@userId", userId),
-                new SqlParameter("@chatId", chatId),
-                new SqlParameter("@memberStatus", 1),
+                new SqlParameter("@memberStatus", memberStatus),
             };
             var addedRows = await _dataAccess.ExecuteProcedureAsync("ChangeMemberStatus", parameters);
 

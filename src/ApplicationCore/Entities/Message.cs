@@ -9,8 +9,6 @@ namespace ApplicationCore.Entities
         public string AuthorLogin { get; set; }
         public int UserId { get; set; }
         public int ChatId { get; set; }
-        public int MediaId { get; set; }
-        public int ReplyId { get; set; }
         public bool IsPinned { get; set; }
     }
 }

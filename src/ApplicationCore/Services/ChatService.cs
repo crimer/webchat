@@ -1,4 +1,5 @@
-﻿using ApplicationCore.Interfaces;
+﻿using ApplicationCore.Entities;
+using ApplicationCore.Interfaces;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -16,7 +17,7 @@ namespace ApplicationCore.Services
 
         public async Task<bool> BackToChatAsync(int chatId, int userId)
         {
-            var chatMember = await _userRepository.GetChatMemberAsync(chatId, userId);
+            ChatMember chatMember = await _userRepository.GetChatMemberAsync(chatId, userId);
             bool isSuccessReturn = false;
 
             if (chatMember.MemberStatusId == 2)
@@ -35,28 +36,27 @@ namespace ApplicationCore.Services
             return _chatRepository.ChangeUserRoleAsync(chatId, userId, userRoleId);
         }
 
-        public async Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId, int? mediaId)
+        public async Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId)
         {
-            int createdChatId = await _chatRepository.CreateNewChatAsync(chatName, chatTypeId, mediaId);
+            int createdChatId = await _chatRepository.CreateNewChatAsync(chatName, chatTypeId);
             var subscribeSuccess = await _chatRepository.SubscribeUserToChatAsync(createdChatId, userCreatorId, 1);
             return subscribeSuccess;
         }
 
         public async Task InviteMembersToChatAsync(int chatId, IEnumerable<int> usersIds)
         {
-            foreach (var userId in usersIds)
+            foreach (int userId in usersIds)
             {
-                var member = await _userRepository.GetChatMemberAsync(chatId, userId);
+                ChatMember member = await _userRepository.GetChatMemberAsync(chatId, userId);
                 if(member == null)
                 {
                     await _chatRepository.SubscribeUserToChatAsync(chatId, userId);
                 }
                 else if(member.MemberStatusId == 2)
                 {
-                    await _chatRepository.BackUserToChatAsync(chatId, userId);
+                    await _chatRepository.ChangeMemberStatusInChatAsync(chatId, userId, 1);
                 }
             }
         }
-
     }
 }

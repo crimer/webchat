@@ -10,6 +10,7 @@ import {
     ChangeChatNameDto,
 } from '../common/Dtos/Chat/ChatDtos'
 import { AccountContext } from '../Contexts/AccountContext'
+import { ChatContext } from '../Contexts/ChatContext'
 import { ToastContext } from '../Contexts/ToastContext'
 import chatRepository from '../repository/ChatRepository'
 
@@ -29,11 +30,13 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type ChangeChatNameProps = {
     chatId: number
+    refreshDetailinfo: (chatId: number) => void
 }
 
-export const ChangeChatName: React.FC<ChangeChatNameProps> = ({ chatId }) => {
+export const ChangeChatName: React.FC<ChangeChatNameProps> = ({ chatId, refreshDetailinfo }) => {
     const classes = useStyles()
     const { openToast } = useContext(ToastContext)
+    const { getChatsByUserId } = useContext(ChatContext)
     const { authUser } = useContext(AccountContext)
     const [newName, setNewName] = useState<string>('')
 
@@ -48,10 +51,10 @@ export const ChangeChatName: React.FC<ChangeChatNameProps> = ({ chatId }) => {
             newName,
         }
 
-        const response = await chatRepository.changeChatName<undefined>(
-            changeChatNameDto
-        )
+        const response = await chatRepository.changeChatName<undefined>(changeChatNameDto)
         if (response && response.isValid) {
+            await refreshDetailinfo(chatId)
+            await getChatsByUserId(+authUser.id)
             openToast({ body: 'Вы успешно поменяли имя чата', type:'success' })
         } else if (response && !response.isValid) {
             openToast({ body: 'Не удалось поменять имя чата', type:'error' })

@@ -19,6 +19,7 @@ import { AccountContext } from '../../Contexts/AccountContext'
 import { ChatDto, ReturnToChatDto } from '../../common/Dtos/Chat/ChatDtos'
 import chatRepository from '../../repository/ChatRepository'
 import { ToastContext } from '../../Contexts/ToastContext'
+import { ChatContext } from '../../Contexts/ChatContext'
 
 const useStyles = makeStyles((theme: Theme) =>
     createStyles({
@@ -74,6 +75,7 @@ export const ReturnToChatModal: React.FC<ReturnToChatModalProps> = ({
 }) => {
     const classes = useStyles()
     const { authUser } = useContext(AccountContext)
+    const { getChatsByUserId } = useContext(ChatContext)
     const { openToast } = useContext(ToastContext)
     const [chats, setChats] = useState<ChatDto[] | null>()
 
@@ -93,7 +95,7 @@ export const ReturnToChatModal: React.FC<ReturnToChatModalProps> = ({
         if(open === true)
             fetchChatsToReturn()
 
-    },[open])
+    }, [open])
 
     const returnToChat = async (chatId: number) => {
 
@@ -106,6 +108,7 @@ export const ReturnToChatModal: React.FC<ReturnToChatModalProps> = ({
 
         const response = await chatRepository.returnToChat<undefined>(returnToChatDto)
         if (response && response.isValid) {
+            await getChatsByUserId(authUser.id)
             openToast({ body: 'Вы вернулись в чат', type:'success' })
         } else if (response && response.responseCode === 400) {
             openToast({ body: "Вы или уже в чате или вас в нем заблокировали", type:'error' })
