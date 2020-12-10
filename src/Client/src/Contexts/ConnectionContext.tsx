@@ -1,5 +1,7 @@
-import React, { createContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
+import { useHistory } from 'react-router-dom'
 import SignalRManager from '../SignalR/SignalRManager'
+import { ToastContext } from './ToastContext'
 
 interface IConnectionContext {
     startConnection(): void
@@ -17,6 +19,16 @@ export const ConnectionContext = createContext<IConnectionContext>({
 
 export const ConnectionContextProvider: React.FC = ({ children }) => {
     const [isConnected, setIsConnected] = useState<boolean>(false)
+    const { openToast } = useContext(ToastContext)
+    const history = useHistory()
+
+    useEffect(() => {
+        if(isConnected) openToast({body: 'Соединение есть', type:'success'})
+        else {
+            openToast({body: 'Потеряно соединение ', type:'warning'})
+            history.push('/login')
+        }
+    }, [isConnected])
 
     const startConnection = () => {
         return SignalRManager.instance

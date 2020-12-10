@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Interfaces;
 using MessageChat.Dto;
 using MessageChat.Dto.Message;
+using MessageChat.Models;
 using MessageChat.Services.AuthUserManager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
@@ -40,7 +41,7 @@ namespace MessageChat.SignalR
                     UserName = currentUserName,
                 };
 
-                await Clients.Users(allAuthUsers).SendAsync("NewMessage", sendMessage);
+                await Clients.Users(allAuthUsers).SendAsync(WebSocketMessageTypes.NewMessage, sendMessage);
             }
             catch (Exception error)
             {

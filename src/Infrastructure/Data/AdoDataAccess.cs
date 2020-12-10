@@ -55,22 +55,6 @@ namespace Infrastructure.Data
             return returnValue;
         }
 
-        public async Task<object> ExecuteScalarAsync(string procedureName, List<SqlParameter> parameters)
-        {
-            object returnValue = null;
-            var dbConnection = await this.GetConnectionAsync();
-            using (SqlConnection connection = dbConnection)
-            {
-                SqlCommand command = this.GetCommand(connection, procedureName, CommandType.StoredProcedure);
-                if (parameters != null && parameters.Count > 0)
-                {
-                    command.Parameters.AddRange(parameters.ToArray());
-                }
-                returnValue = await command.ExecuteScalarAsync();
-            }
-            return returnValue;
-        }
-
         public async Task<IEnumerable<T>> GetProcedureDataAsync<T>(string procedureName, List<SqlParameter> parameters,
             Func<SqlDataReader, T> generator)
         {

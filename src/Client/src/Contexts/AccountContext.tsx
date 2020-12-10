@@ -17,6 +17,7 @@ interface IAccountContext {
     login: (name: string, password: string) => Promise<boolean>
     register: (login: string, password: string) => Promise<boolean>
     logout: () => Promise<void>
+    autoStartConnection: () => Promise<void>
 }
 
 export const AccountContext = React.createContext<IAccountContext>({
@@ -30,6 +31,9 @@ export const AccountContext = React.createContext<IAccountContext>({
     register: (login: string, password: string) => {
         throw Error('Не проинициализирован контекст авторизации')
     },
+    autoStartConnection: () => {
+        throw Error('Не проинициализирован контекст авторизации')
+    },
 })
 
 export const AccountContextProvider: React.FC = ({ children }) => {
@@ -38,21 +42,18 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const { startConnection, stopConnection } = useContext(ConnectionContext)
     const history = useHistory()
 
-    useEffect(() => {
-        const autoStartConnection = async () => {
-            const cookieUserDataJson = Cookies.get('userData')
+    const autoStartConnection = async () => {
+        const cookieUserDataJson = Cookies.get('userData')
 
-            if (cookieUserDataJson !== undefined) {
-                const userData: AuthUserDto = JSON.parse(cookieUserDataJson)
-                setAuthUser(userData)
-                await startConnection()
-                history.push('/chat/')
-            } else {
-                history.push('/login')
-            }
+        if (cookieUserDataJson !== undefined) {
+            const userData: AuthUserDto = JSON.parse(cookieUserDataJson)
+            setAuthUser(userData)
+            await startConnection()
+            history.push('/chat/')
+        } else {
+            history.push('/login')
         }
-        autoStartConnection()
-    }, [])
+    }
 
 
     const login = async (login: string, password: string) => {
@@ -71,6 +72,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                 expires: 1,
                 path: '/',
             })
+            await startConnection()
             return true
         } else if (response) {
             openToast({
@@ -125,7 +127,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     }
 
     return (
-        <AccountContext.Provider value={{ authUser, login, logout, register }}>
+        <AccountContext.Provider value={{ authUser, login, logout, register, autoStartConnection }}>
             {children}
         </AccountContext.Provider>
     )

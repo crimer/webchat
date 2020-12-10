@@ -73,7 +73,7 @@ namespace MessageChat.Controllers
         }
 
         [HttpGet("getPinnedMessagesByChatId/{chatId}")]
-        public async Task<object> GetPinnedMessagesByChatId(int chatId)
+        public async Task<ApiResponse> GetPinnedMessagesByChatId(int chatId)
         {
             var messages = await _chatRepository.GetPinnedMessagesByChatIdAsync(chatId);
             var data = messages.Select(message => new SendMessageDto()
