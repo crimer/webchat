@@ -42,22 +42,24 @@ const useStyles = makeStyles((theme: Theme) => ({
     drawerHeaderTop: {
         display: 'flex',
         flexFlow: 'row nowrap',
-        alignItems: 'center',
         justifyContent: 'space-between',
+        alignItems: 'center',
     },
     drawerPaper: {
         width: drawerWidth,
         backgroundColor: '#2F343D',
         color: '#fff',
     },
-
+    appName:{
+      margin: '0',
+    },
     options: {
         padding: theme.spacing(1),
         display: 'flex',
+        alignSelf: 'center',
         alignItems: 'center',
         justifyContent: 'space-between',
     },
-
     chatIcon: {
         marginRight: '10px',
     },
@@ -155,7 +157,7 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                 anchor='left'>
                 <header className={classes.drawerHeader}>
                     <div className={classes.drawerHeaderTop}>
-                        <h1>Mega Chat</h1>
+                        <h1 className={classes.appName}>Mega Chat</h1>
                         <div className={classes.options}>
                             <div>
                                 <IconButton
@@ -180,25 +182,25 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                                 </IconButton>
                             </div>
                             <div>
-                                <IconButton
-                                    className={classes.iconColor}
-                                    aria-controls='simple-menu'
-                                    aria-haspopup='true'
-                                    onClick={openAccountMenu}>
-                                    <AccountCircleIcon fontSize='default' />
-                                </IconButton>
-                                <Menu
-                                    anchorEl={accountMenu}
-                                    keepMounted
-                                    open={Boolean(accountMenu)}
-                                    onClose={closeAccountMenu}>
-                                    <MenuItem onClick={navigateToProfile}>
-                                        Профиль
-                                    </MenuItem>
-                                    <MenuItem onClick={handleLogout}>
-                                        Выйти
-                                    </MenuItem>
-                                </Menu>
+                            <IconButton
+                                className={classes.iconColor}
+                                aria-controls='simple-menu'
+                                aria-haspopup='true'
+                                onClick={openAccountMenu}>
+                                <AccountCircleIcon fontSize='default' />
+                            </IconButton>
+                            <Menu
+                                anchorEl={accountMenu}
+                                keepMounted
+                                open={Boolean(accountMenu)}
+                                onClose={closeAccountMenu}>
+                                <MenuItem onClick={navigateToProfile}>
+                                    Профиль
+                                </MenuItem>
+                                <MenuItem onClick={handleLogout}>
+                                    Выйти
+                                </MenuItem>
+                            </Menu>
                             </div>
                         </div>
                     </div>

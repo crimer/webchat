@@ -182,7 +182,6 @@ export const UserFrofilePage = () => {
 
                                 <Grid item className={classes.gridItem}>
                                     <Paper className={classes.paper}>
-                                        <p>{JSON.stringify(changePass)}</p>
                                         <form
                                             noValidate
                                             onSubmit={submitChangePassword}>

@@ -46,6 +46,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
                 const userData: AuthUserDto = JSON.parse(cookieUserDataJson)
                 setAuthUser(userData)
                 await startConnection()
+                history.push('/chat/')
             } else {
                 history.push('/login')
             }

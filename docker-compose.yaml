@@ -1,12 +1,13 @@
 version: '3'
 services:
-    client:
-        build: ./src/Client
+    db:
+        container_name: 'db'
+        build: ./src/Database
         ports:
-            - 3000:80
-        container_name: 'chat-react-client'
-        depends_on:
-            - api
+            - 1433:1433
+        environment:
+            ACCEPT_EULA: "Y"
+            SA_PASSWORD: "Pa$$w0rd1234"
 
     api:
         build: ./src
@@ -14,13 +15,4 @@ services:
             - 8080:5001
         container_name: 'chat-web-api'
         depends_on:
-            - ms-sql-server
-
-    ms-sql-server:
-        container_name: 'ms-sql-web-chat'
-        build: ./src/Database
-        ports:
-            - 1433:1433
-        environment:
-            SA_PASSWORD: "Pa$$w0rd1234"
-            ACCEPT_EULA: "Y"
+            - db

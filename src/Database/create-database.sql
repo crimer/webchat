@@ -2,6 +2,7 @@ CREATE DATABASE WebChat;
 GO
 USE WebChat
 
+
 CREATE TABLE ChatTypes (
 	Id INT PRIMARY KEY IDENTITY,
 	[Name] NVARCHAR(50) UNIQUE NOT NULL,
@@ -17,25 +18,16 @@ CREATE TABLE UserRoles (
 	[Name] NVARCHAR(50) UNIQUE NOT NULL,
 )
 
-CREATE TABLE Media (
-	Id INT PRIMARY KEY IDENTITY,
-	[Name] NVARCHAR(255) NOT NULL,
-	[Path] NVARCHAR(255) NOT NULL,
-	MimeType NVARCHAR(50) NULL,
-)
-
 CREATE TABLE [Users] (
 	Id INT PRIMARY KEY IDENTITY,
 	[Login] NVARCHAR(50) UNIQUE NOT NULL,
 	[Password] NVARCHAR(50) NOT NULL,
-	MediaId INT REFERENCES Media(Id) NULL,
 )
 
 CREATE TABLE Chats (
 	Id INT PRIMARY KEY IDENTITY,
 	[Name] NVARCHAR(50) NOT NULL,
 	ChatType INT REFERENCES ChatTypes(Id) NOT NULL,
-	MediaId INT REFERENCES Media(Id) NULL,
 )
 
 CREATE TABLE ChatToUser (
@@ -53,8 +45,6 @@ CREATE TABLE [Messages] (
 	IsPinned BIT DEFAULT 0,
 	UserId INT REFERENCES Users(Id) NOT NULL,
 	ChatId INT REFERENCES Chats(Id) NOT NULL,
-	MediaId INT REFERENCES Media(Id) NULL,
-	ReplyId INT REFERENCES [Messages](Id) NULL,
 )
 
 INSERT INTO UserRoles ([Name]) VALUES
@@ -73,28 +63,25 @@ INSERT INTO MemberStatus([Name]) VALUES
 ('KikedByAdmin');
 
 
-
 GO
 
 CREATE PROC CreateNewChat
 	@name NVARCHAR(50),
 	@chatType INT,
-	@mediaId INT = Null,
 	@createdChatId INT OUTPUT
 AS
 BEGIN
-	INSERT INTO Chats ([Name], ChatType, MediaId) VALUES (@name, @chatType, @mediaId)
+	INSERT INTO Chats ([Name], ChatType) VALUES (@name, @chatType)
 	SELECT @createdChatId = SCOPE_IDENTITY();
 END;
 GO
 
 CREATE PROC CreateNewUser
 	@login NVARCHAR(50),
-	@password NVARCHAR(50),
-	@avatarId INT = NULL
+	@password NVARCHAR(50)
 AS
 BEGIN
-	INSERT INTO Users ([Login], [Password], MediaId) VALUES (@login, @password, @avatarId)
+	INSERT INTO Users ([Login], [Password]) VALUES (@login, @password)
 END;
 GO
 
@@ -113,12 +100,11 @@ CREATE PROC CreateNewMessage
 	@text NVARCHAR(MAX),
 	@userId INT,
 	@chatId INT,
-	@mediaId INT = NULL,
-	@replyId INT = NULL
+	@createdMessageId INT OUTPUT
 AS
 BEGIN
-	INSERT INTO [Messages] (Text, UserId, ChatId, CreatedAt, MediaId, ReplyId) VALUES
-	(@text, @userId, @chatId, GETDATE(), @mediaId, @replyId)
+	INSERT INTO [Messages] (Text, UserId, ChatId, CreatedAt) VALUES	(@text, @userId, @chatId, GETDATE());
+	SELECT @createdMessageId = SCOPE_IDENTITY();
 END;
 GO
 
@@ -136,10 +122,8 @@ CREATE PROC GetUserById
 	@userId INT
 AS
 BEGIN
-	SELECT [Users].Id, Login, Password FROM [Users]
-	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
-	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
-	WHERE [Users].Id = @userId;
+	SELECT Id, Login, Password FROM [Users]
+	WHERE Id = @userId;
 END;
 GO
 
@@ -160,10 +144,33 @@ CREATE PROC GetChatMessages
 	@chatId INT
 AS
 BEGIN
-	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].MediaId, [Messages].ReplyId, [Messages].IsPinned
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].IsPinned
 	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
 	WHERE [Messages].ChatId = @chatId
 	ORDER BY [Messages].CreatedAt;
+END;
+GO
+
+CREATE PROC GetChatMessage
+	@messageId INT
+AS
+BEGIN
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].IsPinned
+	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
+	WHERE [Messages].Id = @messageId
+	ORDER BY [Messages].CreatedAt;
+END;
+GO
+
+
+CREATE PROC TogglePinMessage
+	@messageId INT,
+	@isPin BIT
+AS
+BEGIN
+	UPDATE [Messages]
+	SET IsPinned = @isPin
+	WHERE [Messages].Id = @messageId;
 END;
 GO
 
@@ -196,7 +203,7 @@ CREATE PROC GetPinnedMessagesByChatId
 	@chatId INT
 AS
 BEGIN
-	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].MediaId, [Messages].ReplyId, [Messages].IsPinned
+	SELECT [Messages].Id, [Messages].Text, [Messages].CreatedAt, [Messages].ChatId, [Users].[Login], [Messages].UserId, [Messages].IsPinned
 	FROM [Messages] JOIN [Users] ON [Messages].UserId = [Users].Id
 	WHERE [Messages].ChatId = @chatId AND [Messages].IsPinned = 1
 	ORDER BY [Messages].CreatedAt;
@@ -259,6 +266,17 @@ CREATE PROC ChangeUserRole
 	JOIN ChatToUser ON  ChatToUser.ChatId = [Chats].Id
 	JOIN [Users] ON  ChatToUser.UserId = [Users].Id
 	WHERE [Chats].Id = @chatId AND ChatToUser.MemberStatusId = 1;
+ END;
+ GO
+
+CREATE PROC ChangeUserPassword
+ 	@userId INT,
+	@newPassword NVARCHAR(50)
+ AS
+ BEGIN
+	UPDATE [Users]
+	SET [Password] = @newPassword
+	WHERE Id = @userId;
  END;
  GO
 
