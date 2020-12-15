@@ -16,6 +16,7 @@ import { InviteMemberAutocomplete } from '../Components/InviteMemberAutocomplete
 import chatRepository from '../repository/ChatRepository'
 import {
     ChatDetailDto,
+    ChatType,
     LeaveChatDto,
 } from '../common/Dtos/Chat/ChatDtos'
 import { ToastContext } from '../Contexts/ToastContext'
@@ -70,6 +71,8 @@ export const ChatDetailPage = () => {
         const response = await chatRepository.getDetailChatInfo<ChatDetailDto>(chatId)
         if (response && response.isValid) {
             setDetailInfo(response.data)
+            console.log(response.data);
+            
         } else if (response) {
             openToast({ body: response.errorMessage || 'Неудалось получить информацию о чате', type:'error' })
             history.push('/chat/')
@@ -147,18 +150,21 @@ export const ChatDetailPage = () => {
                                     )}
                                 </div>
                                 <ChatMembers
+                                    chatType={detailInfo.chatType}
                                     currentUserRoleId={currentUserRoleId}
                                     members={detailInfo.members}
                                     refreshDetailinfo={fetchDetailInfo}
                                 />
                             </div>
-                            <div className={classes.gridRow}>
-                                {currentUserRoleId ===
-                                    UserRole.Administrator && (
-                                    <ChangeChatName chatId={chatId} refreshDetailinfo={fetchDetailInfo}/>
-                                )}
-                                <InviteMemberAutocomplete chatId={chatId} refreshDetailinfo={fetchDetailInfo}/>
-                            </div>
+                            {detailInfo.chatType !== ChatType.Direct && (
+                                <div className={classes.gridRow}>
+                                    {currentUserRoleId ===
+                                        UserRole.Administrator && (
+                                        <ChangeChatName chatId={chatId} refreshDetailinfo={fetchDetailInfo}/>
+                                    )}
+                                    <InviteMemberAutocomplete chatId={chatId} refreshDetailinfo={fetchDetailInfo}/>
+                                </div>
+                            )}
                         </section>
                     )}
                 </Paper>

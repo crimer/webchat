@@ -1,6 +1,7 @@
 ﻿using ApplicationCore.Entities;
 using ApplicationCore.Interfaces;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace ApplicationCore.Services
@@ -34,6 +35,22 @@ namespace ApplicationCore.Services
         public Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId)
         {
             return _chatRepository.ChangeUserRoleAsync(chatId, userId, userRoleId);
+        }
+
+        public async Task<int> CreateDirectChatAsync(int userId, int memberId)
+        {
+            IEnumerable<User> allUsers = await _userRepository.GetAllUsers();
+            
+            User user = allUsers.First(u => u.Id == userId);
+            User member = allUsers.First(u => u.Id == memberId);
+            
+            string chatName = $"{user.Login} => {member.Login}";
+            int createdChatId = await _chatRepository.CreateNewChatAsync(chatName, 3);
+            
+            await _chatRepository.SubscribeUserToChatAsync(createdChatId, userId, 1);
+            await _chatRepository.SubscribeUserToChatAsync(createdChatId, memberId, 1);
+
+            return createdChatId;
         }
 
         public async Task<bool> CreateNewChatAsync(string chatName, int chatTypeId, int userCreatorId)

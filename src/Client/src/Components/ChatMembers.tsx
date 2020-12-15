@@ -13,7 +13,7 @@ import {
     TableHead,
     TableRow,
 } from '@material-ui/core'
-import { LeaveChatDto, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
+import { ChatType, LeaveChatDto, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
 import { UserRole } from '../common/Dtos/User/UserDtos'
 import SupervisorAccountIcon from '@material-ui/icons/SupervisorAccount'
 import { ChangeUserRoleModal } from './Modals/ChangeUserRoleModal'
@@ -51,12 +51,14 @@ const useStyles = makeStyles((theme: Theme) =>
 type ChatMembersProps = {
     members: UserChatDto[]
     currentUserRoleId: number | undefined
+    chatType: ChatType
     refreshDetailinfo: (chatId: number) => void
 }
 export const ChatMembers: React.FC<ChatMembersProps> = ({
     members,
     refreshDetailinfo,
     currentUserRoleId,
+    chatType,
 }) => {
     const classes = useStyles()
     const [isOpenModal, setIsOpenModal] = useState(false)
@@ -106,7 +108,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
                         <TableRow>
                             <TableCell align='left'>Имя</TableCell>
                             <TableCell align='left'>Роль</TableCell>
-                            {currentUserRoleId === UserRole.Administrator && (
+                            {currentUserRoleId === UserRole.Administrator && chatType !== ChatType.Direct &&(
                                 <TableCell align='left'>Действие</TableCell>
                             )}
                         </TableRow>
@@ -129,7 +131,7 @@ export const ChatMembers: React.FC<ChatMembersProps> = ({
                                     {UserRole[memberRow.userRoleId]}
                                 </TableCell>
                                 {currentUserRoleId ===
-                                    UserRole.Administrator && (
+                                    UserRole.Administrator && chatType !== ChatType.Direct && (
                                     <TableCell align='left'>
                                         {authUser.id !== memberRow.id && (
                                             <div>

@@ -1,7 +1,6 @@
-CREATE DATABASE WebChat;
+CREATE DATABASE shevchenko_webchatdb;
 GO
-USE WebChat
-
+USE shevchenko_webchatdb
 
 CREATE TABLE ChatTypes (
 	Id INT PRIMARY KEY IDENTITY,
@@ -47,20 +46,21 @@ CREATE TABLE [Messages] (
 	ChatId INT REFERENCES Chats(Id) NOT NULL,
 )
 
-INSERT INTO UserRoles ([Name]) VALUES
+INSERT INTO UserRoles ([Name]) VALUES 
 ('Administrator'),
 ('Manager'),
 ('Member');
 
-INSERT INTO ChatTypes ([Name]) VALUES
+INSERT INTO ChatTypes ([Name]) VALUES 
 ('Group'),
 ('Channel'),
 ('Direct');
 
-INSERT INTO MemberStatus([Name]) VALUES
+INSERT INTO MemberStatus([Name]) VALUES 
 ('InChat'),
 ('LeaveChat'),
 ('KikedByAdmin');
+
 
 
 GO
@@ -75,6 +75,15 @@ BEGIN
 	SELECT @createdChatId = SCOPE_IDENTITY();
 END;
 GO
+
+GO
+CREATE PROC GetAllUsers
+AS
+BEGIN
+	SELECT Id, Login, Password FROM [Users];
+END;
+GO
+
 
 CREATE PROC CreateNewUser
 	@login NVARCHAR(50),
@@ -113,7 +122,7 @@ CREATE PROC GetUserByLoginAndPassword
 	@userPassword NVARCHAR(50)
 AS
 BEGIN
-	SELECT Id, Login, Password FROM [Users]
+	SELECT Id, Login, Password FROM [Users] 
 	WHERE [Login] = @userLogin AND [Password] = @userPassword;
 END;
 GO
@@ -133,7 +142,7 @@ CREATE PROC GetChatMember
 	@chatId INT
 AS
 BEGIN
-	SELECT [Users].Id, [Users].Login, [Users].Password, UserRoles.Id as UserRoleId, ChatToUser.MemberStatusId FROM [Users]
+	SELECT [Users].Id, [Users].Login, [Users].Password, UserRoles.Id as UserRoleId, ChatToUser.MemberStatusId FROM [Users] 
 	JOIN ChatToUser ON ChatToUser.UserId = [Users].Id
 	JOIN UserRoles ON UserRoles.Id = ChatToUser.UserRoleId
 	WHERE [Users].Id = @userId AND ChatToUser.ChatId = @chatId;
@@ -222,7 +231,7 @@ CREATE PROC ChangeChatName
  END;
  GO
 
-
+ 
 CREATE PROC ReturnUserToChat
  	@chatId INT,
 	@userId INT
@@ -257,12 +266,30 @@ CREATE PROC ChangeUserRole
  END;
  GO
 
+ 
+CREATE PROC GetUserDirectChats
+ 	@userId INT
+ AS
+ BEGIN
+	SELECT [Chats].Id, [Chats].Name, [Chats].ChatType, [ChatToUser].UserId
+	FROM [Chats] 
+	JOIN ChatToUser ON [ChatToUser].ChatId = [Chats].Id
+	WHERE [ChatToUser].UserId <> @userId AND [Chats].ChatType = 3 AND
+	[ChatToUser].ChatId IN (
+		SELECT Chats.Id FROM Chats
+		JOIN ChatToUser ON [ChatToUser].ChatId = [Chats].Id
+		WHERE ChatToUser.UserId = @userId AND [Chats].ChatType = 3
+	);
+ END;
+ GO
+
+
  CREATE PROC GetChatMembers
  	@chatId INT
  AS
  BEGIN
 	SELECT [Users].Id, [Users].Login, ChatToUser.UserRoleId
-	FROM [Chats]
+	FROM [Chats] 
 	JOIN ChatToUser ON  ChatToUser.ChatId = [Chats].Id
 	JOIN [Users] ON  ChatToUser.UserId = [Users].Id
 	WHERE [Chats].Id = @chatId AND ChatToUser.MemberStatusId = 1;
@@ -274,7 +301,7 @@ CREATE PROC ChangeUserPassword
 	@newPassword NVARCHAR(50)
  AS
  BEGIN
-	UPDATE [Users]
+	UPDATE [Users] 
 	SET [Password] = @newPassword
 	WHERE Id = @userId;
  END;
@@ -285,7 +312,7 @@ CREATE PROC ChangeUserPassword
  AS
  BEGIN
 	SELECT [Users].Id, [Users].Login, [Users].Password
-	FROM [Users]
+	FROM [Users] 
 	WHERE [Users].Login LIKE @userLogin + '%';
  END;
  GO
@@ -301,3 +328,4 @@ BEGIN
 	WHERE [ChatToUser].ChatId = @chatId AND [ChatToUser].UserId = @userId;
 END;
 GO
+ 

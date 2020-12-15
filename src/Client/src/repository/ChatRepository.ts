@@ -1,5 +1,5 @@
 import { ApiResponse, apiRequest } from '../common/Api/ApiHelper'
-import { ChangeChatNameDto, ChangeUserRoleDto, CreateChatDto, InviteMembersDto, LeaveChatDto, ReturnToChatDto } from '../common/Dtos/Chat/ChatDtos'
+import { ChangeChatNameDto, ChangeUserRoleDto, CreateChatDto, CreateDirectChatDto, InviteMembersDto, LeaveChatDto, ReturnToChatDto } from '../common/Dtos/Chat/ChatDtos'
 
 class ChatRepository {
     public async getMessagesByChatId<T>(chatId: number): Promise<ApiResponse<T>> {
@@ -78,6 +78,14 @@ class ChatRepository {
     public async kikUserFromChat<T>(kikUserFromChatDto: LeaveChatDto): Promise<ApiResponse<T>> {
         const response = await apiRequest<T>('POST', `/chat/kikUserFromChat`, {
             body:{ ...kikUserFromChatDto },
+            headers: { 'Content-Type': 'application/json' },
+        })
+        return response
+    }
+
+    public async createDirectChat<T>(createDirectChatDto: CreateDirectChatDto): Promise<ApiResponse<T>> {
+        const response = await apiRequest<T>('POST', `/chat/createDirectChat`, {
+            body:{ ...createDirectChatDto },
             headers: { 'Content-Type': 'application/json' },
         })
         return response

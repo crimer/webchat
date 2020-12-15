@@ -27,12 +27,6 @@ class SignalRManager {
             this.connection.stop()
         return Promise.resolve()
     }
-
-    public async reconnect(): Promise<void> {
-        await this.stop()
-        await this.start()
-        return Promise.resolve()
-    }
     public sendMessage<T>(messageName: string, reciveMessage: T): Promise<void> {
         return this.connection.send(messageName, reciveMessage)
     }

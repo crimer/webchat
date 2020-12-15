@@ -9,7 +9,6 @@ import { makeStyles } from '@material-ui/core/styles'
 import Container from '@material-ui/core/Container'
 import { Link, useHistory } from 'react-router-dom'
 import { AccountContext } from '../Contexts/AccountContext'
-import SignalRManager from '../SignalR/SignalRManager'
 import { ToastContext } from '../Contexts/ToastContext'
 import { CircularProgress } from '@material-ui/core'
 
@@ -57,7 +56,6 @@ export const LoginPage: React.FC = () => {
         }
         const isLogin = await login(auth.login, auth.password)
         if (isLogin) {
-            await SignalRManager.instance.reconnect()
             openToast({ body:'Вы вошли', type:'success' })
             setAuth({ login: '', password: '' })
             setLoading(false)

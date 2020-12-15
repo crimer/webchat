@@ -48,7 +48,7 @@ namespace MessageChat.Controllers
             {
                 IsPersistent = true,
                 AllowRefresh = true,
-                ExpiresUtc = DateTime.UtcNow.AddMinutes(3)
+                ExpiresUtc = DateTime.UtcNow.AddHours(24)
             });
 
             return new ApiResponse<AuthUserDto>(new AuthUserDto() { Id = user.Id, Login = user.Login }, (int)HttpStatusCode.OK);

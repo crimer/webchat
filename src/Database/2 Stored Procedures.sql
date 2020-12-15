@@ -1,4 +1,4 @@
-USE WebChat
+USE shevchenko_webchatdb
 GO
 
 CREATE PROC CreateNewChat
@@ -11,6 +11,15 @@ BEGIN
 	SELECT @createdChatId = SCOPE_IDENTITY();
 END;
 GO
+
+GO
+CREATE PROC GetAllUsers
+AS
+BEGIN
+	SELECT Id, Login, Password FROM [Users];
+END;
+GO
+
 
 CREATE PROC CreateNewUser
 	@login NVARCHAR(50),
@@ -192,6 +201,24 @@ CREATE PROC ChangeUserRole
 	WHERE [Chats].Id = @chatId;
  END;
  GO
+
+ 
+CREATE PROC GetUserDirectChats
+ 	@userId INT
+ AS
+ BEGIN
+	SELECT [Chats].Id, [Chats].Name, [Chats].ChatType, [ChatToUser].UserId
+	FROM [Chats] 
+	JOIN ChatToUser ON [ChatToUser].ChatId = [Chats].Id
+	WHERE [ChatToUser].UserId <> @userId AND [Chats].ChatType = 3 AND
+	[ChatToUser].ChatId IN (
+		SELECT Chats.Id FROM Chats
+		JOIN ChatToUser ON [ChatToUser].ChatId = [Chats].Id
+		WHERE ChatToUser.UserId = @userId AND [Chats].ChatType = 3
+	);
+ END;
+ GO
+
 
  CREATE PROC GetChatMembers
  	@chatId INT

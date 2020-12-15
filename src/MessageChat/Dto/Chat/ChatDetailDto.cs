@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using ApplicationCore.Entities;
+using System.Collections.Generic;
 
 namespace MessageChat.Dto.Chat
 {
@@ -6,6 +7,7 @@ namespace MessageChat.Dto.Chat
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public ChatType ChatType { get; set; }
         public IEnumerable<UserChatDto> Members { get; set; }
 
     }

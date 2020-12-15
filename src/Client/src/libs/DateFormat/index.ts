@@ -5,6 +5,8 @@ type DateOptions = {
     year?: string
     day?: string
     month?: string
+    timeZone?: string
+    timeZoneName?: string
 }
 enum DateType {
     Time = 'time',
@@ -18,7 +20,7 @@ enum DateType {
  * @param type тип отображения (дата, время или оба), по дефолту только время
  */
 const formatDate = (datetime: number, type: DateType = DateType.Time) => {
-    const options: DateOptions = { hour12: false }
+    const options: DateOptions = { hour12: false, timeZone: 'Asia/Vladivostok' }
 
     if (type.includes('time')) {
         options.hour = 'numeric'

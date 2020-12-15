@@ -93,8 +93,10 @@ export const CreateChatModal: React.FC<CreateChatModalProps> = ({
     const submitChatCreation = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
 
-        if (chatTitle.trim().length === 0 || authUser.id <= 0) return
-
+        if (chatTitle.trim().length === 0 || authUser.id <= 0) {
+            openToast({ body: 'Незвание не должно быть пустым', type:'warning' })
+            return
+        }
         const chatDto: CreateChatDto = {
             chatName: chatTitle,
             chatTypeId: +selectedType as number,
@@ -103,7 +105,7 @@ export const CreateChatModal: React.FC<CreateChatModalProps> = ({
         const response = await chatRepository.createNewChat<undefined>(chatDto)
         if (response && response.isValid) {
             openToast({ body: 'Чат успешно создан', type:'success' })
-            getChatsByUserId(authUser.id)
+            await getChatsByUserId(authUser.id)
         } else if (response) {
             openToast({ body: 'Не удалось создать чат', type:'error' })
         }
@@ -118,11 +120,11 @@ export const CreateChatModal: React.FC<CreateChatModalProps> = ({
             type: ChatType.Group,
             text: 'Группа',
         },
-        {
-            id: 2,
-            type: ChatType.Channel,
-            text: 'Канал',
-        },
+        // {
+        //     id: 2,
+        //     type: ChatType.Channel,
+        //     text: 'Канал',
+        // },
     ]
     return (
         <Dialog open={open} onClose={closeModal}>

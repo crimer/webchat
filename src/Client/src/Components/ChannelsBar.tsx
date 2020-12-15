@@ -13,7 +13,6 @@ import {
 import Drawer from '@material-ui/core/Drawer/Drawer'
 import React, { useContext, useEffect, useState } from 'react'
 import GroupIcon from '@material-ui/icons/Group'
-import ChatIcon from '@material-ui/icons/Chat'
 import RadioIcon from '@material-ui/icons/Radio'
 import { CreateChatModal } from './Modals/CreateChatModal'
 import { ChatType, UserChatDto } from '../common/Dtos/Chat/ChatDtos'
@@ -25,6 +24,8 @@ import AddIcon from '@material-ui/icons/Add'
 import SearchIcon from '@material-ui/icons/Search'
 import MeetingRoomIcon from '@material-ui/icons/MeetingRoom'
 import { ReturnToChatModal } from './Modals/ReturnToChatModal'
+import MailOutlineIcon from '@material-ui/icons/MailOutline'
+import { CreateDirectModal } from './Modals/CreateDirectModal'
 
 const drawerWidth = 320
 
@@ -110,9 +111,11 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
 
     const [isCreareModalOpen, setIsCreareModalOpen] = useState<boolean>(false)
     const [isReturnChatModalOpen, setIsReturnChatModalOpen] = useState<boolean>(false)
+    const [isDirectModalOpen, setIsDirectModalOpen] = useState<boolean>(false)
 
     const createModalClose = () => setIsCreareModalOpen(false)
     const returnModalClose = () => setIsReturnChatModalOpen(false)
+    const directModalClose = () => setIsDirectModalOpen(false)
 
     const openAccountMenu = (event: React.MouseEvent<HTMLButtonElement>) =>
         setAccountMenu(event.currentTarget)
@@ -148,6 +151,10 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                 open={isReturnChatModalOpen}
                 onModalClose={returnModalClose}
             />
+            <CreateDirectModal
+                open={isDirectModalOpen}
+                onModalClose={directModalClose}
+            />
             <Drawer
                 variant='permanent'
                 className={classes.drawer}
@@ -159,6 +166,16 @@ export const ChannelsBar: React.FC<ChannelsBarProps> = () => {
                     <div className={classes.drawerHeaderTop}>
                         <h1 className={classes.appName}>Mega Chat</h1>
                         <div className={classes.options}>
+                            <div>
+                                <IconButton
+                                    aria-label='createChat'
+                                    onClick={() => setIsDirectModalOpen(true)}>
+                                    <MailOutlineIcon
+                                        fontSize='default'
+                                        className={classes.iconColor}
+                                    />
+                                </IconButton>
+                            </div>
                             <div>
                                 <IconButton
                                     aria-label='createChat'
@@ -272,7 +289,7 @@ const ChannelItem: React.FC<{ chatItem: UserChatDto }> = ({ chatItem }) => {
     return (
         <ListItem button>
             {chatItem.chatType === ChatType.Direct && (
-                <ChatIcon className={classes.chatIcon} />
+                <MailOutlineIcon className={classes.chatIcon} />
             )}
             {chatItem.chatType === ChatType.Channel && (
                 <RadioIcon className={classes.chatIcon} />

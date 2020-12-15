@@ -10,5 +10,6 @@ namespace ApplicationCore.Interfaces
         Task ChangeChatNameAsync(int chatId, string newChatName);
         Task ChangeUserRoleAsync(int chatId, int userId, int userRoleId);
         Task<bool> BackToChatAsync(int chatId, int userId);
+        Task<int> CreateDirectChatAsync(int userId, int memberId);
     }
 }

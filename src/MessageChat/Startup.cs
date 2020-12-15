@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.Authentication;
 
 namespace MessageChat
 {
@@ -50,11 +51,6 @@ namespace MessageChat
                 .AddCookie(options =>
                 {
                     options.Cookie.SameSite = SameSiteMode.None;
-                    //options.Events.OnRedirectToLogin = (context) =>
-                    //{
-                    //    context.Response.StatusCode = 401;
-                    //    return Task.CompletedTask;
-                    //};
                 });
         }
 
@@ -82,7 +78,8 @@ namespace MessageChat
             
             app.UseCors(builder =>
             {
-                builder.AllowAnyHeader()
+                builder
+                    .AllowAnyHeader()
                     .AllowCredentials()
                     .AllowAnyMethod()
                     .WithOrigins("http://localhost:3000")

@@ -31,6 +31,7 @@ export type ReturnToChatDto = {
 
 export type ChatDetailDto = {
     id: number
+    chatType: ChatType
     name: string
     members: UserChatDto[]
 }
@@ -54,5 +55,14 @@ export type ChangeUserRoleDto = {
 
 export type LeaveChatDto = {
     userId: number
+    chatId: number
+}
+
+export type CreateDirectChatDto = {
+    userId: number
+    memberId: number
+}
+
+export type DirectChatDto = {
     chatId: number
 }

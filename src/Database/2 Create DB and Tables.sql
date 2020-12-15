@@ -1,6 +1,6 @@
-CREATE DATABASE WebChat;
+CREATE DATABASE shevchenko_webchatdb;
 GO
-USE WebChat
+USE shevchenko_webchatdb
 
 CREATE TABLE ChatTypes (
 	Id INT PRIMARY KEY IDENTITY,

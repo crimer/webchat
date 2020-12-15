@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using static ApplicationCore.Entities.MemberStatuses;
+using static ApplicationCore.Entities.UserRoles;
 
 namespace MessageChat.Controllers
 {
@@ -86,6 +88,7 @@ namespace MessageChat.Controllers
             {
                 Id = chatDetail.Id,
                 Name = chatDetail.Name,
+                ChatType = chatDetail.ChatType,
                 Members = chatMembers
             };
             return new ApiResponse<ChatDetailDto>(detailDto, (int)HttpStatusCode.OK);
@@ -102,6 +105,25 @@ namespace MessageChat.Controllers
                 return new ApiResponse((int)HttpStatusCode.OK);
             else
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "Не удалось создать чат");
+        }
+
+        [HttpPost("createDirectChat")]
+        public async Task<ApiResponse> CreateDirectChat([FromBody] CreateDirectChatDto createDirectChatDto)
+        {
+            if (createDirectChatDto == null || createDirectChatDto.MemberId <= 0 || createDirectChatDto.UserId <= 0)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно создать чат");
+            
+            if (createDirectChatDto.MemberId == createDirectChatDto.UserId)
+                return new ApiResponse((int)HttpStatusCode.BadRequest, "Невозможно создать чат самим собой");
+
+            IEnumerable<DirectChat> userDirectChats = await _chatRepository.GetUserDirectChats(createDirectChatDto.UserId);
+            bool hasDirect = userDirectChats.Select(chat => chat.WithUserId).Contains(createDirectChatDto.MemberId);
+            
+            if(hasDirect) return new ApiResponse((int)HttpStatusCode.BadRequest, "Чат с этим пользователем уже есть");
+            
+            int createdDirectId = await _chatService.CreateDirectChatAsync(createDirectChatDto.UserId, createDirectChatDto.MemberId);
+
+            return new ApiResponse<object>(new { ChatId = createdDirectId }, (int)HttpStatusCode.OK);
         }
 
         [HttpPost("inviteMembersToChat")]
@@ -135,7 +157,7 @@ namespace MessageChat.Controllers
 
             ChatMember user = await _userRepository.GetChatMemberAsync(changeChatNameDto.ChatId, changeChatNameDto.UserId);
 
-            if(user.UserRoleId == 1 && user.MemberStatusId == 1)
+            if((UserRole)user.UserRoleId == UserRole.Administrator && (MemberStatus)user.MemberStatusId == MemberStatus.InChat)
                 await _chatService.ChangeChatNameAsync(changeChatNameDto.ChatId, changeChatNameDto.NewName);
             else 
                 return new ApiResponse((int)HttpStatusCode.BadRequest, "У вас нет прав изменить название чата");

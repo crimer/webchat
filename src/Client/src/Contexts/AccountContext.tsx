@@ -1,11 +1,10 @@
-import React, { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext } from 'react'
 import accountRepository from '../repository/AccountRepository'
 import { ConnectionContext } from './ConnectionContext'
 import Cookies from 'js-cookie'
 import { useHistory } from 'react-router-dom'
 import { ToastContext } from './ToastContext'
-import { AuthUserDto, UserProfileDto, UserRole } from '../common/Dtos/User/UserDtos'
-import usersRepository from '../repository/UsersRepository'
+import { AuthUserDto } from '../common/Dtos/User/UserDtos'
 
 const initUserValue: AuthUserDto = {
     id: -1,
@@ -17,21 +16,21 @@ interface IAccountContext {
     login: (name: string, password: string) => Promise<boolean>
     register: (login: string, password: string) => Promise<boolean>
     logout: () => Promise<void>
-    autoStartConnection: () => Promise<void>
+    autoLogin: () => Promise<void>
 }
 
 export const AccountContext = React.createContext<IAccountContext>({
     authUser: initUserValue,
-    login: (name: string, password: string) => {
+    login: () => {
         throw Error('Не проинициализирован контекст авторизации')
     },
     logout: () => {
         throw Error('Не проинициализирован контекст авторизации')
     },
-    register: (login: string, password: string) => {
+    register: () => {
         throw Error('Не проинициализирован контекст авторизации')
     },
-    autoStartConnection: () => {
+    autoLogin: () => {
         throw Error('Не проинициализирован контекст авторизации')
     },
 })
@@ -42,7 +41,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const { startConnection, stopConnection } = useContext(ConnectionContext)
     const history = useHistory()
 
-    const autoStartConnection = async () => {
+    const autoLogin = async () => {
         const cookieUserDataJson = Cookies.get('userData')
 
         if (cookieUserDataJson !== undefined) {
@@ -59,10 +58,10 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     const login = async (login: string, password: string) => {
         const response = await accountRepository
             .login<AuthUserDto>(login, password)
-            .catch(() =>
+            .catch((e) =>
                 openToast({
                     body:
-                        'Извините, не удалось подключиться к серверу, повторите попытку позже',
+                        `Извините, не удалось подключиться к серверу, повторите попытку позже. ${e}`,
                         type:'error'
                 })
             )
@@ -95,6 +94,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
             )
 
         if (response && response.responseCode === 200) {
+            await startConnection()
             return true
         } else {
             openToast({ body: `При авторизации произошла ошибка.`, type:'error' })
@@ -127,7 +127,7 @@ export const AccountContextProvider: React.FC = ({ children }) => {
     }
 
     return (
-        <AccountContext.Provider value={{ authUser, login, logout, register, autoStartConnection }}>
+        <AccountContext.Provider value={{ authUser, login, logout, register, autoLogin }}>
             {children}
         </AccountContext.Provider>
     )

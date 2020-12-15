@@ -11,7 +11,6 @@ import Container from '@material-ui/core/Container'
 import { AccountContext } from '../Contexts/AccountContext'
 import { ToastContext } from '../Contexts/ToastContext'
 import { CircularProgress } from '@material-ui/core'
-import SignalRManager from '../SignalR/SignalRManager'
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -73,7 +72,6 @@ export const RegisterPage = () => {
     const autoLogin = async (userLogin: string, userPassword: string): Promise<boolean> => {
         const isLogin = await login(userLogin, userPassword)
         if (isLogin) {
-            await SignalRManager.instance.reconnect()
             openToast({ body:'Вы вошли', type:'success' })
             history.push('/chat/')
         }

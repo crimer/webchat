@@ -6,6 +6,7 @@ import {
 } from '../common/Dtos/Chat/MessageDtos'
 import chatRepository from '../repository/ChatRepository'
 import messageRepository from '../repository/MessageRepository'
+import { NewMessage } from '../SignalR/MessageTypes'
 import SignalRManager from '../SignalR/SignalRManager'
 import { AccountContext } from './AccountContext'
 import { ToastContext } from './ToastContext'
@@ -129,7 +130,7 @@ export const ChatContextProvider: React.FC = ({ children }) => {
             chatId,
         }
         return SignalRManager.instance
-            .sendMessage<SendMessageDto>('NewMessage', sendMessageDto)
+            .sendMessage<SendMessageDto>(NewMessage, sendMessageDto)
             .catch(() => {
                 openToast({body:'Не удалось отправить сообщение, потеряно соединение с сервером', type:'error'})
             })

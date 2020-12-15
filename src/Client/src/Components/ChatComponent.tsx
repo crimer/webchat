@@ -186,7 +186,6 @@ const ChatMessageListComponent: React.FC = () => {
         })
     }
 
-    // const messages = getMessages(isPinned)
     useEffect(() => {
         scrollToBottom()
     }, [messages])

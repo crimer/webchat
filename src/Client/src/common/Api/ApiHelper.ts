@@ -25,11 +25,11 @@ export function apiRequest<T>(method: Method, url: string, options: Options = {}
 
     const uri: string = `${options.baseUri || baseUri}${url}`
     const { body, ...restOptions } = options
-
+    
     const headers: Headers = new Headers({
+        ...options.headers,
         ...createContentType(options),
         ...createAuthorization(),
-        ...options.headers,
     })
 
     const config = new Request(uri, {
@@ -51,8 +51,9 @@ export function apiRequest<T>(method: Method, url: string, options: Options = {}
 
 const createBody = (options: Options, headers: Headers): FormData | string | null => {
     const contentType = headers.get('Content-Type')
-    if (options.body && contentType && contentType.includes('application/json')) {
-        const json =  JSON.stringify(options.body)
+    
+    if (options.body && contentType && contentType === 'application/json') {
+        const json = JSON.stringify(options.body)
         return json
     }
     if (options.body instanceof FormData) {
@@ -74,7 +75,7 @@ const createContentType = (options: Options): object => {
     if (options && options.body && options.body instanceof FormData) {
         headerType = 'multipart/form-data'
     }
-
+    
     if (options && typeof options.body === 'object') {
         headerType = 'application/json'
     } else {

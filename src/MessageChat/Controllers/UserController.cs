@@ -1,7 +1,6 @@
 ﻿using ApplicationCore.Entities;
 using ApplicationCore.Helpers;
 using ApplicationCore.Interfaces;
-using ApplicationCore.Services;
 using MessageChat.ApiHelpers;
 using MessageChat.Dto.Chat;
 using MessageChat.Dto.User;

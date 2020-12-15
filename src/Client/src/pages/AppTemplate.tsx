@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import { Switch, Route, useHistory } from 'react-router-dom'
+import { Switch, Route } from 'react-router-dom'
 import { LoginPage } from './LoginPage'
 import { RegisterPage } from './RegisterPage'
 import { ChatPage } from './ChatPage'
@@ -7,9 +7,9 @@ import { UserFrofilePage } from './UserProfilePage'
 import { AccountContext } from '../Contexts/AccountContext'
 
 const AppTemplate = () => {
-    const { autoStartConnection } = useContext(AccountContext)
+    const { autoLogin } = useContext(AccountContext)
     useEffect(() => {
-        autoStartConnection()
+        autoLogin()
     }, [])
     return (
         <Switch>

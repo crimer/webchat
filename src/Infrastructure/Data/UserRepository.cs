@@ -40,6 +40,23 @@ namespace Infrastructure.Data
             return addedRows > 0;
         }
 
+        public async Task<IEnumerable<User>> GetAllUsers()
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>();
+            var dataReader = await _dataAccess.GetProcedureDataAsync<User>("GetAllUsers", parameters,
+                reader => new User()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Login = AdoDataAccess.GetValue<string>(reader, "Login"),
+                    Password = AdoDataAccess.GetValue<string>(reader, "Password"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<User>();
+            else
+                return dataReader;
+        }
+
         public async Task<ChatMember> GetChatMemberAsync(int chatId, int userId)
         {
             List<SqlParameter> parameters = new List<SqlParameter>()

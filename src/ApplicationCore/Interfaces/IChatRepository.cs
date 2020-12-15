@@ -18,5 +18,6 @@ namespace ApplicationCore.Interfaces
         Task<bool> ChangeUserRoleAsync(int chatId, int userId, int userRoleId);
         Task<bool> ChangeMemberStatusInChatAsync(int chatId, int userId, int memberStatus);
         Task<bool> ReturnUserToChatAsync(int chatId, int userId);
+        Task<IEnumerable<DirectChat>> GetUserDirectChats(int userId);
     }
 }

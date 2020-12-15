@@ -221,5 +221,26 @@ namespace Infrastructure.Data
 
             return dataReader > 0;
         }
+
+        public async Task<IEnumerable<DirectChat>> GetUserDirectChats(int userId)
+        {
+            List<SqlParameter> parameters = new List<SqlParameter>()
+            {
+                new SqlParameter("@userId", userId),
+            };
+            var dataReader = await _dataAccess.GetProcedureDataAsync<DirectChat>("GetUserDirectChats", parameters,
+                reader => new DirectChat()
+                {
+                    Id = AdoDataAccess.GetValue<int>(reader, "Id"),
+                    Name = AdoDataAccess.GetValue<string>(reader, "Name"),
+                    ChatType = (ChatType)AdoDataAccess.GetValue<int>(reader, "ChatType"),
+                    WithUserId = AdoDataAccess.GetValue<int>(reader, "UserId"),
+                });
+
+            if (dataReader == null || dataReader.Count() == 0)
+                return Enumerable.Empty<DirectChat>();
+            else
+                return dataReader;
+        }
     }
 }
